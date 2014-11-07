@@ -1,0 +1,26 @@
+﻿body {
+    height: 100%;
+    width: 100%;
+    margin: auto;
+}
+.container {
+    position: absolute;
+    background-image: linear-gradient(0deg, #888888, #EEEEEE);
+    height: 80%;
+    padding: 1%;
+	top: .2em;
+    bottom: calc(2% + 3.4em);
+	width: 92%;
+	margin-left: 3%;
+    margin-right: 3%;
+	margin-top: 5px;
+	margin-bottom: 0px;
+	border-radius: 8px;
+}
+
+div > img {
+    width: auto;
+    height : auto;
+    max-height: 100%;
+    max-width: 100%;
+}
