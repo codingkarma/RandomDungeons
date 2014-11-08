@@ -13,10 +13,38 @@ function startMapEditor() {
             scene = MapEditor(engine);
 
             scene.activeCamera.attachControl(canvas);
-
+			
+			var animationIter = -.0075;
+			var loopCounter = 0;
             // Once the scene is loaded, just register a render loop to render it
             engine.runRenderLoop(function () {
-                
+				// rotate to give some animation
+				if (scene.Sword != 0) {
+					scene.Sword.rotation.y=scene.Sword.rotation.y+1.25*animationIter;
+					scene.Sword.rotation.x=scene.Sword.rotation.x+.8*animationIter;
+					scene.Sword.rotation.z=scene.Sword.rotation.z+animationIter;
+					
+					if (loopCounter > 50) {
+						loopCounter=0;
+						animationIter=animationIter*-1;
+					}
+					else {loopCounter++;}
+				}
+				var walkInc=.5;
+				if (isWKey >0) {
+					scene.Sword.position.x-=walkInc;
+				}
+				if (isSKey >0) {
+					scene.Sword.position.x+=walkInc;
+				}
+				if (isAKey >0) {
+					scene.Sword.position.z-=walkInc;
+				}
+				if (isDKey >0) {
+					scene.Sword.position.z+=walkInc;
+				}
+				
+				
                 //Render scene and any changes
                 scene.render();
             });
