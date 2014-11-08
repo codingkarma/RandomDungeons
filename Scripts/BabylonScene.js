@@ -61,7 +61,7 @@ function MapEditor(engine) {
 
 		// example of loading a mesh from blender export
 		scene.Sword=0;
-    BABYLON.SceneLoader.ImportMesh("", "Models3D/", "Sword.babylon", scene, function (meshes) {
+    BABYLON.SceneLoader.ImportMesh("", "Models3D/", "Sword.js", scene, function (meshes) {
         var m = meshes[0];
         m.isVisible = true;
         m.position = new BABYLON.Vector3(2, 3, 0);
