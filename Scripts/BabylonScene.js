@@ -36,7 +36,7 @@ function MapEditor(engine) {
 	
 	scene.tile = [];
 	//bottom tile for "sealing"
-	drawTile(scene,new BABYLON.Vector3(0, -.1, 0),new BABYLON.Vector3(floorHeight, 0.2, floorWidth),scene.tileMaterialSeal);
+	drawTile(scene,new BABYLON.Vector3(0, -.1, 0),new BABYLON.Vector3(floorHeight, 0.2, floorWidth),scene.tileMaterialSeal, "floor");
 	var tileWidth=10;
 	var MapHeight = floorHeight/tileWidth;
     var MapLength = floorWidth/tileWidth;
@@ -47,17 +47,17 @@ function MapEditor(engine) {
             tileZ = 0;
             tileX += tileWidth;
         }
-		scene.tile[i] = drawTile(scene,new BABYLON.Vector3(tileX, 0, tileZ * tileWidth + zOffset),0,scene.tileMaterialFloor);
+		scene.tile[i] = drawTile(scene,new BABYLON.Vector3(tileX, 0, tileZ * tileWidth + zOffset),0,scene.tileMaterialFloor, "floor");
         scene.tile[i].tileId = i;
         tileZ++;
     }
 	
 	//create walls
 	//North Wall
-	var northWall = drawWall(scene,new BABYLON.Vector3(-1*(floorHeight/2-2.5), 5, 0),new BABYLON.Vector3(5, wallHeight, floorWidth),scene.tileMaterialWall);
-	var southWall = drawWall(scene,new BABYLON.Vector3(floorHeight/2-2.5, 5, 0),new BABYLON.Vector3(5, wallHeight, floorWidth),scene.tileMaterialWall);
-	var eastWall = drawWall(scene,new BABYLON.Vector3(0, 5, floorWidth/2-2.5),new BABYLON.Vector3(floorHeight, wallHeight, 5),scene.tileMaterialWall);
-	var westWall = drawWall(scene,new BABYLON.Vector3(0, 5, -1*(floorWidth/2-2.5)),new BABYLON.Vector3(floorHeight, wallHeight, 5),scene.tileMaterialWall);
+	var northWall = drawTile(scene,new BABYLON.Vector3(-1*(floorHeight/2-2.5), 5, 0),new BABYLON.Vector3(5, wallHeight, floorWidth),scene.tileMaterialWall, "wall");
+	var southWall = drawTile(scene,new BABYLON.Vector3(floorHeight/2-2.5, 5, 0),new BABYLON.Vector3(5, wallHeight, floorWidth),scene.tileMaterialWall, "wall");
+	var eastWall = drawTile(scene,new BABYLON.Vector3(0, 5, floorWidth/2-2.5),new BABYLON.Vector3(floorHeight, wallHeight, 5),scene.tileMaterialWall, "wall");
+	var westWall = drawTile(scene,new BABYLON.Vector3(0, 5, -1*(floorWidth/2-2.5)),new BABYLON.Vector3(floorHeight, wallHeight, 5),scene.tileMaterialWall, "wall");
 
 		// example of loading a mesh from blender export
 		scene.Sword=0;
@@ -109,29 +109,14 @@ this.getScale = function () {
     return this.viewportScale;
 };
 
-function drawTile(Scene,tilePosition,tileScale,tileMaterial) {
+function drawTile(Scene,tilePosition,tileScale,tileMaterial, tyleType) {
 	//if tileScale is 0 or undefined, use default
 	if (tileScale == undefined || tileScale == 0) {
 		//x, z is planer, y is height
 		var tileScale = new BABYLON.Vector3(9.8, 0.2, 9.8);
 	}
 	
-	var newMesh = new BABYLON.Mesh.CreateBox("floor", 1.0, Scene);
-	newMesh.scaling=tileScale;
-	newMesh.position=tilePosition;
-	newMesh.material = tileMaterial;
-	
-	return newMesh;
-};
-
-function drawWall(Scene,tilePosition,tileScale,tileMaterial) {
-	//if tileScale is 0 or undefined, use default
-	if (tileScale == undefined || tileScale == 0) {
-		//x, z is planer, y is height
-		var tileScale = new BABYLON.Vector3(9.8, 0.2, 9.8);
-	}
-	
-	var newMesh = new BABYLON.Mesh.CreateBox("wall", 1.0, Scene);
+	var newMesh = new BABYLON.Mesh.CreateBox(tyleType, 1.0, Scene);
 	newMesh.scaling=tileScale;
 	newMesh.position=tilePosition;
 	newMesh.material = tileMaterial;
