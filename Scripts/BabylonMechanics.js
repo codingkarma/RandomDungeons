@@ -44,7 +44,7 @@ function startMapEditor() {
 					scene.Sword.position.z+=walkInc;
 				}
 				
-				
+				$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
                 //Render scene and any changes
                 scene.render();
             });
