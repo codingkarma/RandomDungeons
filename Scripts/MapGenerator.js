@@ -30,26 +30,18 @@ function getRandomInt(min, max) {
 }
 function GenerateRoom(options)
 {
+	var settings = $.extend({
+			type: getRandomInt(1,3),
+			width: 13,
+			height: 15
+		},options||{});
+
+
 	var room = {};
-	//check to see if options exist and set defaults if not
-	if (options) {
-		if(options.type != undefined)
-		{
-			room.type = options.type;
-		}
-		else {
-			room.type = getRandomInt(1,3);		
-		}
-		if(options.height != undefined || options.width != undefined)
-		{
-			room.width=options.width;
-			room.height=options.height;
-		}
-		else {
-			room.width=13;
-			room.height=15;
-		}
-	}
+	room.type = settings.type;
+	room.width = settings.width;
+	room.height = settings.height;
+
 	room.tiles = [];
 
 	for(var i = 0; i < room.width * room.height; i++)
