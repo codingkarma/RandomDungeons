@@ -32,7 +32,7 @@ function GenerateRoom(options)
 	}
 	room.tiles = [];
 
-	for(i = 0; i < RoomWidth * RoomHeight; i++)
+	for(var i = 0; i < RoomWidth * RoomHeight; i++)
 	{
 		room.tiles[i] = {};
 		room.tiles[i].type = getRandomInt(0,4);
@@ -74,7 +74,7 @@ function GenerateMap()
     var map = {};
     map.rooms = [];
 
-    for(i = 0; i <= MapHeight * MapWidth; i++)
+    for(var i = 0; i <= MapHeight * MapWidth; i++)
     {
     	var room = {};
     	room.col = i % MapWidth;
