@@ -12,11 +12,11 @@ var TileType ={
     Door: 4
 };
 var bjsTileType =[
-	{name: "Wall",diffuseColor: new BABYLON.Color3(0.1, 0.1, 0.1), scale: new BABYLON.Vector3(10, 30, 10)},
-	{name: "Floor",diffuseColor: new BABYLON.Color3(0.5, 0.5, 0.5), scale: new BABYLON.Vector3(10, 0.2, 10)},
-	{name: "Pillar",diffuseColor: new BABYLON.Color3(.1, 0.5, 0.1), scale: new BABYLON.Vector3(10, 30, 10)},
-	{name: "Fire",diffuseColor: new BABYLON.Color3(.5, 0.1, 0.1), scale: new BABYLON.Vector3(10, 0.2, 10)},
-	{name: "Door",diffuseColor: new BABYLON.Color3(.7, 0.7, 0.7), scale: new BABYLON.Vector3(10, 0.2, 10)}
+	{name: "Wall",diffuseTexture: '/Models3D/Wall_Texture.png', bumpTexture: '/Models3D/Wall_BumpTexture.png', diffuseColor: new BABYLON.Color3(0.8, 0.8, 0.8), scale: new BABYLON.Vector3(10, 30, 10)},
+	{name: "Floor",diffuseTexture: '/Models3D/Floor_Tile-2.png', bumpTexture: '/Models3D/Floor_Tile-bump.png', diffuseColor: new BABYLON.Color3(0.5, 0.5, 0.5), scale: new BABYLON.Vector3(10, 0.2, 10)},
+	{name: "Pillar",diffuseTexture: 0, bumpTexture: 0, diffuseColor: new BABYLON.Color3(.1, 0.5, 0.1), scale: new BABYLON.Vector3(10, 30, 10)},
+	{name: "Fire",diffuseTexture: 0, bumpTexture: 0, diffuseColor: new BABYLON.Color3(.5, 0.1, 0.1), scale: new BABYLON.Vector3(10, 0.2, 10)},
+	{name: "Door",diffuseTexture: 0, bumpTexture: 0, diffuseColor: new BABYLON.Color3(.7, 0.7, 0.7), scale: new BABYLON.Vector3(10, 0.2, 10)}
 ];
 
 //height and width seem to be backwards? from col and row
