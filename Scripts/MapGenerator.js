@@ -4,7 +4,14 @@ var RoomType = {
     Boss: 2,
     Empty: 3
 };
-var TileType =[
+var TileType ={
+    Wall: 0,
+    Floor: 1,
+    Pillar: 2,
+	Fire: 3,
+    Door: 4
+};
+var bjsTileType =[
 	{name: "Wall",diffuseColor: new BABYLON.Color3(0.1, 0.1, 0.1), scale: new BABYLON.Vector3(10, 30, 10)},
 	{name: "Floor",diffuseColor: new BABYLON.Color3(0.5, 0.5, 0.5), scale: new BABYLON.Vector3(10, 0.2, 10)},
 	{name: "Pillar",diffuseColor: new BABYLON.Color3(.1, 0.5, 0.1), scale: new BABYLON.Vector3(10, 30, 10)},
@@ -18,12 +25,8 @@ var RoomWidth = 13;
 var TileWidth = 10;
 
 function getRandomInt(min, max) {
-	if (max-min == 0) {
-		return Math.round(Math.random()) + min;
-	}
-	else {
-		return Math.round(Math.random() * (max - min)) + min;
-	}
+	max++; //makes max inclusive
+	return Math.floor(Math.random() * (max - min)) + min;
 }
 function GenerateRoom(options)
 {
@@ -56,11 +59,11 @@ function GenerateRoom(options)
 		room.tiles[i].row = Math.floor(i/room.width)
 		//ensure outer perimeter are walls
 		if (room.tiles[i].col == 0 || room.tiles[i].row == 0 || room.tiles[i].col == room.width-1 || room.tiles[i].row == room.height-1) {
-			room.tiles[i].type=0;
+			room.tiles[i].type=TileType.Wall;
 		}
 		//make perimeter just inside walls all floors (this can change)
 		else if (room.tiles[i].col == 1 || room.tiles[i].row == 1 || room.tiles[i].col == room.width-2 || room.tiles[i].row == room.height-2) {
-			room.tiles[i].type=1;
+			room.tiles[i].type=TileType.Floor;
 		}
 		else {
 			room.tiles[i].type = getRandomInt(1,3);
@@ -79,7 +82,7 @@ function GenerateBranch(map, startCol, startRow)
 	else
 	{
 		map.rooms[startRow * map.width + startCol] = GenerateRoom();
-		var decision = getRandomInt(0,4);
+		var decision = getRandomInt(0,3);
 
 		switch(decision) 
 		{

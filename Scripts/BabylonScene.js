@@ -113,11 +113,11 @@ this.getScale = function () {
 
 function drawTile(Scene, tile, index) {
 
-    var newMesh = new BABYLON.Mesh.CreateBox(TileType[tile.type].name + '-' + parseInt(index), 1.0, Scene);
-    newMesh.scaling = TileType[tile.type].scale;
+    var newMesh = new BABYLON.Mesh.CreateBox(bjsTileType[tile.type].name + '-' + parseInt(index), 1.0, Scene);
+    newMesh.scaling = bjsTileType[tile.type].scale;
     newMesh.position = new BABYLON.Vector3(tile.col*tile.width, 0, tile.row*tile.width);
-    newMesh.material= new BABYLON.StandardMaterial("texture-" + TileType[tile.type].name, Scene);
-	newMesh.material.diffuseColor = TileType[tile.type].diffuseColor;
+    newMesh.material= new BABYLON.StandardMaterial("texture-" + bjsTileType[tile.type].name, Scene);
+	newMesh.material.diffuseColor = bjsTileType[tile.type].diffuseColor;
 
     return newMesh;
 };
