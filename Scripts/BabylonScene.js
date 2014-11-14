@@ -9,6 +9,10 @@ function MapEditor(engine) {
     var ambient = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 100, 0), scene);
 	ambient.diffuse = new BABYLON.Color3(.98, .95, .9);
 	ambient.specular = new BABYLON.Color3(0, 0, 0);
+	
+    var ambient1 = new BABYLON.PointLight("Omni", new BABYLON.Vector3(150, 50, 150), scene);
+	ambient1.diffuse = new BABYLON.Color3(.68, .65, .6);
+	ambient1.specular = new BABYLON.Color3(0, 0, 0);
 
     //Adding an Arc Rotate Camera
     //var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
@@ -118,6 +122,12 @@ function drawTile(Scene, tile, index) {
     newMesh.position = new BABYLON.Vector3(tile.col*tile.width, 0, tile.row*tile.width);
     newMesh.material= new BABYLON.StandardMaterial("texture-" + bjsTileType[tile.type].name, Scene);
 	newMesh.material.diffuseColor = bjsTileType[tile.type].diffuseColor;
+	if (bjsTileType[tile.type].diffuseTexture) {
+		newMesh.material.diffuseTexture = new BABYLON.Texture(bjsTileType[tile.type].diffuseTexture, Scene);
+	}
+	if (bjsTileType[tile.type].bumpTexture) {
+		newMesh.material.bumpTexture = new BABYLON.Texture(bjsTileType[tile.type].bumpTexture, Scene);
+	}
 
     return newMesh;
 };
