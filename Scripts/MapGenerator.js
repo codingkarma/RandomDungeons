@@ -1,7 +1,8 @@
 var RoomType = {
     Normal: 0,
-    Enterance: 1,
-    Boss: 2
+    Entrance: 1,
+    Boss: 2,
+    Empty: 3
 };
 var TileType = {
     Floor: 0,
@@ -31,7 +32,7 @@ function GenerateRoom(options)
 	}
 	room.tiles = [];
 
-	for(i = 0; i < 100; i++)
+	for(i = 0; i < RoomWidth * RoomHeight; i++)
 	{
 		room.tiles[i] = {};
 		room.tiles[i].type = getRandomInt(0,4);
@@ -45,7 +46,15 @@ function GenerateMap()
     var map = {};
     map.rooms = [];
 
-    var options = {type: 1};
+    for(i = 0; i <= MapHeight * MapWidth; i++)
+    {
+    	var room = {};
+    	room.col = i % MapWidth;
+    	room.row = Math.floor(i/MapWidth);
+    	room.type = RoomType.Empty;
+    }
+
+    var options = {type: RoomType.Entrance};
     map.rooms.push(GenerateRoom(options));
     map.rooms[0].col = MapWidth / 2;
     map.rooms[0].row = MapHeight;
