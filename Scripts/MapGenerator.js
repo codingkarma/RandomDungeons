@@ -54,10 +54,12 @@ function GenerateMap()
     	room.type = RoomType.Empty;
     }
 
+    entranceCol = MapWidth/2;
+    entranceRow = MapHeight;
     var options = {type: RoomType.Entrance};
-    map.rooms.push(GenerateRoom(options));
-    map.rooms[0].col = MapWidth / 2;
-    map.rooms[0].row = MapHeight;
+    map.rooms[row * MapWidth + col] = GenerateRoom(options);
+
+    //GenerateBranch(map, branchStartCol, branchStartRow);
 
     return map;
 }
