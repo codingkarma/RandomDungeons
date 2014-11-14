@@ -41,6 +41,17 @@ function GenerateRoom(options)
 	}
 	return room;
 }
+function GenerateBranch(map, startCol, startRow)
+{
+	if(map.rooms[startRow * MapWidth + startCol].type != RoomType.Empty)
+	{
+		return;
+	}
+	else
+	{
+		
+	}
+}
 function GenerateMap()
 {
     var map = {};
@@ -52,14 +63,16 @@ function GenerateMap()
     	room.col = i % MapWidth;
     	room.row = Math.floor(i/MapWidth);
     	room.type = RoomType.Empty;
+
+    	map.rooms[row * MapWidth + col] = room;
     }
 
     entranceCol = MapWidth/2;
     entranceRow = MapHeight;
     var options = {type: RoomType.Entrance};
-    map.rooms[row * MapWidth + col] = GenerateRoom(options);
+    map.rooms[entranceRow * MapWidth + entranceCol] = GenerateRoom(options);
 
-    //GenerateBranch(map, branchStartCol, branchStartRow);
+    //GenerateBranch(map, entranceCol, entranceRow - 1);
 
     return map;
 }
