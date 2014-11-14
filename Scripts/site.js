@@ -4,9 +4,10 @@ var isAKey = 0;
 var isSKey = 0;
 var isDKey = 0;
 
+var map;
+
 $(document).ready(function () {
 
-    
     $(document).keydown(function (e) {
         if (e.keyCode == 87) {
             isWKey=1;
@@ -35,6 +36,7 @@ $(document).ready(function () {
             isDKey=0;
         }
     });
-
+	
+	map = GenerateMap(3,3);
 	startMapEditor();
 });

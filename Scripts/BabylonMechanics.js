@@ -29,22 +29,24 @@ function startMapEditor() {
 						animationIter=animationIter*-1;
 					}
 					else {loopCounter++;}
-				}
-				var walkInc=.5;
-				if (isWKey >0) {
-					scene.Sword.position.x-=walkInc;
-				}
-				if (isSKey >0) {
-					scene.Sword.position.x+=walkInc;
-				}
-				if (isAKey >0) {
-					scene.Sword.position.z-=walkInc;
-				}
-				if (isDKey >0) {
-					scene.Sword.position.z+=walkInc;
+					if (loopCounter % 10 == 0) {
+						$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
+					}
+					var walkInc=.5;
+					if (isWKey >0) {
+						scene.Sword.position.x-=walkInc;
+					}
+					if (isSKey >0) {
+						scene.Sword.position.x+=walkInc;
+					}
+					if (isAKey >0) {
+						scene.Sword.position.z-=walkInc;
+					}
+					if (isDKey >0) {
+						scene.Sword.position.z+=walkInc;
+					}
 				}
 				
-				$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
                 //Render scene and any changes
                 scene.render();
             });

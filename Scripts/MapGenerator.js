@@ -1,55 +1,84 @@
 var RoomType = {
-    Normal: 0,
-    Entrance: 1,
+    Entrance: 0,
+    Normal: 1,
     Boss: 2,
     Empty: 3
 };
-var TileType = {
-    Floor: 0,
-    Wall: 1,
-    Door: 2,
-    Pillar: 3
-};
+var TileType =[
+	{name: "Wall",diffuseColor: new BABYLON.Color3(0.1, 0.1, 0.1), scale: new BABYLON.Vector3(10, 30, 10)},
+	{name: "Floor",diffuseColor: new BABYLON.Color3(0.5, 0.5, 0.5), scale: new BABYLON.Vector3(10, 0.2, 10)},
+	{name: "Pillar",diffuseColor: new BABYLON.Color3(.1, 0.5, 0.1), scale: new BABYLON.Vector3(10, 30, 10)},
+	{name: "Fire",diffuseColor: new BABYLON.Color3(.5, 0.1, 0.1), scale: new BABYLON.Vector3(10, 0.2, 10)},
+	{name: "Door",diffuseColor: new BABYLON.Color3(.7, 0.7, 0.7), scale: new BABYLON.Vector3(10, 0.2, 10)}
+];
 
-var MapHeight = 10;
-var MapWidth = 10;
-var RoomHeight = 10;
-var RoomWidth = 10;
+//height and width seem to be backwards? from col and row
+var RoomHeight = 15;
+var RoomWidth = 13;
+var TileWidth = 10;
 
 function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
+	if (max-min == 0) {
+		return Math.round(Math.random()) + min;
+	}
+	else {
+		return Math.round(Math.random() * (max - min)) + min;
+	}
 }
 function GenerateRoom(options)
 {
 	var room = {};
-	if(options && options.type)
-	{
-		room.type = options.type;
-	}
-	else
-	{
-		room.type = getRandomInt(0,3);
+	//check to see if options exist and set defaults if not
+	if (options) {
+		if(options.type != undefined)
+		{
+			room.type = options.type;
+		}
+		else {
+			room.type = getRandomInt(1,3);		
+		}
+		if(options.height != undefined || options.width != undefined)
+		{
+			room.width=options.width;
+			room.height=options.height;
+		}
+		else {
+			room.width=13;
+			room.height=15;
+		}
 	}
 	room.tiles = [];
 
-	for(var i = 0; i < RoomWidth * RoomHeight; i++)
+	for(var i = 0; i < room.width * room.height; i++)
 	{
 		room.tiles[i] = {};
-		room.tiles[i].type = getRandomInt(0,4);
-		room.tiles[i].col = i % RoomWidth;
-		room.tiles[i].row = Math.floor(i/RoomWidth)
+		room.tiles[i].col = i % room.width;
+		room.tiles[i].row = Math.floor(i/room.width)
+		//ensure outer perimeter are walls
+		if (room.tiles[i].col == 0 || room.tiles[i].row == 0 || room.tiles[i].col == room.width-1 || room.tiles[i].row == room.height-1) {
+			room.tiles[i].type=0;
+		}
+		//make perimeter just inside walls all floors (this can change)
+		else if (room.tiles[i].col == 1 || room.tiles[i].row == 1 || room.tiles[i].col == room.width-2 || room.tiles[i].row == room.height-2) {
+			room.tiles[i].type=1;
+		}
+		else {
+			room.tiles[i].type = getRandomInt(1,3);
+		}
+		room.tiles[i].width = TileWidth;
 	}
 	return room;
 }
+
 function GenerateBranch(map, startCol, startRow)
 {
-	if(map.rooms[startRow * MapWidth + startCol].type != RoomType.Empty)
+	if(map.rooms[startRow * map.width + startCol].type != RoomType.Empty)
 	{
 		return;
 	}
 	else
 	{
-		map.rooms[startRow * MapWidth + startCol] = GenerateRoom();
+		map.rooms[startRow * map.width + startCol] = GenerateRoom();
 		var decision = getRandomInt(0,4);
 
 		switch(decision) 
@@ -69,31 +98,33 @@ function GenerateBranch(map, startCol, startRow)
 		}
 	}
 }
-function GenerateMap()
+
+function GenerateMap(MapHeight,MapWidth)
 {
     var map = {};
     map.rooms = [];
-
-    for(var i = 0; i <= MapHeight * MapWidth; i++)
+	map.height = MapHeight;
+	map.width = MapWidth;
+	
+	//initialize Rooms
+    for(var i = 0; i < map.height * map.width; i++)
     {
-    	var options = {type: RoomType.Empty}
+    	var options = {type: RoomType.Empty, height: RoomHeight, width: RoomWidth}
     	var room = GenerateRoom(options);
-    	room.col = i % MapWidth;
-    	room.row = Math.floor(i/MapWidth);
+    	room.col = i % map.width;
+    	room.row = Math.floor(i/map.width);
     	room.type = RoomType.Empty;
 
-    	map.rooms[room.row * MapWidth + room.col] = room;
+    	map.rooms[room.row * map.width + room.col] = room;
     }
-
-    entranceCol = MapWidth/2;
-    entranceRow = MapHeight;
-    var options = {type: RoomType.Entrance};
-    map.rooms[entranceRow * MapWidth + entranceCol] = GenerateRoom(options);
+	
+	//create a single room as an entrance
+    entranceCol = Math.floor(map.width/2);
+    entranceRow = map.height-1;
+    var options = {type: RoomType.Entrance, height: RoomHeight, width: RoomWidth};
+    map.rooms[entranceRow * map.width + entranceCol] = GenerateRoom(options);
 
     GenerateBranch(map, entranceCol, entranceRow - 1);
 
     return map;
 }
-
-var map = GenerateMap();
-alert(JSON.stringify(map));

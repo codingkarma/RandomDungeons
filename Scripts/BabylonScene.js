@@ -2,84 +2,87 @@ function MapEditor(engine) {
     //Creation of the scene 
     var scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+	scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
+	scene.collisionsEnabled = true;
 
     //Adding the light to the scene
-    var light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 100, 100), scene);
+    var ambient = new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 100, 0), scene);
+	ambient.diffuse = new BABYLON.Color3(.98, .95, .9);
+	ambient.specular = new BABYLON.Color3(0, 0, 0);
 
     //Adding an Arc Rotate Camera
     //var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
     var Alpha = .000000001;
     var Beta = Math.PI / 16;
-    var camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, 130, new BABYLON.Vector3.Zero(), scene);
+    var camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, RoomHeight*11, new BABYLON.Vector3.Zero(), scene);
     //set camera to not move
-    camera.lowerAlphaLimit = Alpha;
-    camera.upperAlphaLimit = Alpha;
-    camera.lowerBetaLimit = Beta;
-    camera.upperBetaLimit = Beta;
-
-    //lazy way for handling materials
-    scene.tileMaterialFloor = new BABYLON.StandardMaterial("tile-texture-Floor", scene);
-    scene.tileMaterialFloor.diffuseColor = new BABYLON.Color3(.5, 0.5, 0.5);
-
-    scene.tileMaterialWall = new BABYLON.StandardMaterial("tile-texture-Wall", scene);
-    scene.tileMaterialWall.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.18);
-
-    scene.tileMaterialSeal = new BABYLON.StandardMaterial("tile-texture-Seal", scene);
-    scene.tileMaterialSeal.diffuseColor = new BABYLON.Color3(0.1, 0.3, 0.1);
+    // camera.lowerAlphaLimit = Alpha;
+    // camera.upperAlphaLimit = Alpha;
+    // camera.lowerBetaLimit = Beta;
+    // camera.upperBetaLimit = Beta;
 
     scene.tileMaterialSword = new BABYLON.StandardMaterial("tile-texture-Sword", scene);
     scene.tileMaterialSword.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.7);
-
-    var floorWidth = 120;
-    var floorHeight = 100;
-    var wallHeight = 30;
+	// scene.tileMaterialSword.specularColor = new BABYLON.Color3(0, 0, 0);
 
     scene.tile = [];
-    //bottom tile for "sealing"
-    drawTile(scene, new BABYLON.Vector3(0, -.1, 0), new BABYLON.Vector3(floorHeight, 0.2, floorWidth), scene.tileMaterialSeal, "floor");
-    var tileWidth = 10;
-    var MapHeight = floorHeight / tileWidth;
-    var MapLength = floorWidth / tileWidth;
-    var tileZ = 0; var tileX = -(MapHeight / 2 - 1) * tileWidth;
-    zOffset = -(MapLength / 2 - 1) * tileWidth;
-    for (var i = 0; i < (MapHeight * MapLength) ; i++) {
-        if (tileZ > (MapLength - 1)) {
-            tileZ = 0;
-            tileX += tileWidth;
-        }
-        scene.tile[i] = drawTile(scene, new BABYLON.Vector3(tileX, 0, tileZ * tileWidth + zOffset), 0, scene.tileMaterialFloor, "floor");
-        scene.tile[i].tileId = i;
-        tileZ++;
-    }
-
-    //create walls
-    var northWall = drawTile(scene, new BABYLON.Vector3(-1 * (floorHeight / 2 - 2.5), 5, 0), new BABYLON.Vector3(5, wallHeight, floorWidth), scene.tileMaterialWall, "wall");
-    var southWall = drawTile(scene, new BABYLON.Vector3(floorHeight / 2 - 2.5, 5, 0), new BABYLON.Vector3(5, wallHeight, floorWidth), scene.tileMaterialWall, "wall");
-    var eastWall = drawTile(scene, new BABYLON.Vector3(0, 5, floorWidth / 2 - 2.5), new BABYLON.Vector3(floorHeight, wallHeight, 5), scene.tileMaterialWall, "wall");
-    var westWall = drawTile(scene, new BABYLON.Vector3(0, 5, -1 * (floorWidth / 2 - 2.5)), new BABYLON.Vector3(floorHeight, wallHeight, 5), scene.tileMaterialWall, "wall");
-
+	// var ground = new BABYLON.Mesh.CreateBox("Seal", 1.0, scene);
+	//Draw Entrance Room
+	for (var i_room=0; i_room < map.rooms.length; i_room++) {
+		if (map.rooms[i_room].type == RoomType.Entrance) {
+			for (var i = 0; i < map.rooms[i_room].tiles.length ; i++) {
+				scene.tile[i] = drawTile(scene, map.rooms[i_room].tiles[i],i);
+				scene.tile[i].checkCollisions = true;
+				scene.tile[i].tileId = i;
+			}
+			var centerX=map.rooms[i_room].width/2*map.rooms[i_room].tiles[0].width-1;
+			var centerZ=map.rooms[i_room].height/2*map.rooms[i_room].tiles[0].width-1;
+			camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+			//bottom tile for "sealing"
+			// ground.scaling =new BABYLON.Vector3(map.rooms[i_room].width*10, 0.2, map.rooms[i_room].height*10);
+			// ground.position = new BABYLON.Vector3(centerX, -.1, centerZ);
+			// ground.material= new BABYLON.StandardMaterial("texture-Seal", scene);
+			// ground.diffuseColor =new BABYLON.Color3(0.3, 0.3, 0.3);
+		}
+	}
+    
+	
     // example of loading a mesh from blender export
     scene.Sword = 0;
-    BABYLON.SceneLoader.ImportMesh("", "Models3D/", "Sword.js", scene, function (meshes) {
+    BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.js", scene, function (meshes, particleSystems) {
         var m = meshes[0];
         m.isVisible = true;
-        m.position = new BABYLON.Vector3(2, 3, 0);
+        m.position = new BABYLON.Vector3(12, 7, 12);
         m.scaling = new BABYLON.Vector3(2, 2, 2);
         m.rotation.x = Math.PI / 6;
         m.rotation.y = Math.PI / 6;
         m.rotation.z = Math.PI / 3;
-        m.material = scene.tileMaterialSword;
+        // m.material = scene.tileMaterialSword;
         scene.Sword = m;
+		// scene.Sword.checkCollisions = true;
+		// scene.Sword.applyGravity=true;
+		// //Set the ellipsoid around the camera (e.g. your player's size)
+		// scene.Sword.ellipsoid = new BABYLON.Vector3(1, 1, 1);
     });
+	
+    // ground.checkCollisions = true;
+	
+    // BABYLON.SceneLoader.ImportMesh("", "Models3D/", "BookGolem.js", scene, function (newMesh) {
+        // scene.BookGolem = newMesh;
+        // scene.BookGolem[0].position.y += 4;
+		// for (var i=1; i< newMesh.length;i++) {
+			// scene.BookGolem[i].position.y += 4;
+		// }
+        // // m[0].isVisible = true;
+        // // m.material = scene.tileMaterialSword;
+    // });
 
-    //need to see what this does, don't remember
-    scene.registerBeforeRender(function () {
-        //if (box.intersectsMesh(plan, true)) {
-
-        //} else {
-        //    box.position.y -= 1;
-        //}
-    });
+    scene.registerBeforeRender(function(){	
+		if(scene.isReady() && scene.Sword) {
+			velocity = new BABYLON.Vector3(0, -10, 0);	
+			// scene.Sword.moveWithCollisions(velocity);
+		}
+	});
 
     //When click event is raised
     $('#renderCanvas').on("click", function (evt) {
@@ -108,17 +111,13 @@ this.getScale = function () {
     return this.viewportScale;
 };
 
-function drawTile(Scene, tilePosition, tileScale, tileMaterial, tyleType) {
-    //if tileScale is 0 or undefined, use default
-    if (tileScale == undefined || tileScale == 0) {
-        //x, z is planer, y is height
-        var tileScale = new BABYLON.Vector3(9.8, 0.2, 9.8);
-    }
+function drawTile(Scene, tile, index) {
 
-    var newMesh = new BABYLON.Mesh.CreateBox(tyleType, 1.0, Scene);
-    newMesh.scaling = tileScale;
-    newMesh.position = tilePosition;
-    newMesh.material = tileMaterial;
+    var newMesh = new BABYLON.Mesh.CreateBox(TileType[tile.type].name + '-' + parseInt(index), 1.0, Scene);
+    newMesh.scaling = TileType[tile.type].scale;
+    newMesh.position = new BABYLON.Vector3(tile.col*tile.width, 0, tile.row*tile.width);
+    newMesh.material= new BABYLON.StandardMaterial("texture-" + TileType[tile.type].name, Scene);
+	newMesh.material.diffuseColor = TileType[tile.type].diffuseColor;
 
     return newMesh;
 };
