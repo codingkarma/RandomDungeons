@@ -64,7 +64,7 @@ function GenerateMap()
     	room.row = Math.floor(i/MapWidth);
     	room.type = RoomType.Empty;
 
-    	map.rooms[row * MapWidth + col] = room;
+    	map.rooms[room.row * MapWidth + room.col] = room;
     }
 
     entranceCol = MapWidth/2;
