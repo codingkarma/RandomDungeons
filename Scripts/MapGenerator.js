@@ -49,7 +49,24 @@ function GenerateBranch(map, startCol, startRow)
 	}
 	else
 	{
-		
+		map.rooms[startRow * MapWidth + startCol] = GenerateRoom();
+		var decision = getRandomInt(0,4);
+
+		switch(decision) 
+		{
+			case 0:
+				GenerateBranch(map, startCol--, startRow);
+				break;
+			case 1:
+				GenerateBranch(map, startCol, startRow--);
+				break;
+			case 2:
+				GenerateBranch(map, startCol++, startRow);
+				break;
+			case 3:
+				GenerateBranch(map, startCol, startRow++);
+				break;
+		}
 	}
 }
 function GenerateMap()
@@ -72,7 +89,7 @@ function GenerateMap()
     var options = {type: RoomType.Entrance};
     map.rooms[entranceRow * MapWidth + entranceCol] = GenerateRoom(options);
 
-    //GenerateBranch(map, entranceCol, entranceRow - 1);
+    GenerateBranch(map, entranceCol, entranceRow - 1);
 
     return map;
 }
