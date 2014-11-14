@@ -19,7 +19,7 @@ function startMapEditor() {
             // Once the scene is loaded, just register a render loop to render it
             engine.runRenderLoop(function () {
 				// rotate to give some animation
-				if (scene.Sword != 0) {
+				if(scene.isReady() && scene.Sword) {
 					scene.Sword.rotation.y=scene.Sword.rotation.y+1.25*animationIter;
 					scene.Sword.rotation.x=scene.Sword.rotation.x+.8*animationIter;
 					scene.Sword.rotation.z=scene.Sword.rotation.z+animationIter;
@@ -32,19 +32,21 @@ function startMapEditor() {
 					if (loopCounter % 10 == 0) {
 						$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
 					}
-					var walkInc=.5;
+					var vX=0; var vZ=0;
 					if (isWKey >0) {
-						scene.Sword.position.x-=walkInc;
+						vX=-1;
 					}
 					if (isSKey >0) {
-						scene.Sword.position.x+=walkInc;
+						vX=1;
 					}
 					if (isAKey >0) {
-						scene.Sword.position.z-=walkInc;
+						vZ=-1;
 					}
 					if (isDKey >0) {
-						scene.Sword.position.z+=walkInc;
+						vZ=1;
 					}
+					var velocity=new BABYLON.Vector3(vX, -10, vZ);
+					scene.Sword.moveWithCollisions(velocity);
 				}
 				
                 //Render scene and any changes

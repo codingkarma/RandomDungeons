@@ -59,10 +59,10 @@ function MapEditor(engine) {
         m.rotation.z = Math.PI / 3;
         // m.material = scene.tileMaterialSword;
         scene.Sword = m;
-		// scene.Sword.checkCollisions = true;
-		// scene.Sword.applyGravity=true;
-		// //Set the ellipsoid around the camera (e.g. your player's size)
-		// scene.Sword.ellipsoid = new BABYLON.Vector3(1, 1, 1);
+		scene.Sword.checkCollisions = true;
+		scene.Sword.applyGravity=true;
+		//Set the ellipsoid around the camera (e.g. your player's size)
+		scene.Sword.ellipsoid = new BABYLON.Vector3(2, 1, 2);
     });
 	
     // ground.checkCollisions = true;
@@ -79,7 +79,7 @@ function MapEditor(engine) {
 
     scene.registerBeforeRender(function(){	
 		if(scene.isReady() && scene.Sword) {
-			velocity = new BABYLON.Vector3(0, -10, 0);	
+			// var velocity = new BABYLON.Vector3(0, -10, 0);	
 			// scene.Sword.moveWithCollisions(velocity);
 		}
 	});
