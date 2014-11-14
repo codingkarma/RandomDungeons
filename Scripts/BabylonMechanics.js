@@ -1,4 +1,4 @@
-function startMapEditor() { 
+function startMapEditor() {  
 
         var canvas = document.getElementById("renderCanvas");
 
