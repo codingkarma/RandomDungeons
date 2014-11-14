@@ -94,12 +94,12 @@ function GenerateBranch(map, startCol, startRow)
 	}
 }
 
-function GenerateMap(MapHeight,MapWidth)
+function GenerateMap(mapHeight,mapWidth)
 {
     var map = {};
     map.rooms = [];
-	map.height = MapHeight;
-	map.width = MapWidth;
+	map.height = mapHeight;
+	map.width = mapWidth;
 	
 	//initialize Rooms
     for(var i = 0; i < map.height * map.width; i++)
