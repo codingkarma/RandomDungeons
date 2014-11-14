@@ -76,7 +76,8 @@ function GenerateMap()
 
     for(var i = 0; i <= MapHeight * MapWidth; i++)
     {
-    	var room = {};
+    	var options = {type: RoomType.Empty}
+    	var room = GenerateRoom(options);
     	room.col = i % MapWidth;
     	room.row = Math.floor(i/MapWidth);
     	room.type = RoomType.Empty;
