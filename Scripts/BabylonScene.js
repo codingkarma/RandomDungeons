@@ -39,9 +39,13 @@ function MapEditor(engine) {
 	//Tile Type detailed materials
 	//Wall
 	bjsHelper.tileType[0].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[0].name, scene);
-	bjsHelper.tileType[0].material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture.png', scene);
-	bjsHelper.tileType[0].material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture.png', scene);
-	bjsHelper.tileType[0].material.diffuseColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+	bjsHelper.tileType[0].material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture-2.png', scene);
+	bjsHelper.tileType[0].material.diffuseTexture.wAng=0;
+	bjsHelper.tileType[0].material.diffuseTexture.uScale=1;
+	// bjsHelper.tileType[0].material.diffuseTexture.vOffset=-1;
+	bjsHelper.tileType[0].material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture-2.png', scene);
+	bjsHelper.tileType[0].material.bumpTexture.uScale=1;
+	bjsHelper.tileType[0].material.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 	//Floor
 	bjsHelper.tileType[1].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[1].name, scene);
 	bjsHelper.tileType[1].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', scene);
@@ -49,10 +53,14 @@ function MapEditor(engine) {
 	bjsHelper.tileType[1].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
 	//Pillar
 	bjsHelper.tileType[2].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[2].name, scene);
-	bjsHelper.tileType[2].material.diffuseColor = new BABYLON.Color3(.1, 0.5, 0.1);
+	bjsHelper.tileType[2].material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture-2.png', scene);
+	bjsHelper.tileType[2].material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture-2.png', scene);
+	bjsHelper.tileType[2].material.diffuseColor = new BABYLON.Color3(.5, 0.5, 0.5);
 	//Fire
 	bjsHelper.tileType[3].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[3].name, scene);
-	bjsHelper.tileType[3].material.diffuseColor = new BABYLON.Color3(.5, 0.1, 0.1);
+	bjsHelper.tileType[3].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', scene);
+	bjsHelper.tileType[3].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', scene);
+	bjsHelper.tileType[3].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
 	//Door
 	bjsHelper.tileType[4].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[4].name, scene);
 	bjsHelper.tileType[4].material.diffuseColor = new BABYLON.Color3(.7, 0.7, 0.7);

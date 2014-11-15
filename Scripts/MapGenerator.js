@@ -66,9 +66,9 @@ function GenerateRoom(options)
 			reflectionRow = room.height - room.tiles[i].row - 1;
 			reflectionCol = room.width - room.tiles[i].col - 1;
 
-			console.log('i:' + i);
-			console.log('x,y:' + reflectionCol + ',' + reflectionRow);
-			console.log('guessAtReflecti:' + (reflectionRow * room.width + reflectionCol));
+			// console.log('i:' + i);
+			// console.log('x,y:' + reflectionCol + ',' + reflectionRow);
+			// console.log('guessAtReflecti:' + (reflectionRow * room.width + reflectionCol));
 			room.tiles[i].type = room.tiles[(reflectionRow * room.width + reflectionCol)].type;
 		}
 		room.tiles[i].width = TileWidth;
