@@ -44,7 +44,7 @@ function GenerateRoom(options)
 
 	room.tiles = [];
 
-	for(var i = 0; i < room.width * room.height; i++)
+	for(var i = 0; i < (room.width * room.height)/2; i++)
 	{
 		room.tiles[i] = {};
 		room.tiles[i].col = i % room.width;
@@ -60,7 +60,7 @@ function GenerateRoom(options)
 		else {
 			if(getRandomInt(0,1) == 0)
 			{
-				room.tiles[i].type = 1;
+				room.tiles[i].type = RoomType.Normal;
 			}
 			else
 			{
@@ -70,6 +70,7 @@ function GenerateRoom(options)
 		}
 		room.tiles[i].width = TileWidth;
 	}
+	$.merge(room.tiles, room.tiles)
 	return room;
 }
 
