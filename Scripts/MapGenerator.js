@@ -60,7 +60,7 @@ function GenerateRoom(options)
 		{
 			if(getRandomInt(0,1) == 0)
 			{
-				room.tiles[i].type = RoomType.Normal;
+				room.tiles[i].type = TileType.Floor;
 			}
 			else
 			{
