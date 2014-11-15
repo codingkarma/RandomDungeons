@@ -43,7 +43,6 @@ function GenerateRoom(options)
 	room.height = settings.height;
 
 	room.tiles = [];
-
 	for(var i = 0; i < room.width * room.height; i++)
 	{
 		room.tiles[i] = {};
@@ -57,7 +56,8 @@ function GenerateRoom(options)
 		else if (room.tiles[i].col == 1 || room.tiles[i].row == 1 || room.tiles[i].col == room.width-2 || room.tiles[i].row == room.height-2) {
 			room.tiles[i].type=TileType.Floor;
 		}
-		else {
+		else if(i < Math.ceil(room.width * room.height)/2)
+		{
 			if(getRandomInt(0,1) == 0)
 			{
 				room.tiles[i].type = RoomType.Normal;
@@ -67,6 +67,16 @@ function GenerateRoom(options)
 				room.tiles[i].type = getRandomInt(1,3);
 			}
 			
+		}
+		else
+		{
+			reflectionRow = room.height - room.tiles[i].row - 1;
+			reflectionCol = room.width - room.tiles[i].col - 1;
+
+			console.log('i:' + i);
+			console.log('x,y:' + reflectionCol + ',' + reflectionRow);
+			console.log('guessAtReflecti:' + (reflectionRow * room.width + reflectionCol));
+			room.tiles[i].type = room.tiles[(reflectionRow * room.width + reflectionCol)].type;
 		}
 		room.tiles[i].width = TileWidth;
 	}
