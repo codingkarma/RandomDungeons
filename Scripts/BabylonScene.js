@@ -1,3 +1,13 @@
+var bjsHelper =  {
+	tileType: [
+		{name: "Wall", material: 0, scale: new BABYLON.Vector3(10, 30, 10)},
+		{name: "Floor", material: 0, scale: new BABYLON.Vector3(10, 0.2, 10)},
+		{name: "Pillar", material: 0, scale: new BABYLON.Vector3(10, 30, 10)},
+		{name: "Fire",material: 0, scale: new BABYLON.Vector3(10, 0.2, 10)},
+		{name: "Door", material: 0, scale: new BABYLON.Vector3(10, 0.2, 10)}
+	]
+};
+
 function MapEditor(engine) {
     //Creation of the scene 
     var scene = new BABYLON.Scene(engine);
@@ -25,6 +35,28 @@ function MapEditor(engine) {
     // camera.lowerBetaLimit = Beta;
     // camera.upperBetaLimit = Beta;
 
+	//Create me some textures
+	//Tile Type detailed materials
+	//Wall
+	bjsHelper.tileType[0].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[0].name, scene);
+	bjsHelper.tileType[0].material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture.png', scene);
+	bjsHelper.tileType[0].material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture.png', scene);
+	bjsHelper.tileType[0].material.diffuseColor = new BABYLON.Color3(0.8, 0.8, 0.8);
+	//Floor
+	bjsHelper.tileType[1].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[1].name, scene);
+	bjsHelper.tileType[1].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', scene);
+	bjsHelper.tileType[1].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', scene);
+	bjsHelper.tileType[1].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	//Pillar
+	bjsHelper.tileType[2].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[2].name, scene);
+	bjsHelper.tileType[2].material.diffuseColor = new BABYLON.Color3(.1, 0.5, 0.1);
+	//Fire
+	bjsHelper.tileType[3].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[3].name, scene);
+	bjsHelper.tileType[3].material.diffuseColor = new BABYLON.Color3(.5, 0.1, 0.1);
+	//Door
+	bjsHelper.tileType[4].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[4].name, scene);
+	bjsHelper.tileType[4].material.diffuseColor = new BABYLON.Color3(.7, 0.7, 0.7);
+	
     scene.tileMaterialSword = new BABYLON.StandardMaterial("tile-texture-Sword", scene);
     scene.tileMaterialSword.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.7);
 	// scene.tileMaterialSword.specularColor = new BABYLON.Color3(0, 0, 0);
@@ -117,17 +149,10 @@ this.getScale = function () {
 
 function drawTile(Scene, tile, index) {
 
-    var newMesh = new BABYLON.Mesh.CreateBox(bjsTileType[tile.type].name + '-' + parseInt(index), 1.0, Scene);
-    newMesh.scaling = bjsTileType[tile.type].scale;
+    var newMesh = new BABYLON.Mesh.CreateBox(bjsHelper.tileType[tile.type].name + '-' + parseInt(index), 1.0, Scene);
+    newMesh.scaling = bjsHelper.tileType[tile.type].scale;
     newMesh.position = new BABYLON.Vector3(tile.col*tile.width, 0, tile.row*tile.width);
-    newMesh.material= new BABYLON.StandardMaterial("texture-" + bjsTileType[tile.type].name, Scene);
-	newMesh.material.diffuseColor = bjsTileType[tile.type].diffuseColor;
-	if (bjsTileType[tile.type].diffuseTexture) {
-		newMesh.material.diffuseTexture = new BABYLON.Texture(bjsTileType[tile.type].diffuseTexture, Scene);
-	}
-	if (bjsTileType[tile.type].bumpTexture) {
-		newMesh.material.bumpTexture = new BABYLON.Texture(bjsTileType[tile.type].bumpTexture, Scene);
-	}
+    newMesh.material = bjsHelper.tileType[tile.type].material;
 
     return newMesh;
 };
