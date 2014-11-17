@@ -13,13 +13,23 @@ var TileType ={
 };
 
 //height and width seem to be backwards? from col and row
-var RoomHeight = 15;
-var RoomWidth = 13;
+var RoomHeight = 13;
+var RoomWidth = 15;
 var TileWidth = 10;
 
 function getRandomInt(min, max) {
 	max++; //makes max inclusive
 	return Math.floor(Math.random() * (max - min)) + min;
+}
+function getRandomIntFromArray(array) {
+	var max=array.length;
+	var min=0;
+	if (array == undefined) {
+		return -1;
+	}
+	else {
+		return array[Math.floor(Math.random() * (max - min)) + min];
+	}
 }
 function GenerateRoom(options)
 {
@@ -78,29 +88,61 @@ function GenerateRoom(options)
 
 function GenerateBranch(map, startCol, startRow)
 {
-	if(map.rooms[startRow * map.width + startCol].type != RoomType.Empty)
+	//check which rooms are available
+	var checkRoom = [];
+	if (startRow-1 >= 0) {
+		checkRoom.push(0);
+	}
+	if (startCol+1 <= map.width-1) {
+		checkRoom.push(1);
+	}
+	if (startRow+1 <= map.height-1) {
+		checkRoom.push(2);
+	}
+	if (startCol-1 >= 0) {
+		checkRoom.push(3);
+	}
+	var decision = getRandomIntFromArray(checkRoom);
+	
+	switch(decision) 
+	{
+		//clockwise check starting "north"
+		case -1:
+			return;
+		case 0:
+			startRow--;
+			break;
+		case 1:
+			startCol++;
+			break;
+		case 2:
+			startRow++;
+			break;
+		case 3:
+			startCol--;
+			break;
+	}
+	//check to see if it is in within bounds
+	if(map.rooms[startRow * map.width + startCol].type != RoomType.Empty )
 	{
 		return;
 	}
 	else
 	{
-		map.rooms[startRow * map.width + startCol] = GenerateRoom();
-		var decision = getRandomInt(0,3);
+		var options = {type: RoomType.Normal, height: RoomHeight, width: RoomWidth};
+		map.rooms[startRow * map.width + startCol] = GenerateRoom(options);
+    	map.rooms[startRow * map.width + startCol].col = startCol;
+    	map.rooms[startRow * map.width + startCol].row = startRow;
+		GenerateBranch(map, startCol, startRow);
+	}
+	return;
+}
 
-		switch(decision) 
-		{
-			case 0:
-				GenerateBranch(map, startCol--, startRow);
-				break;
-			case 1:
-				GenerateBranch(map, startCol, startRow--);
-				break;
-			case 2:
-				GenerateBranch(map, startCol++, startRow);
-				break;
-			case 3:
-				GenerateBranch(map, startCol, startRow++);
-				break;
+function GenerateDoors(map) {
+	for (var i = 0; i < map.height * map.width; i++) {
+		//check if the room is a perimeter room
+		if (map.rooms[i].col == 0 || map.rooms[i].row == 0 || map.rooms[i].col == map.width-1 || map.rooms[i].row == map.height-1) {
+			
 		}
 	}
 }
@@ -125,12 +167,19 @@ function GenerateMap(mapHeight,mapWidth)
     }
 	
 	//create a single room as an entrance
-    entranceCol = Math.floor(map.width/2);
-    entranceRow = map.height-1;
+    var entranceCol = Math.floor(map.width/2);
+    var entranceRow = map.height-1;
     var options = {type: RoomType.Entrance, height: RoomHeight, width: RoomWidth};
     map.rooms[entranceRow * map.width + entranceCol] = GenerateRoom(options);
+	map.rooms[entranceRow * map.width + entranceCol].col =entranceCol;
+	map.rooms[entranceRow * map.width + entranceCol].row = entranceRow;
+	map.entranceCol=entranceCol;
+	map.entranceRow=entranceRow;
 
-    GenerateBranch(map, entranceCol, entranceRow - 1);
+    GenerateBranch(map, entranceCol, entranceRow);
+	
+	//Generate doors
+	// GenerateDoors(map);
 
     return map;
 }

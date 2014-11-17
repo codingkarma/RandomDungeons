@@ -5,7 +5,8 @@
 }
 .container {
     position: absolute;
-    background-image: linear-gradient(0deg, #888888, #EEEEEE);
+    /* background-image: linear-gradient(0deg, #888888, #EEEEEE); */
+    background-image: linear-gradient(0deg, #222222, #AAAAAA);
     height: calc(100% - 2em);
 	top: 1em;
     bottom: 1em;
