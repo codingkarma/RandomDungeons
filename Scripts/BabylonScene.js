@@ -84,9 +84,9 @@ function MapEditor(engine) {
 				scene.rooms[i_room].tiles[i].mesh.checkCollisions = true;
 				scene.rooms[i_room].tiles[i].mesh.tileId = i;
 			}
-			var centerX=roomX0+map.rooms[i_room].width/2*map.rooms[i_room].tiles[0].width;
-			var centerZ=roomZ0-map.rooms[i_room].height/2*map.rooms[i_room].tiles[0].width;
-			scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+			var centerX=map.rooms[i_room].width/2*map.rooms[i_room].tiles[0].width;
+			var centerZ=map.rooms[i_room].height/2*map.rooms[i_room].tiles[0].width;
+			scene.camera.target = new BABYLON.Vector3(roomX0+centerX, 0, roomZ0-centerZ);
 			//set active room to entrance
 			scene.activeRoom=map.rooms[i_room];
 			scene.activeRoom.index=i_room;
@@ -95,10 +95,10 @@ function MapEditor(engine) {
 			
 			//Add a light to the room
 			scene.rooms[i_room].light = [];
-			scene.rooms[i_room].light[0] = new BABYLON.PointLight("Omni", new BABYLON.Vector3(roomX0, 100, roomZ0), scene);
+			scene.rooms[i_room].light[0] = new BABYLON.PointLight("Omni", new BABYLON.Vector3(roomX0+centerX, 200, roomZ0-centerZ), scene);
 			scene.rooms[i_room].light[0].diffuse = new BABYLON.Color3(.98, .95, .9);
 			scene.rooms[i_room].light[0].specular = new BABYLON.Color3(0, 0, 0);
-			scene.rooms[i_room].light[1] = new BABYLON.PointLight("Omni", new BABYLON.Vector3(roomX0+150, 50, roomZ0-150), scene);
+			scene.rooms[i_room].light[1] = new BABYLON.PointLight("Omni-1", new BABYLON.Vector3(roomX0+2*centerX, 100, roomZ0-2*centerZ), scene);
 			scene.rooms[i_room].light[1].diffuse = new BABYLON.Color3(.68, .65, .6);
 			scene.rooms[i_room].light[1].specular = new BABYLON.Color3(0, 0, 0);
 		}
@@ -112,6 +112,16 @@ function MapEditor(engine) {
 				scene.rooms[i_room].tiles[i].mesh.checkCollisions = true;
 				scene.rooms[i_room].tiles[i].mesh.tileId = i;
 			}
+			var centerX=map.rooms[i_room].width/2*map.rooms[i_room].tiles[0].width;
+			var centerZ=map.rooms[i_room].height/2*map.rooms[i_room].tiles[0].width;
+			//Add a light to the room
+			scene.rooms[i_room].light = [];
+			scene.rooms[i_room].light[0] = new BABYLON.PointLight("Omni", new BABYLON.Vector3(roomX0+centerX, 200, roomZ0-centerZ), scene);
+			scene.rooms[i_room].light[0].diffuse = new BABYLON.Color3(.98, .95, .9);
+			scene.rooms[i_room].light[0].specular = new BABYLON.Color3(0, 0, 0);
+			scene.rooms[i_room].light[1] = new BABYLON.PointLight("Omni-1", new BABYLON.Vector3(roomX0+2*centerX, 100, roomZ0-2*centerZ), scene);
+			scene.rooms[i_room].light[1].diffuse = new BABYLON.Color3(.68, .65, .6);
+			scene.rooms[i_room].light[1].specular = new BABYLON.Color3(0, 0, 0);
 		}
 	}
     
