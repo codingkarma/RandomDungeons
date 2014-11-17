@@ -61,8 +61,7 @@ function startMapEditor() {
 						else {
 							loopCounter++;
 						}
-					}
-					if (loopCounter % 10 == 0) {
+						if (loopCounter % 10 == 0) {
 						$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
 						//check what room the player is in
 						if (scene.Sword.position.z > (scene.activeRoom.roomZ0)) {
@@ -117,6 +116,8 @@ function startMapEditor() {
 							var centerZ=scene.activeRoom.roomZ0-scene.activeRoom.height/2*scene.activeRoom.tiles[0].width;
 							scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
 						}
+					}
+					
 						
 						
 					}

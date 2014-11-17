@@ -23,7 +23,7 @@ function MapEditor(engine) {
     //var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
     var Alpha = 3*Math.PI/2;
     var Beta = Math.PI/16;
-    var camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, RoomHeight*11, new BABYLON.Vector3.Zero(), scene);
+    scene.camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, RoomHeight*11, new BABYLON.Vector3.Zero(), scene);
     //set camera to not move
     // camera.lowerAlphaLimit = Alpha;
     // camera.upperAlphaLimit = Alpha;
@@ -86,7 +86,13 @@ function MapEditor(engine) {
 			}
 			var centerX=roomX0+map.rooms[i_room].width/2*map.rooms[i_room].tiles[0].width;
 			var centerZ=roomZ0-map.rooms[i_room].height/2*map.rooms[i_room].tiles[0].width;
-			camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+			scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+			//set active room to entrance
+			scene.activeRoom=map.rooms[i_room];
+			scene.activeRoom.index=i_room;
+			scene.activeRoom.roomX0=scene.activeRoom.col*scene.activeRoom.width*scene.activeRoom.tiles[0].width;
+			scene.activeRoom.roomZ0=-scene.activeRoom.row*scene.activeRoom.height*scene.activeRoom.tiles[0].width;
+			
 			//Add a light to the room
 			scene.rooms[i_room].light = [];
 			scene.rooms[i_room].light[0] = new BABYLON.PointLight("Omni", new BABYLON.Vector3(roomX0, 100, roomZ0), scene);
