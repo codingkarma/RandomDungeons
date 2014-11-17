@@ -48,9 +48,9 @@ function startMapEditor() {
 						
 					}
 					else {
-						// scene.Sword.rotation.y=scene.Sword.rotation.y+1.25*animationIter;
-						// scene.Sword.rotation.x=scene.Sword.rotation.x+.8*animationIter;
-						// scene.Sword.rotation.z=scene.Sword.rotation.z+animationIter;
+						scene.Sword.rotation.y=scene.Sword.rotation.y+1.25*animationIter;
+						scene.Sword.rotation.x=scene.Sword.rotation.x+.8*animationIter;
+						scene.Sword.rotation.z=scene.Sword.rotation.z+animationIter;
 						
 						// scene.Blob.position.y=scene.Blob.position.y+2*animationIter;
 						
@@ -64,6 +64,61 @@ function startMapEditor() {
 					}
 					if (loopCounter % 10 == 0) {
 						$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
+						//check what room the player is in
+						if (scene.Sword.position.z > (scene.activeRoom.roomZ0)) {
+							//going north
+							var i_room=(scene.activeRoom.row-1) * map.width + scene.activeRoom.col;
+							//set active room to entrance
+							scene.activeRoom=map.rooms[i_room];
+							scene.activeRoom.index=i_room;
+							scene.activeRoom.roomX0=scene.activeRoom.col*scene.activeRoom.width*scene.activeRoom.tiles[0].width;
+							scene.activeRoom.roomZ0=-scene.activeRoom.row*scene.activeRoom.height*scene.activeRoom.tiles[0].width;
+							//set camera to new position
+							var centerX=scene.activeRoom.roomX0+scene.activeRoom.width/2*scene.activeRoom.tiles[0].width;
+							var centerZ=scene.activeRoom.roomZ0-scene.activeRoom.height/2*scene.activeRoom.tiles[0].width;
+							scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+						}
+						else if (scene.Sword.position.x > (scene.activeRoom.roomX0+scene.activeRoom.width*scene.activeRoom.tiles[0].width)) {
+							//going east
+							var i_room=(scene.activeRoom.row) * map.width + scene.activeRoom.col+1;
+							//set active room to entrance
+							scene.activeRoom=map.rooms[i_room];
+							scene.activeRoom.index=i_room;
+							scene.activeRoom.roomX0=scene.activeRoom.col*scene.activeRoom.width*scene.activeRoom.tiles[0].width;
+							scene.activeRoom.roomZ0=-scene.activeRoom.row*scene.activeRoom.height*scene.activeRoom.tiles[0].width;
+							//set camera to new position
+							var centerX=scene.activeRoom.roomX0+scene.activeRoom.width/2*scene.activeRoom.tiles[0].width;
+							var centerZ=scene.activeRoom.roomZ0-scene.activeRoom.height/2*scene.activeRoom.tiles[0].width;
+							scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+						}
+						else if (scene.Sword.position.z < (scene.activeRoom.roomZ0 - scene.activeRoom.height*scene.activeRoom.tiles[0].width)) {
+							//going south
+							var i_room=(scene.activeRoom.row+1) * map.width + scene.activeRoom.col;
+							//set active room to entrance
+							scene.activeRoom=map.rooms[i_room];
+							scene.activeRoom.index=i_room;
+							scene.activeRoom.roomX0=scene.activeRoom.col*scene.activeRoom.width*scene.activeRoom.tiles[0].width;
+							scene.activeRoom.roomZ0=-scene.activeRoom.row*scene.activeRoom.height*scene.activeRoom.tiles[0].width;
+							//set camera to new position
+							var centerX=scene.activeRoom.roomX0+scene.activeRoom.width/2*scene.activeRoom.tiles[0].width;
+							var centerZ=scene.activeRoom.roomZ0-scene.activeRoom.height/2*scene.activeRoom.tiles[0].width;
+							scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+						}
+						else if (scene.Sword.position.x < (scene.activeRoom.roomX0)) {
+							//going west
+							var i_room=(scene.activeRoom.row) * map.width + scene.activeRoom.col-1;
+							//set active room to entrance
+							scene.activeRoom=map.rooms[i_room];
+							scene.activeRoom.index=i_room;
+							scene.activeRoom.roomX0=scene.activeRoom.col*scene.activeRoom.width*scene.activeRoom.tiles[0].width;
+							scene.activeRoom.roomZ0=-scene.activeRoom.row*scene.activeRoom.height*scene.activeRoom.tiles[0].width;
+							//set camera to new position
+							var centerX=scene.activeRoom.roomX0+scene.activeRoom.width/2*scene.activeRoom.tiles[0].width;
+							var centerZ=scene.activeRoom.roomZ0-scene.activeRoom.height/2*scene.activeRoom.tiles[0].width;
+							scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+						}
+						
+						
 					}
 					var vX=0; var vZ=0;
 					if (isWKey >0) {

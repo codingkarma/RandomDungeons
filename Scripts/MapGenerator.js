@@ -88,6 +88,12 @@ function GenerateRoom(options)
 
 function GenerateBranch(map, startCol, startRow)
 {
+	var prevCol = startCol;
+	var prevRow = startRow;
+	var prevDoorCol = 0;
+	var prevDoorRow = 0;
+	var starDoorCol = 0;
+	var starDoorRow = 0;
 	//check which rooms are available
 	var checkRoom = [];
 	if (startRow-1 >= 0) {
@@ -102,8 +108,8 @@ function GenerateBranch(map, startCol, startRow)
 	if (startCol-1 >= 0) {
 		checkRoom.push(3);
 	}
+	//randomly choose which direction to go
 	var decision = getRandomIntFromArray(checkRoom);
-	
 	switch(decision) 
 	{
 		//clockwise check starting "north"
@@ -111,15 +117,35 @@ function GenerateBranch(map, startCol, startRow)
 			return;
 		case 0:
 			startRow--;
+			//choose random door north
+			prevDoorCol=getRandomInt(1,map.rooms[prevRow * map.width + prevCol].width-2);
+			prevDoorRow=0;
+			startDoorCol=prevDoorCol;
+			startDoorRow=map.rooms[startRow * map.width + startCol].height-1;
 			break;
 		case 1:
 			startCol++;
+			//choose random door east
+			prevDoorCol=map.rooms[prevRow * map.width + prevCol].width-1;
+			prevDoorRow=getRandomInt(1,map.rooms[prevRow * map.width + prevCol].height-2);
+			startDoorCol=0;
+			startDoorRow=prevDoorRow;
 			break;
 		case 2:
 			startRow++;
+			//choose random door south
+			prevDoorCol=getRandomInt(1,map.rooms[prevRow * map.width + prevCol].width-2);
+			prevDoorRow=map.rooms[prevRow * map.width + prevCol].height-1;
+			startDoorCol=prevDoorCol;
+			startDoorRow=0;
 			break;
 		case 3:
+			//choose random door west
 			startCol--;
+			prevDoorCol=0;
+			prevDoorRow=getRandomInt(1,map.rooms[prevRow * map.width + prevCol].height-2);
+			startDoorCol=map.rooms[startRow * map.width + startCol].width-1;
+			startDoorRow=prevDoorRow;
 			break;
 	}
 	//check to see if it is in within bounds
@@ -133,6 +159,11 @@ function GenerateBranch(map, startCol, startRow)
 		map.rooms[startRow * map.width + startCol] = GenerateRoom(options);
     	map.rooms[startRow * map.width + startCol].col = startCol;
     	map.rooms[startRow * map.width + startCol].row = startRow;
+		//create door between the existing and generated room
+		//previous room
+		map.rooms[prevRow * map.width + prevCol].tiles[prevDoorRow * map.rooms[prevRow * map.width + prevCol].width + prevDoorCol].type=TileType.Door;
+		//new room
+		map.rooms[startRow * map.width + startCol].tiles[startDoorRow * map.rooms[startRow * map.width + startCol].width + startDoorCol].type=TileType.Door;
 		GenerateBranch(map, startCol, startRow);
 	}
 	return;
