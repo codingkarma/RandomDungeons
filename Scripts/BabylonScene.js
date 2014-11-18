@@ -67,7 +67,8 @@ function MapEditor(engine) {
 	// scene.tileMaterialSword.specularColor = new BABYLON.Color3(0, 0, 0);
 	
 	scene.BlobMaterial = new BABYLON.StandardMaterial("tile-texture-Blob", scene);
-    scene.BlobMaterial.diffuseColor = new BABYLON.Color3(0.8, 0.1, 0.1);
+    scene.BlobMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.3);
+    scene.BlobMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
 
     scene.rooms = map.rooms;
 	//Draw Rooms
@@ -109,6 +110,29 @@ function MapEditor(engine) {
 		}
 	}
     
+	//create animations for player
+	scene.idleAnimation = new BABYLON.Animation("idleAnimation", "rotation", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+	// Animation keys
+    scene.idleAnimation.tempKeys = [];
+	function updateIdleAnimation(Scene) {
+		var val = Scene.player.rotation.x;
+		return new BABYLON.Vector3(val+1, Math.PI/2, Math.PI/4);
+	}
+    //At the animation key 0, the value of scaling is "1"
+    scene.idleAnimation.tempKeys.push({
+        frame: 0,
+        value: new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4)
+    });
+	scene.idleAnimation.tempKeys.push({
+        frame: 30,
+        value: new BABYLON.Vector3(Math.PI/3, Math.PI/1.8, Math.PI/3)
+    });
+	scene.idleAnimation.tempKeys.push({
+        frame: 60,
+        value: new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4)
+    });
+	//Adding keys to the animation object
+    scene.idleAnimation.setKeys(scene.idleAnimation.tempKeys);
     // example of loading a mesh from blender export
     scene.player = 0;
     BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.js", scene, function (meshes, particleSystems) {
@@ -126,23 +150,18 @@ function MapEditor(engine) {
 		scene.player.applyGravity=true;
 		//Set the ellipsoid around the camera (e.g. your player's size)
 		scene.player.ellipsoid = new BABYLON.Vector3(2, 1, 2);
+		scene.player.previousRotation = scene.player.rotation.y;
+		scene.player.animations.push(scene.idleAnimation);
+		// scene.beginAnimation(scene.player, 0, 60, true);
     });
 	
+	
+
 	//Spawn a Blob on some random tile
-	// BABYLON.SceneLoader.ImportMesh("", "Models3D/", "Blob.js", scene, function (newMesh) {
-		// var entranceIndex = map.height-1 * map.width + Math.floor(map.width/2);
-		
-        // scene.Blob = newMesh[0];
-		// var randomTile = getRandomInt(0, map.rooms[entranceIndex].width*map.rooms[entranceIndex].height);
-		// while (map.rooms[entranceIndex].tiles[randomTile].type != TileType.Floor) {
-			// randomTile = getRandomInt(0, map.rooms[entranceIndex].width*map.rooms[entranceIndex].height);
-		// }
-		// var tileIndex = map.rooms[entranceIndex].tiles[randomTile].row*map.rooms[entranceIndex].tiles[randomTile].width + map.rooms[entranceIndex].tiles[randomTile].col;
-		// scene.Blob.position = new BABYLON.Vector3(scene.map.rooms[entranceIndex].tiles[randomTile].mesh.position.x, scene.map.rooms[entranceIndex].tiles[randomTile].mesh.position.y, scene.map.rooms[entranceIndex].tiles[randomTile].mesh.position.z);
-		// scene.Blob.scaling = new BABYLON.Vector3(8, 8, 8);
-        // scene.Blob.isVisible = true;
-        // scene.Blob.material = scene.BlobMaterial;
-    // });
+	scene.enemy=[];
+	spawnEnemy(scene);
+	spawnEnemy(scene);
+	spawnEnemy(scene);
 	
     // BABYLON.SceneLoader.ImportMesh("", "Models3D/", "BookGolem.js", scene, function (newMesh) {
         // scene.BookGolem = newMesh;
@@ -152,7 +171,7 @@ function MapEditor(engine) {
 		// }
         // // m[0].isVisible = true;
         // // m.material = scene.tileMaterialSword;
-    // });
+    // });	
 
     scene.registerBeforeRender(function(){	
 		if(scene.isReady() && scene.player) {
@@ -196,4 +215,28 @@ function drawTile(Scene, tile, index) {
     newMesh.material = bjsHelper.tileType[tile.type].material;
 
     return newMesh;
+};
+
+function spawnEnemy(Scene) {
+	var entranceIndex = Scene.activeRoom.index;
+	//TO DO: Implement other enemy types, for now just a rolling ball, who has lost his chain
+    var newMesh = new BABYLON.Mesh.CreateSphere("enemySphere", 8.0, 8.0, Scene);
+	var enemyIndex = Scene.enemy.push(newMesh) - 1;
+	var randomTile = getRandomInt(0, map.rooms[entranceIndex].width*map.rooms[entranceIndex].height);
+	while (map.rooms[entranceIndex].tiles[randomTile].type != TileType.Floor) {
+		randomTile = getRandomInt(0, map.rooms[entranceIndex].width*map.rooms[entranceIndex].height);
+	}
+	var tileIndex = map.rooms[entranceIndex].tiles[randomTile].row*map.rooms[entranceIndex].tiles[randomTile].width + map.rooms[entranceIndex].tiles[randomTile].col;
+	Scene.enemy[enemyIndex].position = new BABYLON.Vector3(Scene.rooms[entranceIndex].tiles[randomTile].mesh.position.x, 1, Scene.rooms[entranceIndex].tiles[randomTile].mesh.position.z);
+	Scene.enemy[enemyIndex].scaling = new BABYLON.Vector3(1, 1, 1);
+	Scene.enemy[enemyIndex].material = Scene.BlobMaterial;
+	
+	
+	Scene.enemy[enemyIndex].checkCollisions = true;
+	Scene.enemy[enemyIndex].applyGravity=true;
+	//Set the ellipsoid around the camera (e.g. your player's size)
+	Scene.enemy[enemyIndex].ellipsoid = new BABYLON.Vector3(1, 1, 1);
+	
+	return;
+
 };

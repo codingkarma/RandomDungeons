@@ -17,7 +17,7 @@ function startMapEditor() {
 			var animationIter = -.0075;
 			var loopCounter = 0;
 			var firstTime=1;
-            // Once the scene is loaded, just register a render loop to render it
+            // Once the scene is loaded, register a render loop to render it
             engine.runRenderLoop(function () {
 				// rotate to give some animation
 				if(scene.isReady() && scene.player) {
@@ -47,13 +47,7 @@ function startMapEditor() {
 						}
 						
 					}
-					else {
-						scene.player.rotation.y=scene.player.rotation.y+1.25*animationIter;
-						scene.player.rotation.x=scene.player.rotation.x+.8*animationIter;
-						scene.player.rotation.z=scene.player.rotation.z+animationIter;
-						
-						// scene.Blob.position.y=scene.Blob.position.y+2*animationIter;
-						
+					else {						
 						if (loopCounter > 50) {
 							loopCounter=0;
 							animationIter=animationIter*-1;
@@ -67,21 +61,7 @@ function startMapEditor() {
 							checkActiveRoom(scene);
 						}
 					}
-					var vX=0; var vZ=0;
-					if (isWKey >0) {
-						vZ=1;
-					}
-					if (isSKey >0) {
-						vZ=-1;
-					}
-					if (isAKey >0) {
-						vX=-1;
-					}
-					if (isDKey >0) {
-						vX=1;
-					}
-					var velocity=new BABYLON.Vector3(vX, -10, vZ);
-					scene.player.moveWithCollisions(velocity);
+					processInput(scene.player);
 				}
 				
                 //Render scene and any changes
@@ -97,6 +77,10 @@ function startMapEditor() {
         }
 
 };
+
+function animatePlayer(Scene) {
+	
+}
 
 function checkActiveRoom(Scene) {
 	if (Scene.player.position.z > (Scene.activeRoom.roomZ0)) {
