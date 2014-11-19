@@ -17,10 +17,25 @@ function startMapEditor() {
 			var animationIter = -.0075;
 			var loopCounter = 0;
 			var firstTime=1;
+			var isErrthingReady=0;
+			var i;
             // Once the scene is loaded, register a render loop to render it
             engine.runRenderLoop(function () {
 				// rotate to give some animation
-				if(scene.isReady() && scene.player) {
+				if (isErrthingReady == 0) {
+					if (scene.isReady() && scene.player) {
+						isErrthingReady = 1;
+					}
+					else {
+						isErrthingReady = 0;
+					}
+					if (isErrthingReady != 0 ) {
+						for (i=0; i < scene.enemy.length;i++) {
+							scene.enemy[i].velocity = new BABYLON.Vector3(0,-10,0);
+						}
+					}
+				}
+				else {
 					if (Attack == 1) {
 						if (firstTime == 1) {
 							// scene.player.rotation = new BABYLON.Vector3(Math.PI/1.5, 0, Math.PI/2.2);
@@ -60,8 +75,17 @@ function startMapEditor() {
 							//check what room the player is in
 							checkActiveRoom(scene);
 						}
+						else if (loopCounter % 31 == 0) {
+							for (i=0; i < scene.enemy.length;i++) {
+								scene.enemy[i].velocity = GetPathVector(scene.enemy[i].position,scene.player.position,{speed: 1.5, tolerance: 5});
+							}
+						}
 					}
 					processInput(scene.player);
+					//Need to update this every loop, I guess
+					for (i=0; i < scene.enemy.length;i++) {
+						scene.enemy[i].moveWithCollisions(scene.enemy[i].velocity);
+					}
 				}
 				
                 //Render scene and any changes
@@ -72,8 +96,6 @@ function startMapEditor() {
             window.addEventListener("resize", function () {
                 engine.resize();
             });
-
-            
         }
 
 };

@@ -1,8 +1,15 @@
-function GetPathVector(startX, startZ, endX, endZ, tolerence)
+function GetPathVector(startPosition, endPosition, options)
 {
-	if(Math.abs(startX-endX) < tolerence || Math.abs(startZ-endZ) < tolerence)
+	var settings = $.extend({
+		speed: 1.0,
+		tolerance: 1.0
+	},options||{});
+
+	if(Math.abs(startPosition.x-endPosition.x) < settings.tolerance || Math.abs(startPosition.z-endPosition.z) < settings.tolerance)
 	{
-		new BABYLON.Vector3(0, 0, 0);
+		return new BABYLON.Vector3(0, -10, 0);
 	}
-	return new BABYLON.Vector3(startX-endX, 0, startZ-endZ);
+	else {
+		return new BABYLON.Vector3(-1*settings.speed*(startPosition.x-endPosition.x)/startPosition.x, -10, settings.speed*(startPosition.z-endPosition.z)/startPosition.z);
+	}
 }

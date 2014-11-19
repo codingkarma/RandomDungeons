@@ -84,6 +84,7 @@ function MapEditor(engine) {
 				//reposition to room location
 				scene.rooms[i_room].tiles[i].mesh.position.x=scene.rooms[i_room].tiles[i].mesh.position.x+roomX0;
 				scene.rooms[i_room].tiles[i].mesh.position.z=scene.rooms[i_room].tiles[i].mesh.position.z+roomZ0;
+				scene.rooms[i_room].tiles[i].mesh.backFaceCulling = false;
 				
 				scene.rooms[i_room].tiles[i].mesh.checkCollisions = true;
 				scene.rooms[i_room].tiles[i].mesh.tileId = i;
@@ -220,20 +221,21 @@ function drawTile(Scene, tile, index) {
 function spawnEnemy(Scene) {
 	var entranceIndex = Scene.activeRoom.index;
 	//TO DO: Implement other enemy types, for now just a rolling ball, who has lost his chain
-    var newMesh = new BABYLON.Mesh.CreateSphere("enemySphere", 8.0, 8.0, Scene);
+	var index = Scene.enemy.length;
+    var newMesh = new BABYLON.Mesh.CreateSphere("enemySphere-" + parseInt(index), 8.0, 8.0, Scene);
 	var enemyIndex = Scene.enemy.push(newMesh) - 1;
 	var randomTile = getRandomInt(0, map.rooms[entranceIndex].width*map.rooms[entranceIndex].height);
 	while (map.rooms[entranceIndex].tiles[randomTile].type != TileType.Floor) {
 		randomTile = getRandomInt(0, map.rooms[entranceIndex].width*map.rooms[entranceIndex].height);
 	}
 	var tileIndex = map.rooms[entranceIndex].tiles[randomTile].row*map.rooms[entranceIndex].tiles[randomTile].width + map.rooms[entranceIndex].tiles[randomTile].col;
-	Scene.enemy[enemyIndex].position = new BABYLON.Vector3(Scene.rooms[entranceIndex].tiles[randomTile].mesh.position.x, 1, Scene.rooms[entranceIndex].tiles[randomTile].mesh.position.z);
+	Scene.enemy[enemyIndex].position = new BABYLON.Vector3(Scene.rooms[entranceIndex].tiles[randomTile].mesh.position.x, 50, Scene.rooms[entranceIndex].tiles[randomTile].mesh.position.z);
 	Scene.enemy[enemyIndex].scaling = new BABYLON.Vector3(1, 1, 1);
 	Scene.enemy[enemyIndex].material = Scene.BlobMaterial;
 	
 	
 	Scene.enemy[enemyIndex].checkCollisions = true;
-	Scene.enemy[enemyIndex].applyGravity=true;
+	Scene.enemy[enemyIndex].applyGravity = true;
 	//Set the ellipsoid around the camera (e.g. your player's size)
 	Scene.enemy[enemyIndex].ellipsoid = new BABYLON.Vector3(1, 1, 1);
 	
