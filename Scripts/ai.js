@@ -1,3 +1,4 @@
+
 function GetPathVector(startPosition, endPosition, options)
 {
 	var settings = $.extend({
@@ -12,4 +13,19 @@ function GetPathVector(startPosition, endPosition, options)
 	else {
 		return new BABYLON.Vector3(-1*settings.speed*(startPosition.x-endPosition.x)/startPosition.x, -10, settings.speed*(startPosition.z-endPosition.z)/startPosition.z);
 	}
+}
+
+function GetDirectionAndAngle(startX, startZ, endX, endZ, options)
+{
+	var settings = $.extend({
+		speed: 1.0,
+		tolerance: 1.0
+	},options||{});
+
+	if(Math.abs(startPosition.x-endPosition.x) < settings.tolerance || Math.abs(startPosition.z-endPosition.z) < settings.tolerance)
+	{
+		return {vector: new BABYLON.Vector3(0, -10, 0), angle: Math.acos((startX*endX + startZ*endZ)/(sqrt(startX^2 + endX^2) *sqrt(startZ^2 + endZ^2)))};
+	}
+	return {vector: new BABYLON.Vector3(startX-endX, 0, startZ-endZ), 
+		angle:Math.acos((startX * endX + startZ * endZ)/(sqrt(startX^2 + endX^2) *sqrt(startZ^2 + endZ^2)))};
 }
