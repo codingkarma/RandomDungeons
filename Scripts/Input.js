@@ -4,7 +4,7 @@ var LeftDown = false;
 var RightDown = false;
 var UpDown = false;
 var DownDown = false;
-var PreviousPosition = 2 * Math.PI;
+var SpaceBarDown = false;
 //KEYS
 var KEYS = {
     SPACE: 32,
@@ -35,6 +35,9 @@ function doKeyDown(evt) {
             DownDown = true;
             break;
     }
+	if (evt.keyCode == KEYS.SPACE) {
+		SpaceBarDown = true;
+	}
 }
 
 function doKeyUp(evt) {
@@ -53,6 +56,9 @@ function doKeyUp(evt) {
             DownDown = false;
             break;
     }
+	if (evt.keyCode == KEYS.SPACE) {
+		SpaceBarDown = false;
+	}
 }
 
 function processInput(entity) {
@@ -75,8 +81,12 @@ function processInput(entity) {
         vX=1;
 		entity.rotation.y = Math.PI;
     }
-	var velocity=new BABYLON.Vector3(vX, -10, vZ);
+	var velocity=new BABYLON.Vector3(vX, scene.gravity.y, vZ);
 	entity.moveWithCollisions(velocity);
+	
+	if (SpaceBarDown == true) {
+		entity.Attack = 1;
+	}
 
 }
 

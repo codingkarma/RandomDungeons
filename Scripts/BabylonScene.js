@@ -150,7 +150,7 @@ function MapEditor(engine) {
 		scene.player.checkCollisions = true;
 		scene.player.applyGravity=true;
 		//Set the ellipsoid around the camera (e.g. your player's size)
-		scene.player.ellipsoid = new BABYLON.Vector3(2, 1, 2);
+		scene.player.ellipsoid = new BABYLON.Vector3(3, 1, 3);
 		scene.player.previousRotation = scene.player.rotation.y;
 		scene.player.animations.push(scene.idleAnimation);
 		// scene.beginAnimation(scene.player, 0, 60, true);
@@ -175,7 +175,17 @@ function MapEditor(engine) {
     // });	
 
     scene.registerBeforeRender(function(){	
-		if(scene.isReady() && scene.player) {
+		if(scene.isErrthingReady != 0) {
+			//Balloon 1 intersection -- Precise = false
+			for (i=0; i < scene.enemy.length;i++) {
+				if (scene.player.intersectsMesh(scene.enemy[i], true) && scene.player.Attack == 1) {
+					scene.enemy[i].renderOutline = true;
+					scene.enemy[i].outlineColor = new BABYLON.Color4(.8,.2,.2,.8);
+					scene.enemy[i].outlineWidth =.2;
+				} else {
+					scene.enemy[i].renderOutline = false;
+				}
+			}
 			// var velocity = new BABYLON.Vector3(0, -10, 0);	
 			// scene.player.moveWithCollisions(velocity);
 		}
@@ -237,7 +247,7 @@ function spawnEnemy(Scene) {
 	Scene.enemy[enemyIndex].checkCollisions = true;
 	Scene.enemy[enemyIndex].applyGravity = true;
 	//Set the ellipsoid around the camera (e.g. your player's size)
-	Scene.enemy[enemyIndex].ellipsoid = new BABYLON.Vector3(1, 1, 1);
+	Scene.enemy[enemyIndex].ellipsoid = new BABYLON.Vector3(2, 1, 2);
 	
 	return;
 

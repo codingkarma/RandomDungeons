@@ -14,29 +14,33 @@ function startMapEditor() {
 
             scene.activeCamera.attachControl(canvas);
 			
+			
+			
 			var animationIter = -.0075;
 			var loopCounter = 0;
 			var firstTime=1;
-			var isErrthingReady=0;
+			scene.isErrthingReady=0;
 			var i;
             // Once the scene is loaded, register a render loop to render it
             engine.runRenderLoop(function () {
 				// rotate to give some animation
-				if (isErrthingReady == 0) {
+				if (scene.isErrthingReady == 0) {
 					if (scene.isReady() && scene.player) {
-						isErrthingReady = 1;
+						scene.isErrthingReady = 1;
 					}
 					else {
-						isErrthingReady = 0;
+						scene.isErrthingReady = 0;
 					}
-					if (isErrthingReady != 0 ) {
+					//when everything is ready this gets executed once
+					if (scene.isErrthingReady != 0 ) {
 						for (i=0; i < scene.enemy.length;i++) {
-							scene.enemy[i].velocity = new BABYLON.Vector3(0,-10,0);
+							scene.enemy[i].velocity = new BABYLON.Vector3(0,scene.gravity.y,0);
 						}
+						scene.player.Attack=0;
 					}
 				}
 				else {
-					if (Attack == 1) {
+					if (scene.player.Attack == 1) {
 						if (firstTime == 1) {
 							// scene.player.rotation = new BABYLON.Vector3(Math.PI/1.5, 0, Math.PI/2.2);
 							scene.player.rotation = new BABYLON.Vector3(0, Math.PI/1.2, Math.PI/2);
@@ -51,7 +55,7 @@ function startMapEditor() {
 							
 							if (loopCounter > 12) {
 								loopCounter=0;
-								Attack=0;
+								scene.player.Attack=0;
 								firstTime=1;
 								animationIter = -.0075;
 								scene.player.rotation = new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4);
