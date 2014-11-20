@@ -12,13 +12,14 @@ var bjsHelper =  {
 	]
 };
 
-function MapEditor(engine) {
+function CreateScene(engine) {
     //Creation of the scene 
     var scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
 	scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
 	scene.collisionsEnabled = true;
-
+	scene.isErrthingReady = false;
+    
     //Adding an Arc Rotate Camera
     //var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
     var Alpha = 3*Math.PI/2;
@@ -175,7 +176,7 @@ function MapEditor(engine) {
     // });	
 
     scene.registerBeforeRender(function(){	
-		if(scene.isErrthingReady != 0) {
+		if(scene.isErrthingReady) {
 			//Balloon 1 intersection -- Precise = false
 			for (i=0; i < scene.enemy.length;i++) {
 				if (scene.player.intersectsMesh(scene.enemy[i], true) && scene.player.Attack == 1) {

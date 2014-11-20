@@ -24,8 +24,8 @@ function GetDirectionAndAngle(startX, startZ, endX, endZ, options)
 
 	if(Math.abs(startPosition.x-endPosition.x) < settings.tolerance || Math.abs(startPosition.z-endPosition.z) < settings.tolerance)
 	{
-		return {vector: new BABYLON.Vector3(0, scene.gravity.y, 0), angle: Math.acos((startX*endX + startZ*endZ)/(sqrt(startX^2 + endX^2) *sqrt(startZ^2 + endZ^2)))};
+		return {vector: GetPathVector(startPosition, endPosition, options), angle: Math.acos((startX*endX + startZ*endZ)/(sqrt(startX^2 + endX^2) *sqrt(startZ^2 + endZ^2)))};
 	}
-	return {vector: new BABYLON.Vector3(startX-endX, scene.gravity.y, startZ-endZ), 
+	return {vector: GetPathVector(startPosition, endPosition, options), 
 		angle:Math.acos((startX * endX + startZ * endZ)/(sqrt(startX^2 + endX^2) *sqrt(startZ^2 + endZ^2)))};
 }
