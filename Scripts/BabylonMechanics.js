@@ -1,4 +1,4 @@
-function startMapEditor() {  
+function startGame() {  
 
         var canvas = document.getElementById("renderCanvas");
 
@@ -9,28 +9,25 @@ function startMapEditor() {
             // Babylon
             var engine = new BABYLON.Engine(canvas, true);
 
-            //Creating scene (in "scene_tuto.js")
-            scene = MapEditor(engine);
+            //Creating scene (in "BabylonScene.js")
+            scene = CreateScene(engine);
 
             scene.activeCamera.attachControl(canvas);
 			
 			var animationIter = -.0075;
 			var loopCounter = 0;
 			var firstTime=1;
-			scene.isErrthingReady=0;
+
 			var i;
             // Once the scene is loaded, register a render loop to render it
             engine.runRenderLoop(function () {
 				// rotate to give some animation
-				if (scene.isErrthingReady == 0) {
+				if (!scene.isErrthingReady) {
 					if (scene.isReady() && scene.player) {
-						scene.isErrthingReady = 1;
-					}
-					else {
-						scene.isErrthingReady = 0;
+						scene.isErrthingReady = true;
 					}
 					//when everything is ready this gets executed once
-					if (scene.isErrthingReady != 0 ) {
+					if (scene.isErrthingReady) {
 						for (i=0; i < scene.enemy.length;i++) {
 							scene.enemy[i].velocity = new BABYLON.Vector3(0,scene.gravity.y,0);
 						}

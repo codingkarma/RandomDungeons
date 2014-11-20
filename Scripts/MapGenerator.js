@@ -24,7 +24,7 @@ function getRandomInt(min, max) {
 function getRandomIntFromArray(array) {
 	var max=array.length;
 	var min=0;
-	if (array == undefined) {
+	if (!array || array.length == 0) {
 		return -1;
 	}
 	else {
@@ -34,7 +34,7 @@ function getRandomIntFromArray(array) {
 function GenerateRoom(options)
 {
 	var settings = $.extend({
-			type: getRandomInt(1,3),
+			type: getRandomInt(1,2),
 			width: 13,
 			height: 15
 		},options||{});
@@ -75,10 +75,6 @@ function GenerateRoom(options)
 		{
 			reflectionRow = room.height - room.tiles[i].row - 1;
 			reflectionCol = room.width - room.tiles[i].col - 1;
-
-			// console.log('i:' + i);
-			// console.log('x,y:' + reflectionCol + ',' + reflectionRow);
-			// console.log('guessAtReflecti:' + (reflectionRow * room.width + reflectionCol));
 			room.tiles[i].type = room.tiles[(reflectionRow * room.width + reflectionCol)].type;
 		}
 		room.tiles[i].width = TileWidth;
@@ -94,6 +90,7 @@ function GenerateBranch(map, startCol, startRow)
 	var prevDoorRow = 0;
 	var starDoorCol = 0;
 	var starDoorRow = 0;
+
 	//check which rooms are available
 	var checkRoom = [];
 	if (startRow-1 >= 0) {
@@ -108,13 +105,15 @@ function GenerateBranch(map, startCol, startRow)
 	if (startCol-1 >= 0) {
 		checkRoom.push(3);
 	}
+	//exit if no rooms available
+	if(checkRoom.length == 0)
+	{
+		return;
+	}
 	//randomly choose which direction to go
 	var decision = getRandomIntFromArray(checkRoom);
 	switch(decision) 
 	{
-		//clockwise check starting "north"
-		case -1:
-			return;
 		case 0:
 			startRow--;
 			//choose random door north
