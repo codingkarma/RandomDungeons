@@ -5,7 +5,7 @@ var EntityType ={
 
 
 function Entity(options) {
-	return $.extend({
+	$.extend(this,{
 			type: EntityType.Sphere,
 			health: 1,
 			damage: 1,
