@@ -68,18 +68,22 @@ function processInput(entity) {
     if (UpDown && !DownDown) {
         vZ=1;
 		entity.rotation.y = Math.PI / 2;
+		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI / 2, entity.rotation.z);
     }
     else if (DownDown && !UpDown) {
         vZ=-1;
 		entity.rotation.y = -Math.PI / 2;
+		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, -Math.PI / 2, entity.rotation.z);
     }
     if (LeftDown && !RightDown) {
         vX=-1;
 		entity.rotation.y = 0;
+		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, 0, entity.rotation.z);
     }
     else if (RightDown && !LeftDown) {
         vX=1;
 		entity.rotation.y = Math.PI;
+		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI, entity.rotation.z);
     }
 	var velocity=new BABYLON.Vector3(vX, scene.gravity.y, vZ);
 	entity.moveWithCollisions(velocity);

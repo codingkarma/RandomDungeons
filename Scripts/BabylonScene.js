@@ -29,49 +29,12 @@ function MapEditor(engine) {
     scene.camera.upperAlphaLimit = Alpha;
     scene.camera.lowerBetaLimit = Beta;
     scene.camera.upperBetaLimit = Beta;
-
-	//Create me some textures
-	//Tile Type detailed materials
-	//Wall
-	bjsHelper.tileType[0].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[0].name, scene);
-	bjsHelper.tileType[0].material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture-2.png', scene);
-	bjsHelper.tileType[0].material.diffuseTexture.wAng=0;
-	bjsHelper.tileType[0].material.diffuseTexture.uScale=1;
-	// bjsHelper.tileType[0].material.diffuseTexture.vOffset=-1;
-	bjsHelper.tileType[0].material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture-2.png', scene);
-	bjsHelper.tileType[0].material.bumpTexture.uScale=1;
-	bjsHelper.tileType[0].material.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-	//Floor
-	bjsHelper.tileType[1].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[1].name, scene);
-	bjsHelper.tileType[1].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', scene);
-	bjsHelper.tileType[1].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', scene);
-	bjsHelper.tileType[1].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-	//Pillar
-	bjsHelper.tileType[2].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[2].name, scene);
-	bjsHelper.tileType[2].material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture-2.png', scene);
-	bjsHelper.tileType[2].material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture-2.png', scene);
-	bjsHelper.tileType[2].material.diffuseColor = new BABYLON.Color3(.5, 0.5, 0.5);
-	//Fire
-	bjsHelper.tileType[3].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[3].name, scene);
-	bjsHelper.tileType[3].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', scene);
-	bjsHelper.tileType[3].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', scene);
-	bjsHelper.tileType[3].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-	//Door
-	bjsHelper.tileType[4].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[4].name, scene);
-	bjsHelper.tileType[4].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', scene);
-	bjsHelper.tileType[4].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', scene);
-	bjsHelper.tileType[4].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
 	
-    scene.tileMaterialSword = new BABYLON.StandardMaterial("tile-texture-Sword", scene);
-    scene.tileMaterialSword.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.7);
-	// scene.tileMaterialSword.specularColor = new BABYLON.Color3(0, 0, 0);
-	
-	scene.BlobMaterial = new BABYLON.StandardMaterial("tile-texture-Blob", scene);
-    scene.BlobMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.3);
-    scene.BlobMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+	createMaterials(scene);
 
     scene.rooms = map.rooms;
 	//Draw Rooms
+	//TODO: change roomX0/roomZ0 to originOffset and add to each room as a parameter
 	var roomX0=0;
 	var roomZ0=0;
 	for (var i_room=0; i_room < map.rooms.length; i_room++) {
@@ -110,30 +73,7 @@ function MapEditor(engine) {
 			}
 		}
 	}
-    
-	//create animations for player
-	scene.idleAnimation = new BABYLON.Animation("idleAnimation", "rotation", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
-	// Animation keys
-    scene.idleAnimation.tempKeys = [];
-	function updateIdleAnimation(Scene) {
-		var val = Scene.player.rotation.x;
-		return new BABYLON.Vector3(val+1, Math.PI/2, Math.PI/4);
-	}
-    //At the animation key 0, the value of scaling is "1"
-    scene.idleAnimation.tempKeys.push({
-        frame: 0,
-        value: new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4)
-    });
-	scene.idleAnimation.tempKeys.push({
-        frame: 30,
-        value: new BABYLON.Vector3(Math.PI/3, Math.PI/1.8, Math.PI/3)
-    });
-	scene.idleAnimation.tempKeys.push({
-        frame: 60,
-        value: new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4)
-    });
-	//Adding keys to the animation object
-    scene.idleAnimation.setKeys(scene.idleAnimation.tempKeys);
+	
     // example of loading a mesh from blender export
     scene.player = 0;
     BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.js", scene, function (meshes, particleSystems) {
@@ -152,11 +92,8 @@ function MapEditor(engine) {
 		//Set the ellipsoid around the camera (e.g. your player's size)
 		scene.player.ellipsoid = new BABYLON.Vector3(3, 1, 3);
 		scene.player.previousRotation = scene.player.rotation.y;
-		scene.player.animations.push(scene.idleAnimation);
-		// scene.beginAnimation(scene.player, 0, 60, true);
+		scene.player.playerAnimations = new playerAnimations();
     });
-	
-	
 
 	//Spawn a Blob on some random tile
 	scene.enemy=[];
@@ -176,7 +113,7 @@ function MapEditor(engine) {
 
     scene.registerBeforeRender(function(){	
 		if(scene.isErrthingReady != 0) {
-			//Balloon 1 intersection -- Precise = false
+			//Detect if player hits enemy mesh
 			for (i=0; i < scene.enemy.length;i++) {
 				if (scene.player.intersectsMesh(scene.enemy[i], true) && scene.player.Attack == 1) {
 					scene.enemy[i].renderOutline = true;
@@ -186,8 +123,6 @@ function MapEditor(engine) {
 					scene.enemy[i].renderOutline = false;
 				}
 			}
-			// var velocity = new BABYLON.Vector3(0, -10, 0);	
-			// scene.player.moveWithCollisions(velocity);
 		}
 	});
 
@@ -216,7 +151,7 @@ this.getScale = function () {
     // Calculate viewport scale 
     this.viewportScale = screen.width / window.innerWidth;
     return this.viewportScale;
-};
+}
 
 function drawTile(Scene, tile, index) {
 
@@ -226,7 +161,7 @@ function drawTile(Scene, tile, index) {
     newMesh.material = bjsHelper.tileType[tile.type].material;
 
     return newMesh;
-};
+}
 
 function spawnEnemy(Scene) {
 	var entranceIndex = Scene.activeRoom.index;
@@ -251,4 +186,96 @@ function spawnEnemy(Scene) {
 	
 	return;
 
-};
+}
+
+function playerAnimations() {
+
+	this.updateIdle = function (Scene) {
+		//create animations for player
+		Scene.idleAnimation = new BABYLON.Animation("idleAnimation", "rotation", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+		// Animation keys
+		Scene.idleAnimation.tempKeys = [];
+		//At the animation key 0, the value of scaling is "1"
+		Scene.idleAnimation.tempKeys.push({
+			frame: 0,
+			value: Scene.player.currentFacingAngle.add(new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4))
+		});
+		Scene.idleAnimation.tempKeys.push({
+			frame: 30,
+			value: new BABYLON.Vector3(Math.PI/3, Math.PI/1.8, Math.PI/3)
+		});
+		Scene.idleAnimation.tempKeys.push({
+			frame: 60,
+			value: new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4)
+		});
+		//Adding keys to the animation object
+		Scene.idleAnimation.setKeys(Scene.idleAnimation.tempKeys);
+		Scene.player.animations.push(scene.idleAnimation);
+	};
+	
+	this.updateAttack = function (Scene) {
+		//create animations for player
+		Scene.attackAnimation = new BABYLON.Animation("attackAnimation", "rotation", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+		// Animation keys
+		Scene.attackAnimation.tempKeys = [];
+		//At the animation key 0, the value of scaling is "1"
+		Scene.attackAnimation.tempKeys.push({
+			frame: 0,
+			value: new BABYLON.Vector3(0, Scene.player.currentFacingAngle.y + Math.PI/2.2, Math.PI/2)
+		});
+		Scene.attackAnimation.tempKeys.push({
+			frame: 10,
+			value: new BABYLON.Vector3(0, Scene.player.currentFacingAngle.y - 0.8, Math.PI/2)
+		});
+		//Adding keys to the animation object
+		Scene.attackAnimation.setKeys(Scene.attackAnimation.tempKeys);
+		Scene.player.animations.push(Scene.attackAnimation);
+		Scene.beginAnimation(Scene.player, 0, 10, false, 1.0, function () {
+			Scene.player.Attacking=0;
+			Scene.player.Attack=0; 
+			Scene.player.rotation = new BABYLON.Vector3(Math.PI/6,Scene.player.currentFacingAngle.y,Math.PI/4);
+		});
+	};
+}
+
+function createMaterials(Scene) {
+	//Create me some textures
+	//Tile Type detailed materials
+	//Wall
+	bjsHelper.tileType[0].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[0].name, Scene);
+	bjsHelper.tileType[0].material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture-2.png', Scene);
+	bjsHelper.tileType[0].material.diffuseTexture.wAng=0;
+	bjsHelper.tileType[0].material.diffuseTexture.uScale=1;
+	// bjsHelper.tileType[0].material.diffuseTexture.vOffset=-1;
+	bjsHelper.tileType[0].material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture-2.png', Scene);
+	bjsHelper.tileType[0].material.bumpTexture.uScale=1;
+	bjsHelper.tileType[0].material.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+	//Floor
+	bjsHelper.tileType[1].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[1].name, Scene);
+	bjsHelper.tileType[1].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', Scene);
+	bjsHelper.tileType[1].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', Scene);
+	bjsHelper.tileType[1].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	//Pillar
+	bjsHelper.tileType[2].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[2].name, Scene);
+	bjsHelper.tileType[2].material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture-2.png', Scene);
+	bjsHelper.tileType[2].material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture-2.png', Scene);
+	bjsHelper.tileType[2].material.diffuseColor = new BABYLON.Color3(.5, 0.5, 0.5);
+	//Fire
+	bjsHelper.tileType[3].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[3].name, Scene);
+	bjsHelper.tileType[3].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', Scene);
+	bjsHelper.tileType[3].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', Scene);
+	bjsHelper.tileType[3].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	//Door
+	bjsHelper.tileType[4].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[4].name, Scene);
+	bjsHelper.tileType[4].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', Scene);
+	bjsHelper.tileType[4].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', Scene);
+	bjsHelper.tileType[4].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	
+    Scene.tileMaterialSword = new BABYLON.StandardMaterial("tile-texture-Sword", Scene);
+    Scene.tileMaterialSword.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.7);
+	// Scene.tileMaterialSword.specularColor = new BABYLON.Color3(0, 0, 0);
+	
+	Scene.BlobMaterial = new BABYLON.StandardMaterial("tile-texture-Blob", Scene);
+    Scene.BlobMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.3);
+    Scene.BlobMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+}

@@ -14,8 +14,6 @@ function startMapEditor() {
 
             scene.activeCamera.attachControl(canvas);
 			
-			
-			
 			var animationIter = -.0075;
 			var loopCounter = 0;
 			var firstTime=1;
@@ -37,39 +35,20 @@ function startMapEditor() {
 							scene.enemy[i].velocity = new BABYLON.Vector3(0,scene.gravity.y,0);
 						}
 						scene.player.Attack=0;
+						scene.player.Attacking=0;
+						scene.player.currentFacingAngle = new BABYLON.Vector3(scene.player.rotation.x, scene.player.rotation.y, scene.player.rotation.z);
 					}
 				}
 				else {
 					if (scene.player.Attack == 1) {
-						if (firstTime == 1) {
-							// scene.player.rotation = new BABYLON.Vector3(Math.PI/1.5, 0, Math.PI/2.2);
-							scene.player.rotation = new BABYLON.Vector3(0, Math.PI/1.2, Math.PI/2);
-							firstTime=0;
-							loopCounter=0;
-							animationIter = .08;
+						if (scene.player.Attacking==0) {
+							scene.player.playerAnimations.updateAttack(scene);
+							scene.player.Attacking=1;
 						}
-						else {
-							scene.player.rotation.y=scene.player.rotation.y-1.8*animationIter;
-							// scene.player.rotation.x=scene.player.rotation.x-2*animationIter;
-							// scene.player.rotation.z=scene.player.rotation.z-2*animationIter;
-							
-							if (loopCounter > 12) {
-								loopCounter=0;
-								scene.player.Attack=0;
-								firstTime=1;
-								animationIter = -.0075;
-								scene.player.rotation = new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4);
-							}
-							else {
-								loopCounter++;
-							}
-						}
-						
 					}
 					else {						
-						if (loopCounter > 50) {
+						if (loopCounter > 1000) {
 							loopCounter=0;
-							animationIter=animationIter*-1;
 						}
 						else {
 							loopCounter++;
