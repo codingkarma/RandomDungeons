@@ -55,17 +55,24 @@ function CreateStartScene(engine) {
 	
 	scene.door = new BABYLON.Mesh.CreateBox('door',1.0,scene);
 	scene.door.scaling = new BABYLON.Vector3(20,1,30);
+	scene.door.material = new BABYLON.StandardMaterial("textureDoor", scene);
+	scene.door.material.diffuseTexture = new BABYLON.Texture('./Models3D/Medieval_door2.jpg', scene);
+	scene.door.material.diffuseColor = new BABYLON.Color3(0.4, 0.3, 0.2);
 	
 	scene.floor = new BABYLON.Mesh.CreateBox('floor',1,scene);
 	scene.floor.scaling = new BABYLON.Vector3(100,100,1);
 	scene.floor.position = new BABYLON.Vector3(0,0,-15);
-    scene.floor.material = new BABYLON.StandardMaterial("materialFloor", scene);
-	scene.floor.material.diffuseColor = new BABYLON.Color3(0.7, 0.9, 0.7);
+	scene.floor.material = new BABYLON.StandardMaterial("textureFloor", scene);
+	scene.floor.material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-1.png', scene);
+	scene.floor.material.diffuseTexture.uScale=20;
+	scene.floor.material.diffuseTexture.vScale=20;
+	scene.floor.material.diffuseColor = new BABYLON.Color3(0.6, 0.6, 0.6);
+	
 	// Create a particle system
 	scene.leftTorchFire = new BABYLON.ParticleSystem("particles", 1000, scene);
 
     //Texture of each particle
-    scene.leftTorchFire.particleTexture = new BABYLON.Texture("Models3D/flare.png", scene);
+    scene.leftTorchFire.particleTexture = new BABYLON.Texture("Models3D/flame.png", scene);
 
     // Where the particles come from
     scene.leftTorchFire.minEmitBox = new BABYLON.Vector3(-.75, 0, 0); // Starting all from
@@ -107,11 +114,25 @@ function CreateStartScene(engine) {
     scene.leftTorchFire.updateSpeed = 0.005;
 
     scene.leftTorchLight= new BABYLON.PointLight("Omni", new BABYLON.Vector3(-17, 10,7), scene);
-	scene.leftTorchLight.diffuse = new BABYLON.Color3(.6, .3, .3);
+	scene.leftTorchLight.diffuse = new BABYLON.Color3(.6, .4, .2);
 	scene.leftTorchLight.specular = new BABYLON.Color3(.3, .2, .2);
     scene.rightTorchLight= new BABYLON.PointLight("Omni", new BABYLON.Vector3(17, 10,7), scene);
-	scene.rightTorchLight.diffuse = new BABYLON.Color3(.6, .3, .3);
+	scene.rightTorchLight.diffuse = new BABYLON.Color3(.6, .4, .2);
 	scene.rightTorchLight.specular = new BABYLON.Color3(.3, .2, .2);
+	
+	//Create Torch Meshes
+	scene.leftTorchHandle = new BABYLON.Mesh.CreateCylinder('TorchHandle',6,1.35,.75,8,1,scene);
+	scene.leftTorchHandle.rotation = new BABYLON.Vector3(0,Math.PI/2,Math.PI/2.4);
+	scene.leftTorchHandle.scaling = new BABYLON.Vector3(1,1,1);
+	scene.leftTorchHandle.position = new BABYLON.Vector3(-13, 7, 1.5);
+	scene.leftTorchHandle.material = new BABYLON.StandardMaterial("textureTorch", scene);
+	scene.leftTorchHandle.material.diffuseTexture = new BABYLON.Texture('./Models3D/torch_wood.jpg', scene);
+	
+	scene.rightTorchHandle = new BABYLON.Mesh.CreateCylinder('TorchHandle',6,1.35,.75,8,1,scene);
+	scene.rightTorchHandle.rotation = new BABYLON.Vector3(0,Math.PI/2,Math.PI/2.4);
+	scene.rightTorchHandle.scaling = new BABYLON.Vector3(1,1,1);
+	scene.rightTorchHandle.position = new BABYLON.Vector3(13, 7, 1.5);
+	scene.rightTorchHandle.material = scene.leftTorchHandle.material;
 	
 	scene.player = 0;
     BABYLON.SceneLoader.ImportMesh("", "Models3D/", "TorchTop.b.js", scene, function (meshes) {
@@ -139,6 +160,8 @@ function CreateStartScene(engine) {
 		if (scene.isReady() && scene.rightTorch) {
 			scene.leftTorchFire.emitRate = getRandomInt(500, 1500);
 			scene.rightTorchFire.emitRate = getRandomInt(600, 1600);
+			scene.leftTorchLight.specular = new BABYLON.Color3(getRandomInt(3, 5)/10, .3, .3);
+			scene.rightTorchLight.specular = new BABYLON.Color3(getRandomInt(3, 5)/10, .3, .3);
 		}
 	});
 
