@@ -7,19 +7,89 @@
     position: absolute;
     /* background-image: linear-gradient(0deg, #888888, #EEEEEE); */
     background-image: linear-gradient(0deg, #222222, #AAAAAA);
-    height: calc(100% - 2em);
-	top: 1em;
-    bottom: 1em;
-	width: calc(100% - 2em);
-	left:1em;
-	right: 1em;
-	margin-bottom: 0px;
-	border-radius: 8px;
-	padding: .2em;
+	width: 100%;
+	height: 100%;
+	margin: 0em;
+	padding: 0em;
 }
 
 .renderCanvas {
+    position: absolute;
 	width: 100%;
 	height: 100%;
-	border-radius: 8px;
+}
+
+.fps {
+	color: white;
+	position: absolute;
+	top: 0em;
+	left: 0em;
+}
+
+/*Modal CSS*/
+.modalUnderlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:100%;
+    opacity: .1;
+	background-color: #020202;
+}
+
+.modal {
+    /* display: none; */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.modalForeground {
+    position: relative;
+    left: calc(50% - 13em);
+    top: 30%;
+    width: 24em;
+    height: auto;
+    min-height: 8em;
+	padding: 1em;
+    background-color: rgba(200,200,200,.6);
+    border: 1px solid;
+    border-radius: 1em;
+    border-color: #EEEEEE;
+	box-shadow: 3px 3px 6px #020202;
+    overflow: hidden;
+    z-index: 80;
+}
+.modalButton {
+	cursor: pointer;
+    background-image: linear-gradient(180deg, #888888, #686868 .2em);
+    font-family: OpenSans;
+	font-size: 3em;
+	color: #DDDDDD;
+	text-shadow: 1px 1px 3px #020202;
+	text-align: center;
+	background-color: #686868;
+	max-width: 8em;
+	margin: 0 auto;
+	margin-top: .2em;
+	margin-bottom: .2em;
+	padding: .1em;
+	border-bottom: 2px solid;
+    border-radius: .1em;
+    border-color: #282828;
+	box-shadow: 2px 2px 4px #020202;
+}
+.modalButton:hover {
+	color: #888888;
+}
+/*END - Modal CSS*/
+
+@font-face {
+    font-family: "OpenSans";
+    src: url("../Fonts/OpenSans-Regular.ttf");
+}
+
+@font-face {
+    font-family: "OpenSans-Semibold";
+    src: url("../Fonts/OpenSans-Semibold.ttf");
 }

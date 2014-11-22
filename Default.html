@@ -13,9 +13,20 @@
 </head>
 <body>
     <div class="container">
-	<canvas class="renderCanvas" id="renderCanvas"></canvas>
+		<canvas class="renderCanvas" id="renderCanvas"></canvas>
     </div>
-    <div id="fps">FPS:</div>
+	
+	<div id="modal" class="modal">
+        <div id="modalUnderlay" class="modalUnderlay">
+        </div>
+        <div class="modalForeground">
+            <div id="modalDiv" class="modalDiv">
+				<div class="modalButton" id="startGame">Start Game</div>
+				<div class="modalButton" d="about">About</div>
+			</div>
+        </div>
+    </div>
+    <div class='fps' id="fps">FPS:</div>
 	
 </body>
 	<!--Script references. -->

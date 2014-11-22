@@ -1,4 +1,4 @@
-function startGame() {  
+function startGame(whichScene) {  
 
         var canvas = document.getElementById("renderCanvas");
 
@@ -10,7 +10,12 @@ function startGame() {
             var engine = new BABYLON.Engine(canvas, true);
 
             //Creating scene (in "BabylonScene.js")
-            scene = CreateScene(engine);
+			if (whichScene == 0) {
+				scene = CreateStartScene(engine);
+			}
+			else {
+				scene = CreateScene(engine);
+			}
 
             scene.activeCamera.attachControl(canvas);
 			
@@ -94,8 +99,8 @@ function checkActiveRoom(Scene) {
 		Scene.activeRoom.roomX0=Scene.activeRoom.col*Scene.activeRoom.width*Scene.activeRoom.tiles[0].width;
 		Scene.activeRoom.roomZ0=-Scene.activeRoom.row*Scene.activeRoom.height*Scene.activeRoom.tiles[0].width;
 		//set camera to new position
-		var centerX=Scene.activeRoom.roomX0+Scene.activeRoom.width/2*Scene.activeRoom.tiles[0].width;
-		var centerZ=Scene.activeRoom.roomZ0-Scene.activeRoom.height/2*Scene.activeRoom.tiles[0].width;
+		var centerX=Scene.activeRoom.roomX0+(Scene.activeRoom.width-1)/2*Scene.activeRoom.tiles[0].width;
+		var centerZ=Scene.activeRoom.roomZ0-(Scene.activeRoom.height-1)/2*Scene.activeRoom.tiles[0].width;
 		Scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
 	}
 	else if (Scene.player.position.x > (Scene.activeRoom.roomX0+Scene.activeRoom.width*Scene.activeRoom.tiles[0].width)) {
@@ -107,8 +112,8 @@ function checkActiveRoom(Scene) {
 		Scene.activeRoom.roomX0=Scene.activeRoom.col*Scene.activeRoom.width*Scene.activeRoom.tiles[0].width;
 		Scene.activeRoom.roomZ0=-Scene.activeRoom.row*Scene.activeRoom.height*Scene.activeRoom.tiles[0].width;
 		//set camera to new position
-		var centerX=Scene.activeRoom.roomX0+Scene.activeRoom.width/2*Scene.activeRoom.tiles[0].width;
-		var centerZ=Scene.activeRoom.roomZ0-Scene.activeRoom.height/2*Scene.activeRoom.tiles[0].width;
+		var centerX=Scene.activeRoom.roomX0+(Scene.activeRoom.width-1)/2*Scene.activeRoom.tiles[0].width;
+		var centerZ=Scene.activeRoom.roomZ0-(Scene.activeRoom.height-1)/2*Scene.activeRoom.tiles[0].width;
 		Scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
 	}
 	else if (Scene.player.position.z < (Scene.activeRoom.roomZ0 - Scene.activeRoom.height*Scene.activeRoom.tiles[0].width)) {
@@ -120,8 +125,8 @@ function checkActiveRoom(Scene) {
 		Scene.activeRoom.roomX0=Scene.activeRoom.col*Scene.activeRoom.width*Scene.activeRoom.tiles[0].width;
 		Scene.activeRoom.roomZ0=-Scene.activeRoom.row*Scene.activeRoom.height*Scene.activeRoom.tiles[0].width;
 		//set camera to new position
-		var centerX=Scene.activeRoom.roomX0+Scene.activeRoom.width/2*Scene.activeRoom.tiles[0].width;
-		var centerZ=Scene.activeRoom.roomZ0-Scene.activeRoom.height/2*Scene.activeRoom.tiles[0].width;
+		var centerX=Scene.activeRoom.roomX0+(Scene.activeRoom.width-1)/2*Scene.activeRoom.tiles[0].width;
+		var centerZ=Scene.activeRoom.roomZ0-(Scene.activeRoom.height-1)/2*Scene.activeRoom.tiles[0].width;
 		Scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
 	}
 	else if (Scene.player.position.x < (Scene.activeRoom.roomX0)) {
@@ -133,8 +138,8 @@ function checkActiveRoom(Scene) {
 		Scene.activeRoom.roomX0=Scene.activeRoom.col*Scene.activeRoom.width*Scene.activeRoom.tiles[0].width;
 		Scene.activeRoom.roomZ0=-Scene.activeRoom.row*Scene.activeRoom.height*Scene.activeRoom.tiles[0].width;
 		//set camera to new position
-		var centerX=Scene.activeRoom.roomX0+Scene.activeRoom.width/2*Scene.activeRoom.tiles[0].width;
-		var centerZ=Scene.activeRoom.roomZ0-Scene.activeRoom.height/2*Scene.activeRoom.tiles[0].width;
+		var centerX=Scene.activeRoom.roomX0+(Scene.activeRoom.width-1)/2*Scene.activeRoom.tiles[0].width;
+		var centerZ=Scene.activeRoom.roomZ0-(Scene.activeRoom.height-1)/2*Scene.activeRoom.tiles[0].width;
 		Scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
 	}
 }
