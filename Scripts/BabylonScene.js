@@ -387,7 +387,12 @@ function playerAnimations() {
 		});
 		//Adding keys to the animation object
 		Scene.attackAnimation.setKeys(Scene.attackAnimation.tempKeys);
-		Scene.player.animations.push(Scene.attackAnimation);
+		if (Scene.player.animations == undefined) {
+			Scene.player.animations.push(Scene.attackAnimation);
+		}
+		else {
+			Scene.player.animations[0] = Scene.attackAnimation;
+		}
 		Scene.beginAnimation(Scene.player, 0, 10, false, 1.0, function () {
 			Scene.player.Attacking=0;
 			Scene.player.Attack=0; 
