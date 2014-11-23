@@ -5,13 +5,16 @@ function GetPathVector(startPosition, endPosition, options)
 		speed: 1.0,
 		tolerance: 1.0
 	},options||{});
+	
+	var xDiff = startPosition.x-endPosition.x;
+	var zDiff = startPosition.z-endPosition.z;
 
-	if(Math.abs(startPosition.x-endPosition.x) < settings.tolerance || Math.abs(startPosition.z-endPosition.z) < settings.tolerance)
+	if(Math.abs(xDiff*xDiff + zDiff*zDiff) < settings.tolerance)
 	{
 		return new BABYLON.Vector3(0, scene.gravity.y, 0);
 	}
 	else {
-		return new BABYLON.Vector3(-1*settings.speed*(startPosition.x-endPosition.x)/startPosition.x, scene.gravity.y, settings.speed*(startPosition.z-endPosition.z)/startPosition.z);
+		return new BABYLON.Vector3(-1*settings.speed*xDiff/startPosition.x, scene.gravity.y, settings.speed*zDiff/startPosition.z);
 	}
 }
 

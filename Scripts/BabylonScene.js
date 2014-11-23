@@ -234,6 +234,7 @@ function CreateScene(engine) {
 	
     // example of loading a mesh from blender export
     scene.player = 0;
+	scene.enemy=[];
     BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.js", scene, function (meshes, particleSystems) {
         var m = meshes[0];
         m.isVisible = true;
@@ -251,13 +252,12 @@ function CreateScene(engine) {
 		scene.player.ellipsoid = new BABYLON.Vector3(3, 1, 3);
 		scene.player.previousRotation = scene.player.rotation.y;
 		scene.player.playerAnimations = new playerAnimations();
+		//Spawn a Blob on some random tile
+		spawnEnemy(scene);
+		spawnEnemy(scene);
+		spawnEnemy(scene);
     });
 
-	//Spawn a Blob on some random tile
-	scene.enemy=[];
-	spawnEnemy(scene);
-	spawnEnemy(scene);
-	spawnEnemy(scene);
 	
     // BABYLON.SceneLoader.ImportMesh("", "Models3D/", "BookGolem.js", scene, function (newMesh) {
         // scene.BookGolem = newMesh;
