@@ -192,57 +192,51 @@ function CreateScene(engine) {
 
     scene.rooms = map.rooms;
 	//Draw Rooms
-	//TODO: change roomX0/roomZ0 to originOffset and add to each room as a parameter
-	var roomX0=0;
-	var roomZ0=0;
 	for (var i_room=0; i_room < map.rooms.length; i_room++) {
-		roomX0=map.rooms[i_room].col*map.rooms[i_room].width*map.rooms[i_room].tiles[0].width;
-		roomZ0=-map.rooms[i_room].row*map.rooms[i_room].height*map.rooms[i_room].tiles[0].width;
-		
 		if (map.rooms[i_room].type != RoomType.Empty) {
+			//set room properties
+			scene.rooms[i_room].originOffset = new BABYLON.Vector3(map.rooms[i_room].col*map.rooms[i_room].width*map.rooms[i_room].tiles[0].width,0,-map.rooms[i_room].row*map.rooms[i_room].height*map.rooms[i_room].tiles[0].width);
+			scene.rooms[i_room].centerPosition = new BABYLON.Vector3((map.rooms[i_room].width-1)/2*map.rooms[i_room].tiles[0].width,0,(map.rooms[i_room].height-1)/2*map.rooms[i_room].tiles[0].width);
+			scene.rooms[i_room].index=i_room;
+			scene.rooms[i_room].enemy=[];
 			for (var i = 0; i < map.rooms[i_room].tiles.length ; i++) {
 				scene.rooms[i_room].tiles[i].mesh = drawTile(scene, map.rooms[i_room].tiles[i],i);
 				//reposition to room location
-				scene.rooms[i_room].tiles[i].mesh.position.x=scene.rooms[i_room].tiles[i].mesh.position.x+roomX0;
-				scene.rooms[i_room].tiles[i].mesh.position.z=scene.rooms[i_room].tiles[i].mesh.position.z+roomZ0;
+				scene.rooms[i_room].tiles[i].mesh.position.x=scene.rooms[i_room].tiles[i].mesh.position.x+scene.rooms[i_room].originOffset.x;
+				scene.rooms[i_room].tiles[i].mesh.position.z=scene.rooms[i_room].tiles[i].mesh.position.z+scene.rooms[i_room].originOffset.z;
 				scene.rooms[i_room].tiles[i].mesh.backFaceCulling = false;
 				
 				scene.rooms[i_room].tiles[i].mesh.checkCollisions = true;
 				scene.rooms[i_room].tiles[i].mesh.tileId = i;
 			}
-			var centerX=(map.rooms[i_room].width-1)/2*map.rooms[i_room].tiles[0].width;
-			var centerZ=(map.rooms[i_room].height-1)/2*map.rooms[i_room].tiles[0].width;
 			//Add a light to the room
 			scene.rooms[i_room].light = [];
-			scene.rooms[i_room].light[0] = new BABYLON.PointLight("Omni", new BABYLON.Vector3(roomX0+centerX, 200, roomZ0-centerZ), scene);
+			scene.rooms[i_room].light[0] = new BABYLON.PointLight("Omni", new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 200, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z), scene);
 			scene.rooms[i_room].light[0].diffuse = new BABYLON.Color3(.98, .95, .9);
 			scene.rooms[i_room].light[0].specular = new BABYLON.Color3(0, 0, 0);
-			scene.rooms[i_room].light[1] = new BABYLON.PointLight("Omni-1", new BABYLON.Vector3(roomX0+centerX, 50, roomZ0-2*centerZ), scene);
+			scene.rooms[i_room].light[1] = new BABYLON.PointLight("Omni-1", new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 50, scene.rooms[i_room].originOffset.z-2*scene.rooms[i_room].centerPosition.z), scene);
 			scene.rooms[i_room].light[1].diffuse = new BABYLON.Color3(.68, .65, .6);
 			scene.rooms[i_room].light[1].specular = new BABYLON.Color3(0, 0, 0);
 			
 			if (map.rooms[i_room].type == RoomType.Entrance) {
-				scene.camera.target = new BABYLON.Vector3(roomX0+centerX, 0, roomZ0-centerZ);
+				scene.camera.target = new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 0, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z);
 				//set active room to entrance
 				scene.activeRoom=map.rooms[i_room];
-				scene.activeRoom.index=i_room;
-				scene.activeRoom.roomX0=scene.activeRoom.col*scene.activeRoom.width*scene.activeRoom.tiles[0].width;
-				scene.activeRoom.roomZ0=-scene.activeRoom.row*scene.activeRoom.height*scene.activeRoom.tiles[0].width;
 			}
 		}
 	}
 	
     // example of loading a mesh from blender export
     scene.player = 0;
-	scene.enemy=[];
+	// scene.enemy=[];
     BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.js", scene, function (meshes, particleSystems) {
         var m = meshes[0];
         m.isVisible = true;
-		var entranceIndex = map.entranceRow*map.width+map.entranceCol;
-		roomX0=map.rooms[entranceIndex].col*map.rooms[entranceIndex].width*map.rooms[entranceIndex].tiles[0].width+(Math.floor(map.rooms[entranceIndex].width/2)*map.rooms[entranceIndex].tiles[0].width);
-		roomZ0=-map.rooms[entranceIndex].row*map.rooms[entranceIndex].height*map.rooms[entranceIndex].tiles[0].width-((map.rooms[entranceIndex].height-1)*map.rooms[entranceIndex].tiles[0].width);
-
-        m.position = new BABYLON.Vector3(roomX0, 50, roomZ0+10);
+		var entranceIndex=scene.activeRoom.index;
+		x0=map.rooms[entranceIndex].col*map.rooms[entranceIndex].width*map.rooms[entranceIndex].tiles[0].width+(Math.floor(map.rooms[entranceIndex].width/2)*map.rooms[entranceIndex].tiles[0].width);
+		z0=-map.rooms[entranceIndex].row*map.rooms[entranceIndex].height*map.rooms[entranceIndex].tiles[0].width-((map.rooms[entranceIndex].height-1)*map.rooms[entranceIndex].tiles[0].width);
+		
+        m.position = new BABYLON.Vector3(x0, 50, z0+10);
         m.scaling = new BABYLON.Vector3(2, 2, 2);
         m.rotation = new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4);
         scene.player = m;
@@ -272,13 +266,13 @@ function CreateScene(engine) {
     scene.registerBeforeRender(function(){
 		if(scene.isErrthingReady) {
 			//Detect if player hits enemy mesh
-			for (i=0; i < scene.enemy.length;i++) {
-				if (scene.player.intersectsMesh(scene.enemy[i], true) && scene.player.Attack == 1) {
-					scene.enemy[i].renderOutline = true;
-					scene.enemy[i].outlineColor = new BABYLON.Color4(.8,.2,.2,.8);
-					scene.enemy[i].outlineWidth =.2;
+			for (i=0; i < scene.activeRoom.enemy.length;i++) {
+				if (scene.player.intersectsMesh(scene.activeRoom.enemy[i], true) && scene.player.Attack == 1) {
+					scene.activeRoom.enemy[i].renderOutline = true;
+					scene.activeRoom.enemy[i].outlineColor = new BABYLON.Color4(.8,.2,.2,.8);
+					scene.activeRoom.enemy[i].outlineWidth =.2;
 				} else {
-					scene.enemy[i].renderOutline = false;
+					scene.activeRoom.enemy[i].renderOutline = false;
 				}
 			}
 		}
@@ -322,25 +316,24 @@ function drawTile(Scene, tile, index) {
 }
 
 function spawnEnemy(Scene) {
-	var entranceIndex = Scene.activeRoom.index;
 	//TO DO: Implement other enemy types, for now just a rolling ball, who has lost his chain
-	var index = Scene.enemy.length;
+	var index = Scene.activeRoom.enemy.length;
     var newMesh = new BABYLON.Mesh.CreateSphere("enemySphere-" + parseInt(index), 8.0, 8.0, Scene);
-	var enemyIndex = Scene.enemy.push(newMesh) - 1;
-	var randomTile = getRandomInt(0, map.rooms[entranceIndex].width*map.rooms[entranceIndex].height);
-	while (map.rooms[entranceIndex].tiles[randomTile].type != TileType.Floor) {
-		randomTile = getRandomInt(0, map.rooms[entranceIndex].width*map.rooms[entranceIndex].height);
+	var enemyIndex = Scene.activeRoom.enemy.push(newMesh) - 1;
+	var randomTile = getRandomInt(0, Scene.activeRoom.width*Scene.activeRoom.height);
+	while (Scene.activeRoom.tiles[randomTile].type != TileType.Floor) {
+		randomTile = getRandomInt(0, Scene.activeRoom.width*Scene.activeRoom.height);
 	}
-	var tileIndex = map.rooms[entranceIndex].tiles[randomTile].row*map.rooms[entranceIndex].tiles[randomTile].width + map.rooms[entranceIndex].tiles[randomTile].col;
-	Scene.enemy[enemyIndex].position = new BABYLON.Vector3(Scene.rooms[entranceIndex].tiles[randomTile].mesh.position.x, 50, Scene.rooms[entranceIndex].tiles[randomTile].mesh.position.z);
-	Scene.enemy[enemyIndex].scaling = new BABYLON.Vector3(1, 1, 1);
-	Scene.enemy[enemyIndex].material = Scene.BlobMaterial;
+	var tileIndex = Scene.activeRoom.tiles[randomTile].row*Scene.activeRoom.tiles[randomTile].width + Scene.activeRoom.tiles[randomTile].col;
+	Scene.activeRoom.enemy[enemyIndex].position = new BABYLON.Vector3(Scene.activeRoom.tiles[randomTile].mesh.position.x, 1, Scene.activeRoom.tiles[randomTile].mesh.position.z);
+	Scene.activeRoom.enemy[enemyIndex].scaling = new BABYLON.Vector3(1, 1, 1);
+	Scene.activeRoom.enemy[enemyIndex].material = Scene.BlobMaterial;
 	
 	
-	Scene.enemy[enemyIndex].checkCollisions = true;
-	Scene.enemy[enemyIndex].applyGravity = true;
+	Scene.activeRoom.enemy[enemyIndex].checkCollisions = true;
+	Scene.activeRoom.enemy[enemyIndex].applyGravity = true;
 	//Set the ellipsoid around the camera (e.g. your player's size)
-	Scene.enemy[enemyIndex].ellipsoid = new BABYLON.Vector3(2, 1, 2);
+	Scene.activeRoom.enemy[enemyIndex].ellipsoid = new BABYLON.Vector3(2, 1, 2);
 	
 	return;
 

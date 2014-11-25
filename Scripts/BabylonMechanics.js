@@ -33,8 +33,8 @@ function startGame(whichScene) {
 					}
 					//when everything is ready this gets executed once
 					if (scene.isErrthingReady) {
-						for (i=0; i < scene.enemy.length;i++) {
-							scene.enemy[i].velocity = new BABYLON.Vector3(0,scene.gravity.y,0);
+						for (i=0; i < scene.activeRoom.enemy.length;i++) {
+							scene.activeRoom.enemy[i].velocity = new BABYLON.Vector3(0,scene.gravity.y,0);
 						}
 						scene.player.Attack=0;
 						scene.player.Attacking=0;
@@ -61,15 +61,15 @@ function startGame(whichScene) {
 							checkActiveRoom(scene);
 						}
 						else if (loopCounter % 31 == 0) {
-							for (i=0; i < scene.enemy.length;i++) {
-								scene.enemy[i].velocity = GetPathVector(scene.enemy[i].position,scene.player.position,{speed: 1.5, tolerance: 5});
+							for (i=0; i < scene.activeRoom.enemy.length;i++) {
+								scene.activeRoom.enemy[i].velocity = GetPathVector(scene.activeRoom.enemy[i].position,scene.player.position,{speed: 1.5, tolerance: 5});
 							}
 						}
 					}
 					processInput(scene.player);
 					//Need to update this every loop, I guess
-					for (i=0; i < scene.enemy.length;i++) {
-						scene.enemy[i].moveWithCollisions(scene.enemy[i].velocity);
+					for (i=0; i < scene.activeRoom.enemy.length;i++) {
+						scene.activeRoom.enemy[i].moveWithCollisions(scene.activeRoom.enemy[i].velocity);
 					}
 				}
 				
@@ -90,56 +90,40 @@ function animatePlayer(Scene) {
 }
 
 function checkActiveRoom(Scene) {
-	if (Scene.player.position.z > (Scene.activeRoom.roomZ0)) {
+	if (Scene.player.position.z > (Scene.activeRoom.originOffset.z)) {
 		//going north
 		var i_room=(Scene.activeRoom.row-1) * map.width + Scene.activeRoom.col;
 		//set active room to entrance
 		Scene.activeRoom=map.rooms[i_room];
-		Scene.activeRoom.index=i_room;
-		Scene.activeRoom.roomX0=Scene.activeRoom.col*Scene.activeRoom.width*Scene.activeRoom.tiles[0].width;
-		Scene.activeRoom.roomZ0=-Scene.activeRoom.row*Scene.activeRoom.height*Scene.activeRoom.tiles[0].width;
+		
 		//set camera to new position
-		var centerX=Scene.activeRoom.roomX0+(Scene.activeRoom.width-1)/2*Scene.activeRoom.tiles[0].width;
-		var centerZ=Scene.activeRoom.roomZ0-(Scene.activeRoom.height-1)/2*Scene.activeRoom.tiles[0].width;
-		Scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
 	}
-	else if (Scene.player.position.x > (Scene.activeRoom.roomX0+Scene.activeRoom.width*Scene.activeRoom.tiles[0].width)) {
+	else if (Scene.player.position.x > (Scene.activeRoom.originOffset.x+Scene.activeRoom.width*Scene.activeRoom.tiles[0].width)) {
 		//going east
 		var i_room=(Scene.activeRoom.row) * map.width + Scene.activeRoom.col+1;
 		//set active room to entrance
 		Scene.activeRoom=map.rooms[i_room];
-		Scene.activeRoom.index=i_room;
-		Scene.activeRoom.roomX0=Scene.activeRoom.col*Scene.activeRoom.width*Scene.activeRoom.tiles[0].width;
-		Scene.activeRoom.roomZ0=-Scene.activeRoom.row*Scene.activeRoom.height*Scene.activeRoom.tiles[0].width;
+		
 		//set camera to new position
-		var centerX=Scene.activeRoom.roomX0+(Scene.activeRoom.width-1)/2*Scene.activeRoom.tiles[0].width;
-		var centerZ=Scene.activeRoom.roomZ0-(Scene.activeRoom.height-1)/2*Scene.activeRoom.tiles[0].width;
-		Scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
 	}
-	else if (Scene.player.position.z < (Scene.activeRoom.roomZ0 - Scene.activeRoom.height*Scene.activeRoom.tiles[0].width)) {
+	else if (Scene.player.position.z < (Scene.activeRoom.originOffset.z - Scene.activeRoom.height*Scene.activeRoom.tiles[0].width)) {
 		//going south
 		var i_room=(Scene.activeRoom.row+1) * map.width + Scene.activeRoom.col;
 		//set active room to entrance
 		Scene.activeRoom=map.rooms[i_room];
-		Scene.activeRoom.index=i_room;
-		Scene.activeRoom.roomX0=Scene.activeRoom.col*Scene.activeRoom.width*Scene.activeRoom.tiles[0].width;
-		Scene.activeRoom.roomZ0=-Scene.activeRoom.row*Scene.activeRoom.height*Scene.activeRoom.tiles[0].width;
+		
 		//set camera to new position
-		var centerX=Scene.activeRoom.roomX0+(Scene.activeRoom.width-1)/2*Scene.activeRoom.tiles[0].width;
-		var centerZ=Scene.activeRoom.roomZ0-(Scene.activeRoom.height-1)/2*Scene.activeRoom.tiles[0].width;
-		Scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
 	}
-	else if (Scene.player.position.x < (Scene.activeRoom.roomX0)) {
+	else if (Scene.player.position.x < (Scene.activeRoom.originOffset.x)) {
 		//going west
 		var i_room=(Scene.activeRoom.row) * map.width + Scene.activeRoom.col-1;
 		//set active room to entrance
 		Scene.activeRoom=map.rooms[i_room];
-		Scene.activeRoom.index=i_room;
-		Scene.activeRoom.roomX0=Scene.activeRoom.col*Scene.activeRoom.width*Scene.activeRoom.tiles[0].width;
-		Scene.activeRoom.roomZ0=-Scene.activeRoom.row*Scene.activeRoom.height*Scene.activeRoom.tiles[0].width;
+		
 		//set camera to new position
-		var centerX=Scene.activeRoom.roomX0+(Scene.activeRoom.width-1)/2*Scene.activeRoom.tiles[0].width;
-		var centerZ=Scene.activeRoom.roomZ0-(Scene.activeRoom.height-1)/2*Scene.activeRoom.tiles[0].width;
-		Scene.camera.target = new BABYLON.Vector3(centerX, 0, centerZ);
+		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
 	}
 }
