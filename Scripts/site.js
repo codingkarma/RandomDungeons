@@ -1,5 +1,6 @@
 
 var map;
+var onStartScreen=1;
 
 $(document).ready(function () {
 
@@ -8,6 +9,7 @@ $(document).ready(function () {
 		$('.container').html("<canvas class=\"renderCanvas\" id=\"renderCanvas\"></canvas>");
 		$('#modal').fadeOut(50, function () {
 			$('#modalDiv').html('');
+			onStartScreen=0;
 			scene.dispose();
 			startGame(1);
 		});
