@@ -32,3 +32,11 @@ function GetDirectionAndAngle(startX, startZ, endX, endZ, options)
 	return {vector: GetPathVector(startPosition, endPosition, options), 
 		angle:Math.acos((startX * endX + startZ * endZ)/(sqrt(startX^2 + endX^2) *sqrt(startZ^2 + endZ^2)))};
 }
+
+function GetTileIndex(entity, currentRoom)
+{
+	var row = Math.floor((entity.z-room.originOffset.z)/TileWidth);
+	var col = Math.floor((entity.x-room.originOffset.x)/TileWidth);
+
+	return row * currentRoom.width + col;
+}
