@@ -4,11 +4,11 @@
 
 var bjsHelper =  {
 	tileType: [
-		{name: "Wall", material: 0, scale: new BABYLON.Vector3(10, 30, 10)},
-		{name: "Floor", material: 0, scale: new BABYLON.Vector3(10, 0.2, 10)},
-		{name: "Pillar", material: 0, scale: new BABYLON.Vector3(10, 30, 10)},
-		{name: "Fire",material: 0, scale: new BABYLON.Vector3(10, 0.2, 10)},
-		{name: "Door", material: 0, scale: new BABYLON.Vector3(10, 0.2, 10)}
+		{name: "Wall", material: 0, scale: new BABYLON.Vector3(10, 20, 10), yOffset: 10.1},
+		{name: "Floor", material: 0, scale: new BABYLON.Vector3(10, 0.2, 10), yOffset: 0},
+		{name: "Pillar", material: 0, scale: new BABYLON.Vector3(10, 20, 10), yOffset: 10.1},
+		{name: "Fire",material: 0, scale: new BABYLON.Vector3(10, 0.2, 10), yOffset: 0},
+		{name: "Door", material: 0, scale: new BABYLON.Vector3(10, 0.2, 10), yOffset: 0}
 	]
 };
 
@@ -68,57 +68,14 @@ function CreateStartScene(engine) {
 	scene.floor.material.diffuseTexture.vScale=20;
 	scene.floor.material.diffuseColor = new BABYLON.Color3(0.6, 0.6, 0.6);
 	
-	// Create a particle system
-	scene.leftTorchFire = new BABYLON.ParticleSystem("particles", 1000, scene);
-
-    //Texture of each particle
-    scene.leftTorchFire.particleTexture = new BABYLON.Texture("Models3D/flame.png", scene);
-
-    // Where the particles come from
-    scene.leftTorchFire.minEmitBox = new BABYLON.Vector3(-.75, 0, 0); // Starting all from
-    scene.leftTorchFire.maxEmitBox = new BABYLON.Vector3(.75, .25, 0); // To...
-
-    // Colors of all particles
-    scene.leftTorchFire.color1 = new BABYLON.Color4(1, 0.7, 0.7, 1.0);
-    scene.leftTorchFire.color2 = new BABYLON.Color4(0.5, 0.2, 0.2, 1.0);
-    scene.leftTorchFire.colorDead = new BABYLON.Color4(0.2, 0, 0, 0.0);
-
-    // Size of each particle (random between...
-    scene.leftTorchFire.minSize = 0.1;
-    scene.leftTorchFire.maxSize = 0.5;
-
-    // Life time of each particle (random between...
-    scene.leftTorchFire.minLifeTime = 0.3;
-    scene.leftTorchFire.maxLifeTime = 1;
-
-    // Emission rate
-    scene.leftTorchFire.emitRate = 800;
-
-    // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
-    scene.leftTorchFire.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
-
+	scene.torchFire = [];
+	createTorchFire(scene, scene);
     // Set the gravity of all particles
-    scene.leftTorchFire.gravity = new BABYLON.Vector3(0, 2, 8);
-
-    // Direction of each particle after it has been emitted
-    scene.leftTorchFire.direction1 = new BABYLON.Vector3(-.75, 1, 1);
-    scene.leftTorchFire.direction2 = new BABYLON.Vector3(.25, 1, 1);
-
-    // Angular speed, in radians
-    scene.leftTorchFire.minAngularSpeed = 0;
-    scene.leftTorchFire.maxAngularSpeed = Math.PI;
-
-    // Speed
-    scene.leftTorchFire.minEmitPower = .5;
-    scene.leftTorchFire.maxEmitPower = 1.5;
-    scene.leftTorchFire.updateSpeed = 0.005;
-
-    scene.leftTorchLight= new BABYLON.PointLight("Omni", new BABYLON.Vector3(-17, 10,7), scene);
-	scene.leftTorchLight.diffuse = new BABYLON.Color3(.6, .4, .2);
-	scene.leftTorchLight.specular = new BABYLON.Color3(.3, .2, .2);
-    scene.rightTorchLight= new BABYLON.PointLight("Omni", new BABYLON.Vector3(17, 10,7), scene);
-	scene.rightTorchLight.diffuse = new BABYLON.Color3(.6, .4, .2);
-	scene.rightTorchLight.specular = new BABYLON.Color3(.3, .2, .2);
+    scene.torchFire[0].gravity = new BABYLON.Vector3(0, 2, 8);
+	scene.torchFire[0].minEmitBox = new BABYLON.Vector3(-.75, 0, 0); // Starting all from
+    scene.torchFire[0].maxEmitBox = new BABYLON.Vector3(.75, .25, 0); // To...
+    scene.torchFire[0].direction1 = new BABYLON.Vector3(-.75, 1, 1);
+    scene.torchFire[0].direction2 = new BABYLON.Vector3(.25, 1, 1);
 	
 	//Create Torch Meshes
 	scene.leftTorchHandle = new BABYLON.Mesh.CreateCylinder('TorchHandle',6,1.35,.75,8,1,scene);
@@ -146,22 +103,27 @@ function CreateStartScene(engine) {
         scene.rightTorch.position = new BABYLON.Vector3(13, 8, 4);
         scene.rightTorch.scaling = new BABYLON.Vector3(1.4, 1.4, 1.4);
         scene.rightTorch.rotation = new BABYLON.Vector3(Math.PI/2.4, 0, 0);
-		scene.rightTorchFire = scene.leftTorchFire.clone();
-		scene.rightTorchFire.direction1 = new BABYLON.Vector3(.75, 1, 1);
-		scene.leftTorchFire.emitter = scene.leftTorch; // the starting object, the emitter
-		scene.rightTorchFire.emitter = scene.rightTorch; // the starting object, the emitter
+		scene.torchFire.push(scene.torchFire[0].clone());
+		
+		scene.torchFire[0].light.position = new BABYLON.Vector3(-17, 10, 7);
+		scene.torchFire[1].light = new BABYLON.PointLight("Omni", new BABYLON.Vector3(17, 10, 7), scene);
+		scene.torchFire[1].light.diffuse = new BABYLON.Color3(.6, .4, .2);
+		scene.torchFire[1].light.specular = new BABYLON.Color3(.3, .2, .2);
+		scene.torchFire[1].direction1 = new BABYLON.Vector3(.75, 1, 1);
+		scene.torchFire[0].emitter = scene.leftTorch; // the starting object, the emitter
+		scene.torchFire[1].emitter = scene.rightTorch; // the starting object, the emitter
 		// Start the particle system
-		scene.leftTorchFire.start();
-		scene.rightTorchFire.start();
+		scene.torchFire[0].start();
+		scene.torchFire[1].start();
     });
 	
 
     scene.registerBeforeRender(function(){
 		if (scene.isReady() && scene.rightTorch) {
-			scene.leftTorchFire.emitRate = getRandomInt(500, 1500);
-			scene.rightTorchFire.emitRate = getRandomInt(600, 1600);
-			scene.leftTorchLight.specular = new BABYLON.Color3(getRandomInt(3, 5)/10, .3, .3);
-			scene.rightTorchLight.specular = new BABYLON.Color3(getRandomInt(3, 5)/10, .3, .3);
+			scene.torchFire[0].emitRate = getRandomInt(500, 1500);
+			scene.torchFire[1].emitRate = getRandomInt(600, 1600);
+			scene.torchFire[0].light.specular = new BABYLON.Color3(getRandomInt(3, 5)/10, .3, .3);
+			scene.torchFire[1].light.specular = new BABYLON.Color3(getRandomInt(3, 5)/10, .3, .3);
 		}
 	});
 
@@ -181,78 +143,135 @@ function CreateScene(engine) {
     //var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
     var Alpha = 3*Math.PI/2;
     var Beta = Math.PI/16;
-    scene.camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, RoomHeight*11.5, new BABYLON.Vector3.Zero(), scene);
+    scene.camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, RoomHeight*12, new BABYLON.Vector3.Zero(), scene);
     //set camera to not move
-    scene.camera.lowerAlphaLimit = Alpha;
-    scene.camera.upperAlphaLimit = Alpha;
-    scene.camera.lowerBetaLimit = Beta;
-    scene.camera.upperBetaLimit = Beta;
+    // scene.camera.lowerAlphaLimit = Alpha;
+    // scene.camera.upperAlphaLimit = Alpha;
+    // scene.camera.lowerBetaLimit = Beta;
+    // scene.camera.upperBetaLimit = Beta;
+	
+	
+	scene.ambientLight = new BABYLON.HemisphericLight("ambientLight", new BABYLON.Vector3(0, 1, 0), scene);
+	scene.ambientLight.diffuse = new BABYLON.Color3(.98, .95, .9);
+	scene.ambientLight.specular = new BABYLON.Color3(.1, .1, .1);
+	scene.ambientLight.groundColor = new BABYLON.Color3(.1, .1, .1);
+	scene.ambientLight.intensity = 1;
 	
 	createMaterials(scene);
 
     scene.rooms = map.rooms;
-	//Draw Rooms
-	for (var i_room=0; i_room < map.rooms.length; i_room++) {
-		if (map.rooms[i_room].type != RoomType.Empty) {
-			//set room properties
-			scene.rooms[i_room].originOffset = new BABYLON.Vector3(map.rooms[i_room].col*map.rooms[i_room].width*map.rooms[i_room].tiles[0].width,0,-map.rooms[i_room].row*map.rooms[i_room].height*map.rooms[i_room].tiles[0].width);
-			scene.rooms[i_room].centerPosition = new BABYLON.Vector3((map.rooms[i_room].width-1)/2*map.rooms[i_room].tiles[0].width,0,(map.rooms[i_room].height-1)/2*map.rooms[i_room].tiles[0].width);
-			scene.rooms[i_room].index=i_room;
-			scene.rooms[i_room].enemy=[];
-			for (var i = 0; i < map.rooms[i_room].tiles.length ; i++) {
-				scene.rooms[i_room].tiles[i].mesh = drawTile(scene, map.rooms[i_room].tiles[i],i);
-				//reposition to room location
-				scene.rooms[i_room].tiles[i].mesh.position.x=scene.rooms[i_room].tiles[i].mesh.position.x+scene.rooms[i_room].originOffset.x;
-				scene.rooms[i_room].tiles[i].mesh.position.z=scene.rooms[i_room].tiles[i].mesh.position.z+scene.rooms[i_room].originOffset.z;
-				scene.rooms[i_room].tiles[i].mesh.backFaceCulling = false;
-				
-				scene.rooms[i_room].tiles[i].mesh.checkCollisions = true;
-				scene.rooms[i_room].tiles[i].mesh.tileId = i;
-			}
-			//Add a light to the room
-			scene.rooms[i_room].light = [];
-			scene.rooms[i_room].light[0] = new BABYLON.PointLight("Omni", new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 200, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z), scene);
-			scene.rooms[i_room].light[0].diffuse = new BABYLON.Color3(.98, .95, .9);
-			scene.rooms[i_room].light[0].specular = new BABYLON.Color3(0, 0, 0);
-			scene.rooms[i_room].light[1] = new BABYLON.PointLight("Omni-1", new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 50, scene.rooms[i_room].originOffset.z-2*scene.rooms[i_room].centerPosition.z), scene);
-			scene.rooms[i_room].light[1].diffuse = new BABYLON.Color3(.68, .65, .6);
-			scene.rooms[i_room].light[1].specular = new BABYLON.Color3(0, 0, 0);
-			
-			if (map.rooms[i_room].type == RoomType.Entrance) {
-				scene.camera.target = new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 0, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z);
-				//set active room to entrance
-				scene.activeRoom=map.rooms[i_room];
-			}
-		}
-	}
-	
-    // example of loading a mesh from blender export
+    scene.door = 0;
     scene.player = 0;
-	// scene.enemy=[];
-    BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.js", scene, function (meshes, particleSystems) {
-        var m = meshes[0];
-        m.isVisible = true;
-		var entranceIndex=scene.activeRoom.index;
-		x0=map.rooms[entranceIndex].col*map.rooms[entranceIndex].width*map.rooms[entranceIndex].tiles[0].width+(Math.floor(map.rooms[entranceIndex].width/2)*map.rooms[entranceIndex].tiles[0].width);
-		z0=-map.rooms[entranceIndex].row*map.rooms[entranceIndex].height*map.rooms[entranceIndex].tiles[0].width-((map.rooms[entranceIndex].height-1)*map.rooms[entranceIndex].tiles[0].width);
+    BABYLON.SceneLoader.ImportMesh("", "Models3D/", "DoorFrame.b.js", scene, function (meshes) {
+        scene.doorFrame = meshes;
 		
-        m.position = new BABYLON.Vector3(x0, 50, z0+10);
-        m.scaling = new BABYLON.Vector3(2, 2, 2);
-        m.rotation = new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4);
-        scene.player = m;
-		scene.player.checkCollisions = true;
-		scene.player.applyGravity=true;
-		//Set the ellipsoid around the camera (e.g. your player's size)
-		scene.player.ellipsoid = new BABYLON.Vector3(3, 1, 3);
-		scene.player.previousRotation = scene.player.rotation.y;
-		scene.player.playerAnimations = new playerAnimations();
-		//Spawn a Blob on some random tile
-		spawnEnemy(scene);
-		spawnEnemy(scene);
-		spawnEnemy(scene);
+		BABYLON.SceneLoader.ImportMesh("", "Models3D/", "TorchTopFrame.b.js", scene, function (newMeshes) {
+			scene.torchTop = newMeshes[0];
+			
+			scene.torchTop.isVisible = false;
+			scene.doorFrame[0].isVisible = false;
+			scene.doorFrame.push(scene.torchTop.clone());
+			scene.doorFrame.push(scene.torchTop.clone());
+			var arrayLength = scene.doorFrame.length;
+			for (var j=1;j < arrayLength;j++){
+				scene.doorFrame[j].parent = scene.doorFrame[0];
+				scene.doorFrame[j].isVisible = false;
+			}
+			//create left and right torch tops
+			scene.doorFrame[arrayLength-1].position = new BABYLON.Vector3(1.5,3.2,-1.7);
+			scene.doorFrame[arrayLength-2].position = new BABYLON.Vector3(-1.5,3.2,-1.7);
+			scene.doorFrame[0].scaling = new BABYLON.Vector3(4.8, 4.8, 4.8);
+			
+			//Draw Rooms
+			for (var i_room=0; i_room < map.rooms.length; i_room++) {
+				if (map.rooms[i_room].type != RoomType.Empty) {
+					//set room properties
+					scene.rooms[i_room].originOffset = new BABYLON.Vector3(map.rooms[i_room].col*map.rooms[i_room].width*map.rooms[i_room].tiles[0].width,0,-map.rooms[i_room].row*map.rooms[i_room].height*map.rooms[i_room].tiles[0].width);
+					scene.rooms[i_room].centerPosition = new BABYLON.Vector3((map.rooms[i_room].width-1)/2*map.rooms[i_room].tiles[0].width,0,(map.rooms[i_room].height-1)/2*map.rooms[i_room].tiles[0].width);
+					scene.rooms[i_room].index=i_room;
+					scene.rooms[i_room].enemy=[];
+					scene.rooms[i_room].door=[];
+					for (var i = 0; i < map.rooms[i_room].tiles.length ; i++) {
+						scene.rooms[i_room].tiles[i].mesh = drawTile(scene, map.rooms[i_room].tiles[i],i);
+						//reposition to room location
+						scene.rooms[i_room].tiles[i].mesh.position.x=scene.rooms[i_room].tiles[i].mesh.position.x+scene.rooms[i_room].originOffset.x;
+						scene.rooms[i_room].tiles[i].mesh.position.z=scene.rooms[i_room].tiles[i].mesh.position.z+scene.rooms[i_room].originOffset.z;
+						
+						scene.rooms[i_room].tiles[i].mesh.checkCollisions = true;
+						scene.rooms[i_room].tiles[i].mesh.tileId = i;
+						//create and position doors, adding the torch flame and light
+						if (scene.rooms[i_room].tiles[i].type == TileType.Door) {
+							var doorIndex = scene.rooms[i_room].door.push({Frame: []})-1;
+							scene.rooms[i_room].door[doorIndex].Frame.push(scene.doorFrame[0].clone())
+							scene.rooms[i_room].door[doorIndex].Frame[0].isVisible = true;
+							for (var j=1;j < scene.doorFrame.length;j++){
+								scene.rooms[i_room].door[doorIndex].Frame.push(scene.doorFrame[j].clone());
+								scene.rooms[i_room].door[doorIndex].Frame[j].parent = scene.rooms[i_room].door[doorIndex].Frame[0];
+								scene.rooms[i_room].door[doorIndex].Frame[j].isVisible = true;
+							}
+							scene.rooms[i_room].door[doorIndex].Frame[0].position = new BABYLON.Vector3(scene.rooms[i_room].tiles[i].mesh.position.x, -2,scene.rooms[i_room].tiles[i].mesh.position.z);
+							var doorRotation = ((scene.rooms[i_room].tiles[i].col==scene.rooms[i_room].width-1)*1 + (scene.rooms[i_room].tiles[i].row==scene.rooms[i_room].height-1)*2 + (scene.rooms[i_room].tiles[i].col==0)*3)*Math.PI/2;
+							scene.rooms[i_room].door[doorIndex].Frame[0].rotation = new BABYLON.Vector3(0, doorRotation, 0);
+							//attach fire to TorchTop
+							arrayLength = scene.doorFrame.length-1;
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire = [];
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire = [];
+							createTorchFire(scene, scene.rooms[i_room].door[doorIndex].Frame[arrayLength]);
+							createTorchFire(scene, scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1]);
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire[0].light.intensity = 3;
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire[0].light.intensity = 3;
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire[0].light.range = 40;
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire[0].light.range = 40;
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire[0].emitter = scene.rooms[i_room].door[doorIndex].Frame[arrayLength];
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire[0].emitter = scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1];
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+							// Start the particle system
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire[0].start();
+							scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire[0].start();
+						}
+					}
+					
+					if (map.rooms[i_room].type == RoomType.Entrance) {
+						scene.camera.target = new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 0, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z);
+						//set active room to entrance
+						scene.activeRoom=map.rooms[i_room];
+						//activate torch lights
+						for (doorIndex = 0; doorIndex < scene.activeRoom.door.length; doorIndex++) {
+							arrayLength = scene.activeRoom.door[doorIndex].Frame.length-1;
+							scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
+							scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+						}
+					}
+				}
+			}		
+			
+			BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.js", scene, function (meshes, particleSystems) {
+				var m = meshes[0];
+				m.isVisible = true;
+				var entranceIndex=scene.activeRoom.index;
+				x0=map.rooms[entranceIndex].col*map.rooms[entranceIndex].width*map.rooms[entranceIndex].tiles[0].width+(Math.floor(map.rooms[entranceIndex].width/2)*map.rooms[entranceIndex].tiles[0].width);
+				z0=-map.rooms[entranceIndex].row*map.rooms[entranceIndex].height*map.rooms[entranceIndex].tiles[0].width-((map.rooms[entranceIndex].height-1)*map.rooms[entranceIndex].tiles[0].width);
+				
+				m.position = new BABYLON.Vector3(x0, 50, z0+10);
+				m.scaling = new BABYLON.Vector3(2, 2, 2);
+				m.rotation = new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4);
+				scene.player = m;
+				scene.player.checkCollisions = true;
+				scene.player.applyGravity=true;
+				//Set the ellipsoid around the camera (e.g. your player's size)
+				scene.player.ellipsoid = new BABYLON.Vector3(3, 1, 3);
+				scene.player.previousRotation = scene.player.rotation.y;
+				scene.player.playerAnimations = new playerAnimations();
+				//Spawn a Blob on some random tile
+				spawnEnemy(scene);
+				spawnEnemy(scene);
+				spawnEnemy(scene);
+			});
+		});
     });
-
 	
+    // example of loading a mesh from blender export		
     // BABYLON.SceneLoader.ImportMesh("", "Models3D/", "BookGolem.js", scene, function (newMesh) {
         // scene.BookGolem = newMesh;
         // scene.BookGolem[0].position.y += 4;
@@ -309,7 +328,7 @@ function drawTile(Scene, tile, index) {
 
     var newMesh = new BABYLON.Mesh.CreateBox(bjsHelper.tileType[tile.type].name + '-' + parseInt(index), 1.0, Scene);
     newMesh.scaling = bjsHelper.tileType[tile.type].scale;
-    newMesh.position = new BABYLON.Vector3(tile.col*tile.width, 0, -tile.row*tile.width);
+    newMesh.position = new BABYLON.Vector3(tile.col*tile.width, bjsHelper.tileType[tile.type].yOffset, -tile.row*tile.width);
     newMesh.material = bjsHelper.tileType[tile.type].material;
 
     return newMesh;
@@ -392,6 +411,67 @@ function playerAnimations() {
 			Scene.player.rotation = new BABYLON.Vector3(Math.PI/6,Scene.player.currentFacingAngle.y,Math.PI/4);
 		});
 	};
+}
+
+function createTorchFire(scene, attachTo) {
+	
+	// Create a particle system
+	var index = attachTo.torchFire.push(new BABYLON.ParticleSystem("particles", 1000, scene)) - 1;
+
+    //Texture of each particle
+    attachTo.torchFire[index].particleTexture = new BABYLON.Texture("Models3D/flame.png", scene);
+
+    // Where the particles come from
+    attachTo.torchFire[index].minEmitBox = new BABYLON.Vector3(-.1, 0, -.1);// Starting all from
+    attachTo.torchFire[index].maxEmitBox = new BABYLON.Vector3(.1, .05, .1); // To...
+
+    // Colors of all particles
+    attachTo.torchFire[index].color1 = new BABYLON.Color4(1, 0.7, 0.7, 1.0);
+    attachTo.torchFire[index].color2 = new BABYLON.Color4(0.5, 0.2, 0.2, 1.0);
+    attachTo.torchFire[index].colorDead = new BABYLON.Color4(0.2, 0, 0, 0.0);
+
+    // Size of each particle (random between...
+    attachTo.torchFire[index].minSize = 0.1;
+    attachTo.torchFire[index].maxSize = 0.5;
+
+    // Life time of each particle (random between...
+    attachTo.torchFire[index].minLifeTime = 0.3;
+    attachTo.torchFire[index].maxLifeTime = 1;
+
+    // Emission rate
+    attachTo.torchFire[index].emitRate = 800;
+
+    // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
+    attachTo.torchFire[index].blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+
+	// Set the gravity of all particles
+	attachTo.torchFire[index].gravity = new BABYLON.Vector3(0, 8, 0);
+
+	// Direction of each particle after it has been emitted
+    attachTo.torchFire[index].direction1 = new BABYLON.Vector3(-.2, 1, .2);
+    attachTo.torchFire[index].direction2 = new BABYLON.Vector3(.2, 1, -.2);
+
+    // Angular speed, in radians
+    attachTo.torchFire[index].minAngularSpeed = 0;
+    attachTo.torchFire[index].maxAngularSpeed = Math.PI;
+
+    // Speed
+    attachTo.torchFire[index].minEmitPower = .5;
+    attachTo.torchFire[index].maxEmitPower = 1.5;
+    attachTo.torchFire[index].updateSpeed = 0.005;
+
+	var Position;
+	if (attachTo.absolutePosition == undefined) {
+		Position = new BABYLON.Vector3(0, 10, 0);
+	}
+	else {
+		Position = attachTo.absolutePosition;
+	}
+    attachTo.torchFire[index].light = new BABYLON.PointLight("Omni", Position, scene);
+	attachTo.torchFire[index].light.diffuse = new BABYLON.Color3(.6, .4, .2);
+	attachTo.torchFire[index].light.specular = new BABYLON.Color3(.1, .05, .05);
+	// attachTo.torchFire[index].light.diffuse = new BABYLON.Color3(.6, .4, .2);
+	// attachTo.torchFire[index].light.specular = new BABYLON.Color3(.3, .2, .2);
 }
 
 function createMaterials(Scene) {

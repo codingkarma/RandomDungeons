@@ -107,8 +107,20 @@ function checkActiveRoom(Scene) {
 	if (Scene.player.position.z > (Scene.activeRoom.originOffset.z)) {
 		//going north
 		var i_room=(Scene.activeRoom.row-1) * map.width + Scene.activeRoom.col;
+		//disable torch lights
+		var arrayLength;
+		for (var doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
+			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+		}
 		//set active room to entrance
 		Scene.activeRoom=map.rooms[i_room];
+		for (doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
+			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+		}
 		
 		//set camera to new position
 		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
@@ -116,8 +128,20 @@ function checkActiveRoom(Scene) {
 	else if (Scene.player.position.x > (Scene.activeRoom.originOffset.x+Scene.activeRoom.width*Scene.activeRoom.tiles[0].width)) {
 		//going east
 		var i_room=(Scene.activeRoom.row) * map.width + Scene.activeRoom.col+1;
+		//disable torch lights
+		var arrayLength;
+		for (var doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
+			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+		}
 		//set active room to entrance
 		Scene.activeRoom=map.rooms[i_room];
+		for (doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
+			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+		}
 		
 		//set camera to new position
 		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
@@ -125,8 +149,20 @@ function checkActiveRoom(Scene) {
 	else if (Scene.player.position.z < (Scene.activeRoom.originOffset.z - Scene.activeRoom.height*Scene.activeRoom.tiles[0].width)) {
 		//going south
 		var i_room=(Scene.activeRoom.row+1) * map.width + Scene.activeRoom.col;
+		//disable torch lights
+		var arrayLength;
+		for (var doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
+			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+		}
 		//set active room to entrance
 		Scene.activeRoom=map.rooms[i_room];
+		for (doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
+			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+		}
 		
 		//set camera to new position
 		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
@@ -134,8 +170,20 @@ function checkActiveRoom(Scene) {
 	else if (Scene.player.position.x < (Scene.activeRoom.originOffset.x)) {
 		//going west
 		var i_room=(Scene.activeRoom.row) * map.width + Scene.activeRoom.col-1;
+		//disable torch lights
+		var arrayLength;
+		for (var doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
+			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+		}
 		//set active room to entrance
 		Scene.activeRoom=map.rooms[i_room];
+		for (doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
+			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
+			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+		}
 		
 		//set camera to new position
 		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);

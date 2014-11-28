@@ -117,7 +117,7 @@ function GenerateBranch(map, startCol, startRow)
 		case 0:
 			startRow--;
 			//choose random door north
-			prevDoorCol=getRandomInt(1,map.rooms[prevRow * map.width + prevCol].width-2);
+			prevDoorCol=getRandomInt(2,map.rooms[prevRow * map.width + prevCol].width-3);
 			prevDoorRow=0;
 			startDoorCol=prevDoorCol;
 			startDoorRow=map.rooms[startRow * map.width + startCol].height-1;
@@ -126,14 +126,14 @@ function GenerateBranch(map, startCol, startRow)
 			startCol++;
 			//choose random door east
 			prevDoorCol=map.rooms[prevRow * map.width + prevCol].width-1;
-			prevDoorRow=getRandomInt(1,map.rooms[prevRow * map.width + prevCol].height-2);
+			prevDoorRow=getRandomInt(2,map.rooms[prevRow * map.width + prevCol].height-3);
 			startDoorCol=0;
 			startDoorRow=prevDoorRow;
 			break;
 		case 2:
 			startRow++;
 			//choose random door south
-			prevDoorCol=getRandomInt(1,map.rooms[prevRow * map.width + prevCol].width-2);
+			prevDoorCol=getRandomInt(2,map.rooms[prevRow * map.width + prevCol].width-3);
 			prevDoorRow=map.rooms[prevRow * map.width + prevCol].height-1;
 			startDoorCol=prevDoorCol;
 			startDoorRow=0;
@@ -142,7 +142,7 @@ function GenerateBranch(map, startCol, startRow)
 			//choose random door west
 			startCol--;
 			prevDoorCol=0;
-			prevDoorRow=getRandomInt(1,map.rooms[prevRow * map.width + prevCol].height-2);
+			prevDoorRow=getRandomInt(2,map.rooms[prevRow * map.width + prevCol].height-3);
 			startDoorCol=map.rooms[startRow * map.width + startCol].width-1;
 			startDoorRow=prevDoorRow;
 			break;

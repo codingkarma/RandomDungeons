@@ -1,0 +1,17 @@
+	Babylon.js Exporter version: 1.1.0, Blender version: 2.72 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Python World class constructor completed
+	processing begun of material:  TorchTopFrame.Material.003
+	Diffuse texture found
+	processing begun of light:  Lamp
+	processing begun of camera:  Camera
+	processing begun of mesh:  TorchTop
+		num positions      :  632
+		num normals        :  632
+		num uvs            :  1264
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  996
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
