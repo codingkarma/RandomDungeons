@@ -40,10 +40,10 @@ function CreateStartScene(engine) {
 	scene.leftWall.scaling = new BABYLON.Vector3(40,10,30);
 	scene.leftWall.position = new BABYLON.Vector3(-30,0,0);
 	scene.leftWall.material = new BABYLON.StandardMaterial("textureWall", scene);
-	scene.leftWall.material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture.png', scene);
+	scene.leftWall.material.diffuseTexture = new BABYLON.Texture('./Textures/Wall_Texture.png', scene);
 	scene.leftWall.material.diffuseTexture.uScale=uvScale;
 	scene.leftWall.material.diffuseTexture.vScale=uvScale;
-	scene.leftWall.material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture.png', scene);
+	scene.leftWall.material.bumpTexture = new BABYLON.Texture('./Textures/Wall_BumpTexture.png', scene);
 	scene.leftWall.material.bumpTexture.uScale=uvScale;
 	scene.leftWall.material.bumpTexture.vScale=uvScale;
 	// scene.leftWall.material.diffuseColor = new BABYLON.Color3(1, 1, 1);
@@ -56,14 +56,14 @@ function CreateStartScene(engine) {
 	scene.door = new BABYLON.Mesh.CreateBox('door',1.0,scene);
 	scene.door.scaling = new BABYLON.Vector3(20,1,30);
 	scene.door.material = new BABYLON.StandardMaterial("textureDoor", scene);
-	scene.door.material.diffuseTexture = new BABYLON.Texture('./Models3D/Medieval_door2.jpg', scene);
+	scene.door.material.diffuseTexture = new BABYLON.Texture('./Textures/Medieval_door2.jpg', scene);
 	scene.door.material.diffuseColor = new BABYLON.Color3(0.4, 0.3, 0.2);
 	
 	scene.floor = new BABYLON.Mesh.CreateBox('floor',1,scene);
 	scene.floor.scaling = new BABYLON.Vector3(100,100,1);
 	scene.floor.position = new BABYLON.Vector3(0,0,-15);
 	scene.floor.material = new BABYLON.StandardMaterial("textureFloor", scene);
-	scene.floor.material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-1.png', scene);
+	scene.floor.material.diffuseTexture = new BABYLON.Texture('./Textures/Floor_Tile-1.png', scene);
 	scene.floor.material.diffuseTexture.uScale=20;
 	scene.floor.material.diffuseTexture.vScale=20;
 	scene.floor.material.diffuseColor = new BABYLON.Color3(0.6, 0.6, 0.6);
@@ -92,7 +92,7 @@ function CreateStartScene(engine) {
 	scene.rightTorchHandle.material = scene.leftTorchHandle.material;
 	
 	scene.player = 0;
-    BABYLON.SceneLoader.ImportMesh("", "Models3D/", "TorchTop.b.js", scene, function (meshes) {
+    BABYLON.SceneLoader.ImportMesh("", "./Models3D/", "TorchTop.b.js", scene, function (meshes) {
         var m = meshes[0];
         m.isVisible = true;
         m.position = new BABYLON.Vector3(-13, 8, 4);
@@ -246,7 +246,7 @@ function CreateScene(engine) {
 				}
 			}		
 			
-			BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.js", scene, function (meshes, particleSystems) {
+			BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.b.js", scene, function (meshes, particleSystems) {
 				var m = meshes[0];
 				m.isVisible = true;
 				var entranceIndex=scene.activeRoom.index;
@@ -264,9 +264,10 @@ function CreateScene(engine) {
 				scene.player.previousRotation = scene.player.rotation.y;
 				scene.player.playerAnimations = new playerAnimations();
 				//Spawn a Blob on some random tile
-				spawnEnemy(scene);
-				spawnEnemy(scene);
-				spawnEnemy(scene);
+				var maxEmenies = getRandomInt(1,3);
+				for (var iSpawn = 0; iSpawn < maxEmenies; iSpawn++) {
+					spawnEnemy(scene);
+				}
 			});
 		});
     });
@@ -339,9 +340,9 @@ function spawnEnemy(Scene) {
 	var index = Scene.activeRoom.enemy.length;
     var newMesh = new BABYLON.Mesh.CreateSphere("enemySphere-" + parseInt(index), 8.0, 8.0, Scene);
 	var enemyIndex = Scene.activeRoom.enemy.push(newMesh) - 1;
-	var randomTile = getRandomInt(0, Scene.activeRoom.width*Scene.activeRoom.height);
+	var randomTile = getRandomInt(0, (Scene.activeRoom.width*Scene.activeRoom.height)-1);
 	while (Scene.activeRoom.tiles[randomTile].type != TileType.Floor) {
-		randomTile = getRandomInt(0, Scene.activeRoom.width*Scene.activeRoom.height);
+		randomTile = getRandomInt(0, (Scene.activeRoom.width*Scene.activeRoom.height)-1);
 	}
 	var tileIndex = Scene.activeRoom.tiles[randomTile].row*Scene.activeRoom.tiles[randomTile].width + Scene.activeRoom.tiles[randomTile].col;
 	Scene.activeRoom.enemy[enemyIndex].position = new BABYLON.Vector3(Scene.activeRoom.tiles[randomTile].mesh.position.x, 1, Scene.activeRoom.tiles[randomTile].mesh.position.z);
@@ -419,7 +420,7 @@ function createTorchFire(scene, attachTo) {
 	var index = attachTo.torchFire.push(new BABYLON.ParticleSystem("particles", 1000, scene)) - 1;
 
     //Texture of each particle
-    attachTo.torchFire[index].particleTexture = new BABYLON.Texture("Models3D/flame.png", scene);
+    attachTo.torchFire[index].particleTexture = new BABYLON.Texture("./Textures/flame.png", scene);
 
     // Where the particles come from
     attachTo.torchFire[index].minEmitBox = new BABYLON.Vector3(-.1, 0, -.1);// Starting all from
@@ -477,35 +478,37 @@ function createTorchFire(scene, attachTo) {
 function createMaterials(Scene) {
 	//Create me some textures
 	//Tile Type detailed materials
+	var randomColor = new BABYLON.Color3(getRandomInt(0,10)/10, getRandomInt(0,10)/10, getRandomInt(0,10)/10);
+	// randomColor =  new BABYLON.Color3(0,0,0); // awesome black tiles
 	//Wall
 	bjsHelper.tileType[0].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[0].name, Scene);
-	bjsHelper.tileType[0].material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture-2.png', Scene);
+	bjsHelper.tileType[0].material.diffuseTexture = new BABYLON.Texture('./Textures/Wall_Texture-2.png', Scene);
 	bjsHelper.tileType[0].material.diffuseTexture.wAng=0;
 	bjsHelper.tileType[0].material.diffuseTexture.uScale=1;
 	// bjsHelper.tileType[0].material.diffuseTexture.vOffset=-1;
-	bjsHelper.tileType[0].material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture-2.png', Scene);
+	bjsHelper.tileType[0].material.bumpTexture = new BABYLON.Texture('./Textures/Wall_BumpTexture-2.png', Scene);
 	bjsHelper.tileType[0].material.bumpTexture.uScale=1;
 	bjsHelper.tileType[0].material.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 	//Floor
 	bjsHelper.tileType[1].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[1].name, Scene);
-	bjsHelper.tileType[1].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', Scene);
-	bjsHelper.tileType[1].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', Scene);
-	bjsHelper.tileType[1].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	bjsHelper.tileType[1].material.diffuseTexture = new BABYLON.Texture('./Textures/Floor_Tile-2.png', Scene);
+	bjsHelper.tileType[1].material.bumpTexture = new BABYLON.Texture('./Textures/Floor_Tile-bump.png', Scene);
+	bjsHelper.tileType[1].material.diffuseColor = randomColor;
 	//Pillar
 	bjsHelper.tileType[2].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[2].name, Scene);
-	bjsHelper.tileType[2].material.bumpTexture = new BABYLON.Texture('./Models3D/Wall_BumpTexture-2.png', Scene);
-	bjsHelper.tileType[2].material.diffuseTexture = new BABYLON.Texture('./Models3D/Wall_Texture-2.png', Scene);
-	bjsHelper.tileType[2].material.diffuseColor = new BABYLON.Color3(.5, 0.5, 0.5);
+	bjsHelper.tileType[2].material.bumpTexture = new BABYLON.Texture('./Textures/Wall_BumpTexture-2.png', Scene);
+	bjsHelper.tileType[2].material.diffuseTexture = new BABYLON.Texture('./Textures/Wall_Texture-2.png', Scene);
+	bjsHelper.tileType[2].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
 	//Fire
 	bjsHelper.tileType[3].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[3].name, Scene);
-	bjsHelper.tileType[3].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', Scene);
-	bjsHelper.tileType[3].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', Scene);
-	bjsHelper.tileType[3].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	bjsHelper.tileType[3].material.diffuseTexture = new BABYLON.Texture('./Textures/Floor_Tile-2.png', Scene);
+	bjsHelper.tileType[3].material.bumpTexture = new BABYLON.Texture('./Textures/Floor_Tile-bump.png', Scene);
+	bjsHelper.tileType[3].material.diffuseColor = randomColor;
 	//Door
 	bjsHelper.tileType[4].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[4].name, Scene);
-	bjsHelper.tileType[4].material.diffuseTexture = new BABYLON.Texture('./Models3D/Floor_Tile-2.png', Scene);
-	bjsHelper.tileType[4].material.bumpTexture = new BABYLON.Texture('./Models3D/Floor_Tile-bump.png', Scene);
-	bjsHelper.tileType[4].material.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	bjsHelper.tileType[4].material.diffuseTexture = new BABYLON.Texture('./Textures/Floor_Tile-2.png', Scene);
+	bjsHelper.tileType[4].material.bumpTexture = new BABYLON.Texture('./Textures/Floor_Tile-bump.png', Scene);
+	bjsHelper.tileType[4].material.diffuseColor = randomColor;
 	
     Scene.tileMaterialSword = new BABYLON.StandardMaterial("tile-texture-Sword", Scene);
     Scene.tileMaterialSword.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.7);
