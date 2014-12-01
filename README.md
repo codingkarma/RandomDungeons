@@ -7,16 +7,17 @@ RandomDungeons
 <li>Refine Map Generation and Room Branching</li>
 <li>Create enemy take damage function</li>
 <li>Remove enemy from scene (with animation) when killed</li>
+<li>Re-evaluate: Attacking Check, Enemy Checks (Main Render Loop)</li>
 </ul>
 
 <h2>Assets to Create</h2>
 <h3>3D Models</h3>
 <ul>
-<li>Torch</li>
+<li><strike>Torch</strike></li>
 <li>New Player Sword</li>
-<li>Skeleton Sword</li>
-<li>Enemy Book</li>
-<li>Unlocked Door</li>
+<li><strike>Skeleton Sword</strike></li>
+<li><strike>Enemy Book</strike></li>
+<li><strike>Unlocked Door</strike></li>
 <li>Locked Door</li>
 <li>Book Golem Mini-Boss</li>
 </ul>
