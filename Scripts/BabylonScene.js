@@ -160,8 +160,6 @@ function CreateScene(engine) {
 
     scene.rooms = map.rooms;
     scene.door = 0;
-	//instantiate player
-	scene.player = new Entity({type: EntityType.Player, health: 4, damage: 1, speed: 1, mesh: 0});
     BABYLON.SceneLoader.ImportMesh("", "Models3D/", "DoorFrame.b.js", scene, function (meshes) {
         scene.doorFrame = meshes;
 		
@@ -257,7 +255,8 @@ function CreateScene(engine) {
 				m.position = new BABYLON.Vector3(x0, 50, z0+10);
 				m.scaling = new BABYLON.Vector3(2, 2, 2);
 				m.rotation = new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4);
-				scene.player.mesh = m;
+				//instantiate player
+				scene.player = new Entity(m,{type: EntityType.Player, health: 4, damage: 1, speed: 1});
 				scene.player.mesh.checkCollisions = true;
 				scene.player.mesh.applyGravity=true;
 				//Set the ellipsoid around the camera (e.g. your player's size)
@@ -288,16 +287,6 @@ function CreateScene(engine) {
 
     scene.registerBeforeRender(function(){
 		// if(scene.isErrthingReady) {
-			// //Detect if player hits enemy mesh
-			// for (i=0; i < scene.activeRoom.enemy.length;i++) {
-				// if (scene.player.mesh.intersectsMesh(scene.activeRoom.enemy[i], true) && scene.player.attacking == 1) {
-					// scene.activeRoom.enemy[i].renderOutline = true;
-					// scene.activeRoom.enemy[i].outlineColor = new BABYLON.Color4(.8,.2,.2,.8);
-					// scene.activeRoom.enemy[i].outlineWidth =.2;
-				// } else {
-					// scene.activeRoom.enemy[i].renderOutline = false;
-				// }
-			// }
 		// }
 	});
 
@@ -341,9 +330,7 @@ function drawTile(Scene, tile, index) {
 function spawnEnemy(Scene) {
 	//TO DO: Implement other enemy types, for now just a rolling ball, who has lost his chain
 	var index = Scene.activeRoom.enemy.length;
-    var newMesh = new BABYLON.Mesh.CreateSphere("enemySphere-" + parseInt(index), 8.0, 8.0, Scene);
-	var enemyIndex = Scene.activeRoom.enemy.push(new Entity({type: EntityType.Sphere, health: 2, damage: 1, speed: 1, mesh: 0})) - 1;
-	Scene.activeRoom.enemy[enemyIndex].mesh = newMesh;
+	var enemyIndex = Scene.activeRoom.enemy.push(new Entity(new BABYLON.Mesh.CreateSphere("enemySphere-" + parseInt(index), 8.0, 8.0, Scene), {type: EntityType.Sphere, health: 2, damage: 1, speed: 1})) - 1;
 	
 	var randomTile = getRandomInt(0, (Scene.activeRoom.width*Scene.activeRoom.height)-1);
 	while (Scene.activeRoom.tiles[randomTile].type != TileType.Floor) {
@@ -405,6 +392,38 @@ function playerAnimations() {
 	};
 	
 	this.updateAttack = function (Scene) {
+		//create animations for player
+		Scene.attackAnimation = new BABYLON.Animation("attackAnimation", "rotation", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+		// Animation keys
+		Scene.attackAnimation.tempKeys = [];
+		//At the animation key 0, the value of scaling is "1"
+		Scene.attackAnimation.tempKeys.push({
+			frame: 0,
+			value: new BABYLON.Vector3(0, Scene.player.mesh.currentFacingAngle.y + Math.PI/2.2, Math.PI/2)
+		});
+		Scene.attackAnimation.tempKeys.push({
+			frame: 10,
+			value: new BABYLON.Vector3(0, Scene.player.mesh.currentFacingAngle.y - 0.8, Math.PI/2)
+		});
+		//Adding keys to the animation object
+		Scene.attackAnimation.setKeys(Scene.attackAnimation.tempKeys);
+		if (Scene.player.mesh.animations == undefined) {
+			Scene.player.mesh.animations.push(Scene.attackAnimation);
+		}
+		else {
+			Scene.player.mesh.animations[0] = Scene.attackAnimation;
+		}
+		Scene.beginAnimation(Scene.player.mesh, 0, 10, false, 1.0, function () {
+			Scene.player.attacking=0;
+			// Scene.player.Attack=0;
+			Scene.player.mesh.rotation = new BABYLON.Vector3(Math.PI/6,Scene.player.mesh.currentFacingAngle.y,Math.PI/4);
+		});
+	};
+}
+
+function enemyAnimations() {
+	
+	this.Attack = function (Scene) {
 		//create animations for player
 		Scene.attackAnimation = new BABYLON.Animation("attackAnimation", "rotation", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 		// Animation keys

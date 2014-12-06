@@ -42,7 +42,7 @@ function startGame(whichScene) {
 				engine.runRenderLoop(function () {
 					// rotate to give some animation
 					if (!scene.isErrthingReady) {
-						if (scene.isReady() && scene.player.mesh) {
+						if (scene.isReady() && scene.player) {
 							scene.isErrthingReady = true;
 						}
 						//when everything is ready this gets executed once
