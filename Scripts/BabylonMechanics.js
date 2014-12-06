@@ -42,7 +42,7 @@ function startGame(whichScene) {
 				engine.runRenderLoop(function () {
 					// rotate to give some animation
 					if (!scene.isErrthingReady) {
-						if (scene.isReady() && scene.player) {
+						if (scene.isReady() && scene.player.mesh) {
 							scene.isErrthingReady = true;
 						}
 						//when everything is ready this gets executed once
@@ -50,9 +50,8 @@ function startGame(whichScene) {
 							for (i=0; i < scene.activeRoom.enemy.length;i++) {
 								scene.activeRoom.enemy[i].velocity = new BABYLON.Vector3(0,scene.gravity.y,0);
 							}
-							scene.player.Attack=0;
-							scene.player.Attacking=0;
-							scene.player.currentFacingAngle = new BABYLON.Vector3(scene.player.rotation.x, scene.player.rotation.y, scene.player.rotation.z);
+							scene.player.attacking=0;
+							scene.player.mesh.currentFacingAngle = new BABYLON.Vector3(scene.player.mesh.rotation.x, scene.player.mesh.rotation.y, scene.player.mesh.rotation.z);
 						}
 					}
 					else {
@@ -74,15 +73,15 @@ function startGame(whichScene) {
 								enemyCounter = 0;
 							}
 							else {
-								scene.activeRoom.enemy[enemyCounter].velocity = GetPathVector(scene.activeRoom.enemy[enemyCounter].position,scene.player.position,{speed: 1.5, tolerance: 12});
+								scene.activeRoom.enemy[enemyCounter].velocity = GetPathVector(scene.activeRoom.enemy[enemyCounter].mesh.position,scene.player.mesh.position,{speed: scene.activeRoom.enemy[enemyCounter].speed, tolerance: 12});
 								enemyCounter++;
 							}
 						}
 						
-						processInput(scene.player);
+						processInput(scene.player.mesh);
 						//Need to update this every loop, I guess
 						for (i=0; i < scene.activeRoom.enemy.length;i++) {
-							scene.activeRoom.enemy[i].moveWithCollisions(scene.activeRoom.enemy[i].velocity);
+							scene.activeRoom.enemy[i].mesh.moveWithCollisions(scene.activeRoom.enemy[i].velocity);
 						}
 					}
 					
@@ -104,7 +103,7 @@ function animatePlayer(Scene) {
 }
 
 function checkActiveRoom(Scene) {
-	if (Scene.player.position.z > (Scene.activeRoom.originOffset.z)) {
+	if (Scene.player.mesh.position.z > (Scene.activeRoom.originOffset.z)) {
 		//going north
 		var i_room=(Scene.activeRoom.row-1) * map.width + Scene.activeRoom.col;
 		//disable torch lights
@@ -125,7 +124,7 @@ function checkActiveRoom(Scene) {
 		//set camera to new position
 		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
 	}
-	else if (Scene.player.position.x > (Scene.activeRoom.originOffset.x+Scene.activeRoom.width*Scene.activeRoom.tiles[0].width)) {
+	else if (Scene.player.mesh.position.x > (Scene.activeRoom.originOffset.x+Scene.activeRoom.width*Scene.activeRoom.tiles[0].width)) {
 		//going east
 		var i_room=(Scene.activeRoom.row) * map.width + Scene.activeRoom.col+1;
 		//disable torch lights
@@ -146,7 +145,7 @@ function checkActiveRoom(Scene) {
 		//set camera to new position
 		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
 	}
-	else if (Scene.player.position.z < (Scene.activeRoom.originOffset.z - Scene.activeRoom.height*Scene.activeRoom.tiles[0].width)) {
+	else if (Scene.player.mesh.position.z < (Scene.activeRoom.originOffset.z - Scene.activeRoom.height*Scene.activeRoom.tiles[0].width)) {
 		//going south
 		var i_room=(Scene.activeRoom.row+1) * map.width + Scene.activeRoom.col;
 		//disable torch lights
@@ -167,7 +166,7 @@ function checkActiveRoom(Scene) {
 		//set camera to new position
 		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
 	}
-	else if (Scene.player.position.x < (Scene.activeRoom.originOffset.x)) {
+	else if (Scene.player.mesh.position.x < (Scene.activeRoom.originOffset.x)) {
 		//going west
 		var i_room=(Scene.activeRoom.row) * map.width + Scene.activeRoom.col-1;
 		//disable torch lights

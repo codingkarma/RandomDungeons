@@ -91,7 +91,6 @@ function CreateStartScene(engine) {
 	scene.rightTorchHandle.position = new BABYLON.Vector3(13, 7, 1.5);
 	scene.rightTorchHandle.material = scene.leftTorchHandle.material;
 	
-	scene.player = 0;
     BABYLON.SceneLoader.ImportMesh("", "./Models3D/", "TorchTop.b.js", scene, function (meshes) {
         var m = meshes[0];
         m.isVisible = true;
@@ -161,7 +160,8 @@ function CreateScene(engine) {
 
     scene.rooms = map.rooms;
     scene.door = 0;
-    scene.player = 0;
+	//instantiate player
+	scene.player = new Entity({type: EntityType.Player, health: 4, damage: 1, speed: 1, mesh: 0});
     BABYLON.SceneLoader.ImportMesh("", "Models3D/", "DoorFrame.b.js", scene, function (meshes) {
         scene.doorFrame = meshes;
 		
@@ -246,6 +246,7 @@ function CreateScene(engine) {
 				}
 			}		
 			
+			
 			BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.b.js", scene, function (meshes, particleSystems) {
 				var m = meshes[0];
 				m.isVisible = true;
@@ -256,22 +257,22 @@ function CreateScene(engine) {
 				m.position = new BABYLON.Vector3(x0, 50, z0+10);
 				m.scaling = new BABYLON.Vector3(2, 2, 2);
 				m.rotation = new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4);
-				scene.player = m;
-				scene.player.checkCollisions = true;
-				scene.player.applyGravity=true;
+				scene.player.mesh = m;
+				scene.player.mesh.checkCollisions = true;
+				scene.player.mesh.applyGravity=true;
 				//Set the ellipsoid around the camera (e.g. your player's size)
-				scene.player.ellipsoid = new BABYLON.Vector3(3, 1, 3);
-				scene.player.previousRotation = scene.player.rotation.y;
-				scene.player.playerAnimations = new playerAnimations();
+				scene.player.mesh.ellipsoid = new BABYLON.Vector3(3, 1, 3);
+				scene.player.mesh.previousRotation = scene.player.mesh.rotation.y;
+				scene.player.mesh.playerAnimations = new playerAnimations();
 				//set up the action manager for attacks
 				scene.actionManager = new BABYLON.ActionManager(scene);
 				// Detect player input, then play attack animation
 				scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
 				BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
 						if (evt.sourceEvent.keyCode == KEYS.SPACE) {
-							if (scene.player.Attacking==0) {
-								scene.player.playerAnimations.updateAttack(scene);
-								scene.player.Attacking=1;
+							if (scene.player.attacking==0) {
+								scene.player.mesh.playerAnimations.updateAttack(scene);
+								scene.player.attacking=1;
 							}
 						}
 				}));
@@ -289,7 +290,7 @@ function CreateScene(engine) {
 		// if(scene.isErrthingReady) {
 			// //Detect if player hits enemy mesh
 			// for (i=0; i < scene.activeRoom.enemy.length;i++) {
-				// if (scene.player.intersectsMesh(scene.activeRoom.enemy[i], true) && scene.player.Attacking == 1) {
+				// if (scene.player.mesh.intersectsMesh(scene.activeRoom.enemy[i], true) && scene.player.attacking == 1) {
 					// scene.activeRoom.enemy[i].renderOutline = true;
 					// scene.activeRoom.enemy[i].outlineColor = new BABYLON.Color4(.8,.2,.2,.8);
 					// scene.activeRoom.enemy[i].outlineWidth =.2;
@@ -341,35 +342,36 @@ function spawnEnemy(Scene) {
 	//TO DO: Implement other enemy types, for now just a rolling ball, who has lost his chain
 	var index = Scene.activeRoom.enemy.length;
     var newMesh = new BABYLON.Mesh.CreateSphere("enemySphere-" + parseInt(index), 8.0, 8.0, Scene);
-	var enemyIndex = Scene.activeRoom.enemy.push(newMesh) - 1;
+	var enemyIndex = Scene.activeRoom.enemy.push(new Entity({type: EntityType.Sphere, health: 2, damage: 1, speed: 1, mesh: 0})) - 1;
+	Scene.activeRoom.enemy[enemyIndex].mesh = newMesh;
+	
 	var randomTile = getRandomInt(0, (Scene.activeRoom.width*Scene.activeRoom.height)-1);
 	while (Scene.activeRoom.tiles[randomTile].type != TileType.Floor) {
 		randomTile = getRandomInt(0, (Scene.activeRoom.width*Scene.activeRoom.height)-1);
 	}
 	var tileIndex = Scene.activeRoom.tiles[randomTile].row*Scene.activeRoom.tiles[randomTile].width + Scene.activeRoom.tiles[randomTile].col;
-	Scene.activeRoom.enemy[enemyIndex].position = new BABYLON.Vector3(Scene.activeRoom.tiles[randomTile].mesh.position.x, 1, Scene.activeRoom.tiles[randomTile].mesh.position.z);
-	Scene.activeRoom.enemy[enemyIndex].scaling = new BABYLON.Vector3(1, 1, 1);
-	Scene.activeRoom.enemy[enemyIndex].material = Scene.BlobMaterial;
+	Scene.activeRoom.enemy[enemyIndex].mesh.position = new BABYLON.Vector3(Scene.activeRoom.tiles[randomTile].mesh.position.x, 1, Scene.activeRoom.tiles[randomTile].mesh.position.z);
+	Scene.activeRoom.enemy[enemyIndex].mesh.scaling = new BABYLON.Vector3(1, 1, 1);
+	Scene.activeRoom.enemy[enemyIndex].mesh.material = Scene.BlobMaterial;
 	
-	Scene.activeRoom.enemy[enemyIndex].checkCollisions = true;
-	Scene.activeRoom.enemy[enemyIndex].applyGravity = true;
+	Scene.activeRoom.enemy[enemyIndex].mesh.checkCollisions = true;
+	Scene.activeRoom.enemy[enemyIndex].mesh.applyGravity = true;
 	//Set the ellipsoid around the camera (e.g. your player's size)
-	Scene.activeRoom.enemy[enemyIndex].ellipsoid = new BABYLON.Vector3(2, 1, 2);
+	Scene.activeRoom.enemy[enemyIndex].mesh.ellipsoid = new BABYLON.Vector3(2, 1, 2);
 	
 	// create intersect action
-	Scene.activeRoom.enemy[enemyIndex].actionManager = new BABYLON.ActionManager(scene);
-	Scene.activeRoom.enemy[enemyIndex].health = 5;
+	Scene.activeRoom.enemy[enemyIndex].mesh.actionManager = new BABYLON.ActionManager(scene);
 	// Detect player input, then play animation after executing function
-	Scene.activeRoom.enemy[enemyIndex].actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-	{ trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: scene.player }, function (evt) {
-			if (scene.player.Attacking == 1) {
+	Scene.activeRoom.enemy[enemyIndex].mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+	{ trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: scene.player.mesh }, function (evt) {
+			if (scene.player.attacking == 1) {
 				Scene.activeRoom.enemy[enemyIndex].health--;
 				$('#dmg').html('<br />dmg: ' + parseInt(Scene.activeRoom.enemy[enemyIndex].health));
 			}
 	}));
 	
-	Scene.activeRoom.enemy[enemyIndex].actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-	{ trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, parameter: scene.player }, function (evt) {
+	Scene.activeRoom.enemy[enemyIndex].mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+	{ trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, parameter: scene.player.mesh }, function (evt) {
 
 	}));
 	
@@ -387,7 +389,7 @@ function playerAnimations() {
 		//At the animation key 0, the value of scaling is "1"
 		Scene.idleAnimation.tempKeys.push({
 			frame: 0,
-			value: Scene.player.currentFacingAngle.add(new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4))
+			value: Scene.player.mesh.currentFacingAngle.add(new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/4))
 		});
 		Scene.idleAnimation.tempKeys.push({
 			frame: 30,
@@ -399,7 +401,7 @@ function playerAnimations() {
 		});
 		//Adding keys to the animation object
 		Scene.idleAnimation.setKeys(Scene.idleAnimation.tempKeys);
-		Scene.player.animations.push(scene.idleAnimation);
+		Scene.player.mesh.animations.push(scene.idleAnimation);
 	};
 	
 	this.updateAttack = function (Scene) {
@@ -410,24 +412,24 @@ function playerAnimations() {
 		//At the animation key 0, the value of scaling is "1"
 		Scene.attackAnimation.tempKeys.push({
 			frame: 0,
-			value: new BABYLON.Vector3(0, Scene.player.currentFacingAngle.y + Math.PI/2.2, Math.PI/2)
+			value: new BABYLON.Vector3(0, Scene.player.mesh.currentFacingAngle.y + Math.PI/2.2, Math.PI/2)
 		});
 		Scene.attackAnimation.tempKeys.push({
 			frame: 10,
-			value: new BABYLON.Vector3(0, Scene.player.currentFacingAngle.y - 0.8, Math.PI/2)
+			value: new BABYLON.Vector3(0, Scene.player.mesh.currentFacingAngle.y - 0.8, Math.PI/2)
 		});
 		//Adding keys to the animation object
 		Scene.attackAnimation.setKeys(Scene.attackAnimation.tempKeys);
-		if (Scene.player.animations == undefined) {
-			Scene.player.animations.push(Scene.attackAnimation);
+		if (Scene.player.mesh.animations == undefined) {
+			Scene.player.mesh.animations.push(Scene.attackAnimation);
 		}
 		else {
-			Scene.player.animations[0] = Scene.attackAnimation;
+			Scene.player.mesh.animations[0] = Scene.attackAnimation;
 		}
-		Scene.beginAnimation(Scene.player, 0, 10, false, 1.0, function () {
-			Scene.player.Attacking=0;
+		Scene.beginAnimation(Scene.player.mesh, 0, 10, false, 1.0, function () {
+			Scene.player.attacking=0;
 			// Scene.player.Attack=0;
-			Scene.player.rotation = new BABYLON.Vector3(Math.PI/6,Scene.player.currentFacingAngle.y,Math.PI/4);
+			Scene.player.mesh.rotation = new BABYLON.Vector3(Math.PI/6,Scene.player.mesh.currentFacingAngle.y,Math.PI/4);
 		});
 	};
 }
