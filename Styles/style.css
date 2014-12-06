@@ -23,7 +23,61 @@
 	color: white;
 	position: absolute;
 	top: 0em;
-	left: 0em;
+	right: 0em;
+	margin: .1em;
+}
+
+.topMenu {
+	display: none;
+	color: white;
+	width: 22em;
+	background-color: rgba(60,60,60,.85);
+	border-bottom: solid 1px;
+	border-color: #A8A8A8;
+	border-radius: 0em 0em .5em .5em;
+	height: 2em;
+	position: absolute;
+	top: 0em;
+	left: calc(28% - 11em);
+	padding: .2em;
+}
+
+.healthBar {
+	display: inline-block;
+	width: 1em;
+	height: .6em;
+	padding: 0em;
+	background-color: rgba(200, 20, 20, .9);
+	border-radius: .2em;
+	border: solid 1px;
+	border-color: #AEAEAE;
+	box-shadow: inset -.05em -.05em .2em #282828;
+}
+
+.hotKeys {
+	display: none;
+	color: white;
+	background-color: rgba(60,60,60,.85);
+	border-top: solid 1px;
+	border-color: #A8A8A8;
+	border-radius: .5em .5em 0em 0em;
+	position: absolute;
+	bottom: 0em;
+	left: calc(50% - 6.6em);
+	padding: 0em .3em .2em .3em;
+}
+
+.hotKey {
+	display: inline-block;
+	height: 2.2em;
+	width: 2.2em;
+	background-color: rgba(120,120,120,1);
+	border: solid 1px;
+	border-radius: .2em;
+	border-color: #AEAEAE;
+	margin: .3em .1em .1em .1em;
+	box-shadow: inset -.1em -.1em .2em #282828;
+	padding: .1em .1em .1em .3em;
 }
 
 /*Modal CSS*/

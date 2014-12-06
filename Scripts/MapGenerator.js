@@ -14,7 +14,7 @@ var TileType ={
 
 //height and width seem to be backwards? from col and row
 var RoomHeight = 11;
-var RoomWidth = 13;
+var RoomWidth = 17;
 var TileWidth = 10;
 
 function getRandomInt(min, max) {

@@ -35,9 +35,9 @@ function doKeyDown(evt) {
             DownDown = true;
             break;
     }
-	if (evt.keyCode == KEYS.SPACE) {
-		SpaceBarDown = true;
-	}
+	// if (evt.keyCode == KEYS.SPACE) {
+		// SpaceBarDown = true;
+	// }
 }
 
 function doKeyUp(evt) {
@@ -56,9 +56,9 @@ function doKeyUp(evt) {
             DownDown = false;
             break;
     }
-	if (evt.keyCode == KEYS.SPACE) {
-		SpaceBarDown = false;
-	}
+	// if (evt.keyCode == KEYS.SPACE) {
+		// SpaceBarDown = false;
+	// }
 }
 
 function processInput(entity) {
@@ -88,9 +88,9 @@ function processInput(entity) {
 	var velocity=new BABYLON.Vector3(vX, scene.gravity.y, vZ);
 	entity.moveWithCollisions(velocity);
 	
-	if (SpaceBarDown == true) {
-		entity.Attack = 1;
-	}
+	// if (SpaceBarDown == true) {
+		// entity.Attack = 1;
+	// }
 
 }
 

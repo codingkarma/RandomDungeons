@@ -37,6 +37,7 @@ function startGame(whichScene) {
 				scene.activeCamera.attachControl(canvas);
 				
 				var i;
+				var enemyCounter=0;
 				// Once the scene is loaded, register a render loop to render it
 				engine.runRenderLoop(function () {
 					// rotate to give some animation
@@ -55,30 +56,29 @@ function startGame(whichScene) {
 						}
 					}
 					else {
-						if (scene.player.Attack == 1) {
-							if (scene.player.Attacking==0) {
-								scene.player.playerAnimations.updateAttack(scene);
-								scene.player.Attacking=1;
-							}
-						}
-						else {						
-							if (loopCounter > 1000) {
+						switch (loopCounter) {   
+							case 1000:
 								loopCounter=0;
+								break;
+							default:
+								loopCounter++;
+								break;
+						}
+						if (loopCounter % 5 == 0) {
+							$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
+							//check what room the player is in
+							checkActiveRoom(scene);
+						}
+						else if (loopCounter % (31 + enemyCounter) == 0) {
+							if (enemyCounter >= scene.activeRoom.enemy.length) { 
+								enemyCounter = 0;
 							}
 							else {
-								loopCounter++;
-							}
-							if (loopCounter % 10 == 0) {
-								$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
-								//check what room the player is in
-								checkActiveRoom(scene);
-							}
-							else if (loopCounter % 31 == 0) {
-								for (i=0; i < scene.activeRoom.enemy.length;i++) {
-									scene.activeRoom.enemy[i].velocity = GetPathVector(scene.activeRoom.enemy[i].position,scene.player.position,{speed: 1.5, tolerance: 5});
-								}
+								scene.activeRoom.enemy[enemyCounter].velocity = GetPathVector(scene.activeRoom.enemy[enemyCounter].position,scene.player.position,{speed: 1.5, tolerance: 12});
+								enemyCounter++;
 							}
 						}
+						
 						processInput(scene.player);
 						//Need to update this every loop, I guess
 						for (i=0; i < scene.activeRoom.enemy.length;i++) {

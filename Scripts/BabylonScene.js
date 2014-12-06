@@ -143,7 +143,7 @@ function CreateScene(engine) {
     //var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
     var Alpha = 3*Math.PI/2;
     var Beta = Math.PI/16;
-    scene.camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, RoomHeight*12, new BABYLON.Vector3.Zero(), scene);
+    scene.camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, RoomHeight*13.2, new BABYLON.Vector3.Zero(), scene);
     //set camera to not move
     // scene.camera.lowerAlphaLimit = Alpha;
     // scene.camera.upperAlphaLimit = Alpha;
@@ -263,6 +263,19 @@ function CreateScene(engine) {
 				scene.player.ellipsoid = new BABYLON.Vector3(3, 1, 3);
 				scene.player.previousRotation = scene.player.rotation.y;
 				scene.player.playerAnimations = new playerAnimations();
+				//set up the action manager for attacks
+				scene.actionManager = new BABYLON.ActionManager(scene);
+				// Detect player input, then play attack animation
+				scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+				BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
+						if (evt.sourceEvent.keyCode == KEYS.SPACE) {
+							if (scene.player.Attacking==0) {
+								scene.player.playerAnimations.updateAttack(scene);
+								scene.player.Attacking=1;
+							}
+						}
+				}));
+				
 				//Spawn a Blob on some random tile
 				var maxEmenies = getRandomInt(1,3);
 				for (var iSpawn = 0; iSpawn < maxEmenies; iSpawn++) {
@@ -271,31 +284,20 @@ function CreateScene(engine) {
 			});
 		});
     });
-	
-    // example of loading a mesh from blender export		
-    // BABYLON.SceneLoader.ImportMesh("", "Models3D/", "BookGolem.js", scene, function (newMesh) {
-        // scene.BookGolem = newMesh;
-        // scene.BookGolem[0].position.y += 4;
-		// for (var i=1; i< newMesh.length;i++) {
-			// scene.BookGolem[i].position.y += 4;
-		// }
-        // // m[0].isVisible = true;
-        // // m.material = scene.tileMaterialSword;
-    // });	
 
     scene.registerBeforeRender(function(){
-		if(scene.isErrthingReady) {
-			//Detect if player hits enemy mesh
-			for (i=0; i < scene.activeRoom.enemy.length;i++) {
-				if (scene.player.intersectsMesh(scene.activeRoom.enemy[i], true) && scene.player.Attack == 1) {
-					scene.activeRoom.enemy[i].renderOutline = true;
-					scene.activeRoom.enemy[i].outlineColor = new BABYLON.Color4(.8,.2,.2,.8);
-					scene.activeRoom.enemy[i].outlineWidth =.2;
-				} else {
-					scene.activeRoom.enemy[i].renderOutline = false;
-				}
-			}
-		}
+		// if(scene.isErrthingReady) {
+			// //Detect if player hits enemy mesh
+			// for (i=0; i < scene.activeRoom.enemy.length;i++) {
+				// if (scene.player.intersectsMesh(scene.activeRoom.enemy[i], true) && scene.player.Attacking == 1) {
+					// scene.activeRoom.enemy[i].renderOutline = true;
+					// scene.activeRoom.enemy[i].outlineColor = new BABYLON.Color4(.8,.2,.2,.8);
+					// scene.activeRoom.enemy[i].outlineWidth =.2;
+				// } else {
+					// scene.activeRoom.enemy[i].renderOutline = false;
+				// }
+			// }
+		// }
 	});
 
     //When click event is raised
@@ -349,11 +351,27 @@ function spawnEnemy(Scene) {
 	Scene.activeRoom.enemy[enemyIndex].scaling = new BABYLON.Vector3(1, 1, 1);
 	Scene.activeRoom.enemy[enemyIndex].material = Scene.BlobMaterial;
 	
-	
 	Scene.activeRoom.enemy[enemyIndex].checkCollisions = true;
 	Scene.activeRoom.enemy[enemyIndex].applyGravity = true;
 	//Set the ellipsoid around the camera (e.g. your player's size)
 	Scene.activeRoom.enemy[enemyIndex].ellipsoid = new BABYLON.Vector3(2, 1, 2);
+	
+	// create intersect action
+	Scene.activeRoom.enemy[enemyIndex].actionManager = new BABYLON.ActionManager(scene);
+	Scene.activeRoom.enemy[enemyIndex].health = 5;
+	// Detect player input, then play animation after executing function
+	Scene.activeRoom.enemy[enemyIndex].actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+	{ trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: scene.player }, function (evt) {
+			if (scene.player.Attacking == 1) {
+				Scene.activeRoom.enemy[enemyIndex].health--;
+				$('#dmg').html('<br />dmg: ' + parseInt(Scene.activeRoom.enemy[enemyIndex].health));
+			}
+	}));
+	
+	Scene.activeRoom.enemy[enemyIndex].actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+	{ trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, parameter: scene.player }, function (evt) {
+
+	}));
 	
 	return;
 
@@ -408,7 +426,7 @@ function playerAnimations() {
 		}
 		Scene.beginAnimation(Scene.player, 0, 10, false, 1.0, function () {
 			Scene.player.Attacking=0;
-			Scene.player.Attack=0; 
+			// Scene.player.Attack=0;
 			Scene.player.rotation = new BABYLON.Vector3(Math.PI/6,Scene.player.currentFacingAngle.y,Math.PI/4);
 		});
 	};
@@ -515,6 +533,7 @@ function createMaterials(Scene) {
 	// Scene.tileMaterialSword.specularColor = new BABYLON.Color3(0, 0, 0);
 	
 	Scene.BlobMaterial = new BABYLON.StandardMaterial("tile-texture-Blob", Scene);
+	// Scene.BlobMaterial.diffuseTexture = new BABYLON.Texture('./Textures/stone1.jpg', Scene);
     Scene.BlobMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.3);
     Scene.BlobMaterial.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
 }

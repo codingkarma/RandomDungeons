@@ -13,6 +13,8 @@ $(document).ready(function () {
 			scene.dispose();
 			startGame(1);
 		});
+		$('#topMenu').fadeIn(200, function () {	});
+		$('#hotKeys').fadeIn(200, function () {	});
 		
 	});
 	

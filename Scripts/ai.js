@@ -9,7 +9,7 @@ function GetPathVector(startPosition, endPosition, options)
 	var xDiff = startPosition.x-endPosition.x;
 	var zDiff = startPosition.z-endPosition.z;
 
-	if(Math.abs(xDiff*xDiff + zDiff*zDiff) < settings.tolerance)
+	if(Math.sqrt(xDiff*xDiff + zDiff*zDiff) < settings.tolerance)
 	{
 		return new BABYLON.Vector3(0, scene.gravity.y, 0);
 	}
