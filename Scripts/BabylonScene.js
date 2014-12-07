@@ -284,6 +284,8 @@ function CreateScene(engine) {
 			});
 		});
     });
+	
+	scene.joystick = new BABYLON.GameFX.VirtualJoystick(true);
 
     scene.registerBeforeRender(function(){
 		// if(scene.isErrthingReady) {
@@ -423,9 +425,9 @@ function playerAnimations() {
 
 function enemyAnimations() {
 	
-	this.Attack = function (Scene) {
+	this.die = function (Scene, entity) {
 		//create animations for player
-		Scene.attackAnimation = new BABYLON.Animation("attackAnimation", "rotation", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+		entity.attackAnimation = new BABYLON.Animation("dieAnimation", "scaling", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 		// Animation keys
 		Scene.attackAnimation.tempKeys = [];
 		//At the animation key 0, the value of scaling is "1"
@@ -451,6 +453,7 @@ function enemyAnimations() {
 			Scene.player.mesh.rotation = new BABYLON.Vector3(Math.PI/6,Scene.player.mesh.currentFacingAngle.y,Math.PI/4);
 		});
 	};
+	
 }
 
 function createTorchFire(scene, attachTo) {

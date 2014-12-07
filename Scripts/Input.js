@@ -64,23 +64,24 @@ function doKeyUp(evt) {
 function processInput(entity) {
 	var vX=0;
 	var vZ=0;
+	var delta = (scene.joystick.deltaJoystickVector);
 	
-    if (UpDown && !DownDown) {
+    if (UpDown && !DownDown || delta.y < -45) {
         vZ=1;
 		entity.rotation.y = Math.PI / 2;
 		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI / 2, entity.rotation.z);
     }
-    else if (DownDown && !UpDown) {
+    else if (DownDown && !UpDown || delta.y > 45) {
         vZ=-1;
 		entity.rotation.y = -Math.PI / 2;
 		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, -Math.PI / 2, entity.rotation.z);
     }
-    if (LeftDown && !RightDown) {
+    if (LeftDown && !RightDown || delta.x < -45) {
         vX=-1;
 		entity.rotation.y = 0;
 		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, 0, entity.rotation.z);
     }
-    else if (RightDown && !LeftDown) {
+    else if (RightDown && !LeftDown || delta.x > 45) {
         vX=1;
 		entity.rotation.y = Math.PI;
 		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI, entity.rotation.z);
