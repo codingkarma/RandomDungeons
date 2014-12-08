@@ -42,7 +42,7 @@ function startGame(whichScene) {
 				engine.runRenderLoop(function () {
 					// rotate to give some animation
 					if (!scene.isErrthingReady) {
-						if (scene.isReady() && scene.player) {
+						if (scene.isReady() && scene.isLoaded) {
 							scene.isErrthingReady = true;
 						}
 						//when everything is ready this gets executed once
@@ -52,6 +52,15 @@ function startGame(whichScene) {
 							}
 							scene.player.attacking=0;
 							scene.player.mesh.currentFacingAngle = new BABYLON.Vector3(scene.player.mesh.rotation.x, scene.player.mesh.rotation.y, scene.player.mesh.rotation.z);
+							scene.octree = scene.createOrUpdateSelectionOctree(18, 2);
+							// TO DO: Implement optimization (only availabe in BJS v2+)
+							// scene.optimizeOptions = BABYLON.SceneOptimizerOptions.ModerateDegradationAllowed();
+							// scene.optimizeOptions.targetFrameRate=30;
+							// BABYLON.SceneOptimizer.OptimizeAsync(scene, scene.optimizeOptions, function() {
+							   // // On success
+							// }, function() {
+							   // // FPS target not reached
+							// });
 						}
 					}
 					else {
@@ -103,7 +112,9 @@ function animatePlayer(Scene) {
 }
 
 function checkActiveRoom(Scene) {
+	var capacity = 18;
 	if (Scene.player.mesh.position.z > (Scene.activeRoom.originOffset.z)) {
+		scene.octree = scene.createOrUpdateSelectionOctree(capacity, 2);
 		//going north
 		var i_room=(Scene.activeRoom.row-1) * map.width + Scene.activeRoom.col;
 		//disable torch lights
@@ -125,6 +136,7 @@ function checkActiveRoom(Scene) {
 		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
 	}
 	else if (Scene.player.mesh.position.x > (Scene.activeRoom.originOffset.x+Scene.activeRoom.width*Scene.activeRoom.tiles[0].width)) {
+		scene.octree = scene.createOrUpdateSelectionOctree(capacity, 2);
 		//going east
 		var i_room=(Scene.activeRoom.row) * map.width + Scene.activeRoom.col+1;
 		//disable torch lights
@@ -146,6 +158,7 @@ function checkActiveRoom(Scene) {
 		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
 	}
 	else if (Scene.player.mesh.position.z < (Scene.activeRoom.originOffset.z - Scene.activeRoom.height*Scene.activeRoom.tiles[0].width)) {
+		scene.octree = scene.createOrUpdateSelectionOctree(capacity, 2);
 		//going south
 		var i_room=(Scene.activeRoom.row+1) * map.width + Scene.activeRoom.col;
 		//disable torch lights
@@ -167,6 +180,7 @@ function checkActiveRoom(Scene) {
 		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
 	}
 	else if (Scene.player.mesh.position.x < (Scene.activeRoom.originOffset.x)) {
+		scene.octree = scene.createOrUpdateSelectionOctree(capacity, 2);
 		//going west
 		var i_room=(Scene.activeRoom.row) * map.width + Scene.activeRoom.col-1;
 		//disable torch lights
