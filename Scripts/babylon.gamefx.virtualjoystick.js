@@ -76,7 +76,7 @@ var BABYLON;
         		this.halfHeight = _canvas.height / 2;
         		this._joystickPressed = false;
                 // default joystick color
-        		this._joystickColor = "cyan";
+        		this._joystickColor = "white";
 
         		this.joystickPointerID = -1;
                 // current joystick position
