@@ -1,204 +1,190 @@
 
-function startGame(whichScene) {  
-
-        var canvas = document.getElementById("renderCanvas");
-
-        // Check support
-        if (!BABYLON.Engine.isSupported()) {
-            window.alert('Browser not supported');
-        } else {
-            // Babylon
-            var engine = new BABYLON.Engine(canvas, true);
-			var loopCounter = 0;
-
-            //Creating scene (in "BabylonScene.js")
-			if (whichScene == 0) {
-				scene = CreateStartScene(engine);
-				scene.activeCamera.attachControl(canvas);
-				
-				engine.runRenderLoop(function () {//Render scene and any changes
-					if (onStartScreen == 0) {
-						engine.stopRenderLoop();
-					}
-					if (loopCounter > 1000) {
-						loopCounter=0;
-					}
-					else {
-						loopCounter++;
-					}
-					if (loopCounter % 10 == 0) {
-						$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
-					}
-					scene.render();
-				});
+Game.initScenes = function() { 
+	var activeScene;
+	
+	// Create Start Scene
+	activeScene = Game.scene.push(Game.CreateStartScene(Game.engine)) - 1;
+	//Game.scene[activeScene].camera.attachControl(Game.canvas);
+	Game.scene[activeScene].renderLoop = function () {
+		//Render scene and any changes
+		if (this.isLoaded) {
+			if (Game.engine.loopCounter > 1000) {
+				Game.engine.loopCounter=0;
 			}
 			else {
-				scene = CreateScene(engine);
-				scene.activeCamera.attachControl(canvas);
-				
-				var i;
-				var enemyCounter=0;
-				// Once the scene is loaded, register a render loop to render it
-				engine.runRenderLoop(function () {
-					// rotate to give some animation
-					if (!scene.isErrthingReady) {
-						if (scene.isReady() && scene.isLoaded) {
-							scene.isErrthingReady = true;
-						}
-						//when everything is ready this gets executed once
-						if (scene.isErrthingReady) {
-							for (i=0; i < scene.activeRoom.enemy.length;i++) {
-								scene.activeRoom.enemy[i].velocity = new BABYLON.Vector3(0,scene.gravity.y,0);
-							}
-							scene.player.attacking=0;
-							scene.player.mesh.currentFacingAngle = new BABYLON.Vector3(scene.player.mesh.rotation.x, scene.player.mesh.rotation.y, scene.player.mesh.rotation.z);
-							scene.octree = scene.createOrUpdateSelectionOctree(18, 2);
-							// TO DO: Implement optimization (only availabe in BJS v2+)
-							// scene.optimizeOptions = BABYLON.SceneOptimizerOptions.ModerateDegradationAllowed();
-							// scene.optimizeOptions.targetFrameRate=30;
-							// BABYLON.SceneOptimizer.OptimizeAsync(scene, scene.optimizeOptions, function() {
-							   // // On success
-							// }, function() {
-							   // // FPS target not reached
-							// });
-						}
-					}
-					else {
-						switch (loopCounter) {   
-							case 1000:
-								loopCounter=0;
-								break;
-							default:
-								loopCounter++;
-								break;
-						}
-						if (loopCounter % 5 == 0) {
-							$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
-							//check what room the player is in
-							checkActiveRoom(scene);
-						}
-						else if (loopCounter % (31 + enemyCounter) == 0) {
-							if (enemyCounter >= scene.activeRoom.enemy.length) { 
-								enemyCounter = 0;
-							}
-							else {
-								scene.activeRoom.enemy[enemyCounter].velocity = GetPathVector(scene.activeRoom.enemy[enemyCounter].mesh.position,scene.player.mesh.position,{speed: scene.activeRoom.enemy[enemyCounter].speed, tolerance: 12});
-								enemyCounter++;
-							}
-						}
-						
-						processInput(scene.player.mesh);
-						//Need to update this every loop, I guess
-						for (i=0; i < scene.activeRoom.enemy.length;i++) {
-							scene.activeRoom.enemy[i].mesh.moveWithCollisions(scene.activeRoom.enemy[i].velocity);
-						}
-					}
-					
-					//Render scene and any changes
-					scene.render();
-				});
+				Game.engine.loopCounter++;
 			}
-
-            // Resize
-            window.addEventListener("resize", function () {
-                engine.resize();
-            });
-        }
-
-};
-
-function animatePlayer(Scene) {
+			this.render();
+		}
+	};
+	
+	// Create Game Scene
+	activeScene = Game.scene.push(Game.CreateGameScene(Game.engine)) - 1;
+	Game.scene[activeScene].enemyCounter=0;
+	Game.scene[activeScene].renderLoop = function () {
+		var i=0;
+		// rotate to give some animation
+		if (!this.isErrthingReady) {
+			if (this.isReady() && this.isLoaded) {
+				this.isErrthingReady = true;
+			}
+			//when everything is ready this gets executed once
+			if (this.isErrthingReady) {
+				for (i=0; i < this.activeRoom.enemy.length;i++) {
+					this.activeRoom.enemy[i].velocity = new BABYLON.Vector3(0,this.gravity.y,0);
+				}
+				this.player.attacking=false;
+				this.player.mesh.currentFacingAngle = new BABYLON.Vector3(this.player.mesh.rotation.x, this.player.mesh.rotation.y, this.player.mesh.rotation.z);
+				this.octree = this.createOrUpdateSelectionOctree(18, 2);
+				// TO DO: Implement optimization (only availabe in BJS v2+)
+				// this.optimizeOptions = BABYLON.SceneOptimizerOptions.ModerateDegradationAllowed();
+				// this.optimizeOptions.targetFrameRate=30;
+				// BABYLON.SceneOptimizer.OptimizeAsync(scene, this.optimizeOptions, function() {
+				   // // On success
+				// }, function() {
+				   // // FPS target not reached
+				// });
+			}
+		}
+		else {
+			switch (Game.engine.loopCounter) {   
+				case 1000:
+					Game.engine.loopCounter=0;
+					break;
+				default:
+					Game.engine.loopCounter++;
+					break;
+			}
+			if (Game.engine.loopCounter % 5 == 0) {
+				$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
+				//check what room the player is in
+				this.checkActiveRoom();
+			}
+			else if (Game.engine.loopCounter % (31 + this.enemyCounter) == 0) {
+				if (this.enemyCounter >= this.activeRoom.enemy.length) { 
+					this.enemyCounter = 0;
+				}
+				else {
+					this.activeRoom.enemy[this.enemyCounter].velocity = GetPathVector(this.activeRoom.enemy[this.enemyCounter].mesh.position,this.player.mesh.position,{speed: this.activeRoom.enemy[this.enemyCounter].speed, tolerance: 12});
+					this.enemyCounter++;
+				}
+			}
+			
+			processInput(this.player.mesh);
+			//Need to update this every loop, I guess
+			for (i=0; i < this.activeRoom.enemy.length;i++) {
+				this.activeRoom.enemy[i].mesh.moveWithCollisions(this.activeRoom.enemy[i].velocity);
+			}
+			
+			//Render scene and any changes
+			this.render();
+		}
+	};
+	
+	Game.scene[activeScene].checkActiveRoom = function() {
+		var capacity = 18;
+		if (this.player.mesh.position.z > (this.activeRoom.originOffset.z)) {
+			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
+			//going north
+			var i_room=(this.activeRoom.row-1) * Game.map.width + this.activeRoom.col;
+			//disable torch lights
+			var arrayLength;
+			for (var doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
+				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
+				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
+				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+			}
+			//set active room to entrance
+			this.activeRoom=Game.map.rooms[i_room];
+			for (doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
+				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
+				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
+				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+			}
+			
+			//set camera to new position
+			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
+		}
+		else if (this.player.mesh.position.x > (this.activeRoom.originOffset.x+this.activeRoom.width*this.activeRoom.tiles[0].width)) {
+			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
+			//going east
+			var i_room=(this.activeRoom.row) * Game.map.width + this.activeRoom.col+1;
+			//disable torch lights
+			var arrayLength;
+			for (var doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
+				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
+				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
+				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+			}
+			//set active room to entrance
+			this.activeRoom=Game.map.rooms[i_room];
+			for (doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
+				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
+				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
+				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+			}
+			
+			//set camera to new position
+			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
+		}
+		else if (this.player.mesh.position.z < (this.activeRoom.originOffset.z - this.activeRoom.height*this.activeRoom.tiles[0].width)) {
+			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
+			//going south
+			var i_room=(this.activeRoom.row+1) * Game.map.width + this.activeRoom.col;
+			//disable torch lights
+			var arrayLength;
+			for (var doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
+				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
+				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
+				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+			}
+			//set active room to entrance
+			this.activeRoom=Game.map.rooms[i_room];
+			for (doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
+				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
+				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
+				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+			}
+			
+			//set camera to new position
+			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
+		}
+		else if (this.player.mesh.position.x < (this.activeRoom.originOffset.x)) {
+			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
+			//going west
+			var i_room=(this.activeRoom.row) * Game.map.width + this.activeRoom.col-1;
+			//disable torch lights
+			var arrayLength;
+			for (var doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
+				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
+				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
+				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+			}
+			//set active room to entrance
+			this.activeRoom=Game.map.rooms[i_room];
+			for (doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
+				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
+				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
+				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+			}
+			
+			//set camera to new position
+			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
+		}
+	};
+	
+	// Resize
+	window.addEventListener("resize", function () {
+		Game.engine.resize();
+	});
 	
 }
 
-function checkActiveRoom(Scene) {
-	var capacity = 18;
-	if (Scene.player.mesh.position.z > (Scene.activeRoom.originOffset.z)) {
-		scene.octree = scene.createOrUpdateSelectionOctree(capacity, 2);
-		//going north
-		var i_room=(Scene.activeRoom.row-1) * map.width + Scene.activeRoom.col;
-		//disable torch lights
-		var arrayLength;
-		for (var doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
-			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
-		}
-		//set active room to entrance
-		Scene.activeRoom=map.rooms[i_room];
-		for (doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
-			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
-		}
-		
-		//set camera to new position
-		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
-	}
-	else if (Scene.player.mesh.position.x > (Scene.activeRoom.originOffset.x+Scene.activeRoom.width*Scene.activeRoom.tiles[0].width)) {
-		scene.octree = scene.createOrUpdateSelectionOctree(capacity, 2);
-		//going east
-		var i_room=(Scene.activeRoom.row) * map.width + Scene.activeRoom.col+1;
-		//disable torch lights
-		var arrayLength;
-		for (var doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
-			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
-		}
-		//set active room to entrance
-		Scene.activeRoom=map.rooms[i_room];
-		for (doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
-			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
-		}
-		
-		//set camera to new position
-		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
-	}
-	else if (Scene.player.mesh.position.z < (Scene.activeRoom.originOffset.z - Scene.activeRoom.height*Scene.activeRoom.tiles[0].width)) {
-		scene.octree = scene.createOrUpdateSelectionOctree(capacity, 2);
-		//going south
-		var i_room=(Scene.activeRoom.row+1) * map.width + Scene.activeRoom.col;
-		//disable torch lights
-		var arrayLength;
-		for (var doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
-			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
-		}
-		//set active room to entrance
-		Scene.activeRoom=map.rooms[i_room];
-		for (doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
-			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
-		}
-		
-		//set camera to new position
-		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
-	}
-	else if (Scene.player.mesh.position.x < (Scene.activeRoom.originOffset.x)) {
-		scene.octree = scene.createOrUpdateSelectionOctree(capacity, 2);
-		//going west
-		var i_room=(Scene.activeRoom.row) * map.width + Scene.activeRoom.col-1;
-		//disable torch lights
-		var arrayLength;
-		for (var doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
-			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
-		}
-		//set active room to entrance
-		Scene.activeRoom=map.rooms[i_room];
-		for (doorIndex = 0; doorIndex < Scene.activeRoom.door.length; doorIndex++) {
-			arrayLength = Scene.activeRoom.door[doorIndex].Frame.length-1;
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
-			Scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
-		}
-		
-		//set camera to new position
-		Scene.camera.target = new BABYLON.Vector3(Scene.activeRoom.originOffset.x+Scene.activeRoom.centerPosition.x, 0, Scene.activeRoom.originOffset.z-Scene.activeRoom.centerPosition.z);
-	}
+Game.runRenderLoop = function () {
+	Game.engine.stopRenderLoop();
+
+	// Once the scene is loaded, register a render loop to render it
+	Game.engine.runRenderLoop(function () { 
+		Game.scene[Game.activeScene].renderLoop();
+	});
 }

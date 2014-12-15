@@ -11,10 +11,10 @@ function GetPathVector(startPosition, endPosition, options)
 
 	if(Math.sqrt(xDiff*xDiff + zDiff*zDiff) < settings.tolerance)
 	{
-		return new BABYLON.Vector3(0, scene.gravity.y, 0);
+		return new BABYLON.Vector3(0, Game.scene[Game.activeScene].gravity.y, 0);
 	}
 	else {
-		return new BABYLON.Vector3(-1*settings.speed*xDiff/startPosition.x, scene.gravity.y, settings.speed*zDiff/startPosition.z);
+		return new BABYLON.Vector3(-1*settings.speed*xDiff/startPosition.x, Game.scene[Game.activeScene].gravity.y, settings.speed*zDiff/startPosition.z);
 	}
 }
 

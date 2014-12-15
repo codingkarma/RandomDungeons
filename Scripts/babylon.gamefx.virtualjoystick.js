@@ -22,7 +22,7 @@ var BABYLON;
             var _canvasContext;
             var globalJoystickIndex = 0;
 
-            function VirtualJoystick(leftJoystick) {
+            function VirtualJoystick(leftJoystick,joystickColor) {
                 if (leftJoystick)
                 {
                     this._leftJoystick = true;
@@ -76,7 +76,7 @@ var BABYLON;
         		this.halfHeight = _canvas.height / 2;
         		this._joystickPressed = false;
                 // default joystick color
-        		this._joystickColor = "white";
+        		this._joystickColor = joystickColor;
 
         		this.joystickPointerID = -1;
                 // current joystick position

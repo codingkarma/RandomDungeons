@@ -4,15 +4,17 @@
 	processing begun of material:  Door.Material
 	Diffuse texture found
 Error encountered processing image file:  C:\GitHub\RandomDungeons\Models3D\Door.png, Error:  'C:\\GitHub\\RandomDungeons\\Models3D\\Blender\\..\\Door.png' and 'C:\\GitHub\\RandomDungeons\\Models3D\\Door.png' are the same file
+	Bump texture found
+Error encountered processing image file:  C:\GitHub\RandomDungeons\Models3D\Door_Bump.png, Error:  'C:\\GitHub\\RandomDungeons\\Models3D\\Blender\\..\\Door_Bump.png' and 'C:\\GitHub\\RandomDungeons\\Models3D\\Door_Bump.png' are the same file
 	processing begun of material:  Door.Material.001
-	processing begun of mesh:  Cylinder.001
+	processing begun of mesh:  HandleRear
 		num positions      :  110
 		num normals        :  110
 		num uvs            :  0
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  648
-	processing begun of mesh:  Cylinder
+	processing begun of mesh:  HandleFront
 		num positions      :  110
 		num normals        :  110
 		num uvs            :  0
@@ -21,10 +23,10 @@ Error encountered processing image file:  C:\GitHub\RandomDungeons\Models3D\Door
 		num indices        :  648
 	processing begun of light:  Lamp.002
 	processing begun of light:  Lamp.001
-	processing begun of mesh:  Cube.001
-		num positions      :  68
-		num normals        :  68
-		num uvs            :  136
+	processing begun of mesh:  Door
+		num positions      :  69
+		num normals        :  69
+		num uvs            :  138
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  96

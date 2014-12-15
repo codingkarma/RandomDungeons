@@ -1,25 +1,41 @@
 
-var map;
 var onStartScreen=1;
+var Game = new function () {
+	this.map = {};
+	this.canvas = document.getElementById("renderCanvas");
+	this.engine = new BABYLON.Engine(this.canvas, true);
+	//this.engine.renderEvenInBackground = false;
+	this.engine.loopCounter = 0;
+	this.scene = [];
+	this.sceneType = {
+		Start: 0,
+		Game: 1
+	};
+	this.activeScene = this.sceneType.Start;
+}
 
 $(document).ready(function () {
 
-
-	$('#startGame').click(function () {
-		$('.container').html("<canvas class=\"renderCanvas\" id=\"renderCanvas\"></canvas>");
-		$('#modal').fadeOut(50, function () {
-			$('#modalDiv').html('');
-			onStartScreen=0;
-			scene.dispose();
-			startGame(1);
-		});
-		$('#topMenu').fadeIn(200, function () {	});
-		$('#hotKeys').fadeIn(200, function () {	});
+	// Check support
+	if (!BABYLON.Engine.isSupported()) {
+		window.alert('Browser not supported');
+		//TO DO: Display a different screen
+	} 
+	else {
+		Game.map = GenerateMap(5,5);
+		Game.initScenes();
+		Game.runRenderLoop();
 		
-	});
-	
-	map = GenerateMap(5,5);
-	startGame(0);
+		$('#startGame').click(function () {
+			$('#modal').fadeOut(50, function () {
+					$('#modalDiv').html('');
+					Game.activeScene=Game.sceneType.Game;
+					Game.runRenderLoop();
+				});
+			$('#topMenu').fadeIn(200, function () {	});
+			$('#hotKeys').fadeIn(200, function () {	});
+		});
+	};
 });
 
 //function for modal pop-up

@@ -4,7 +4,6 @@ var LeftDown = false;
 var RightDown = false;
 var UpDown = false;
 var DownDown = false;
-var SpaceBarDown = false;
 //KEYS
 var KEYS = {
     SPACE: 32,
@@ -35,9 +34,6 @@ function doKeyDown(evt) {
             DownDown = true;
             break;
     }
-	// if (evt.keyCode == KEYS.SPACE) {
-		// SpaceBarDown = true;
-	// }
 }
 
 function doKeyUp(evt) {
@@ -56,15 +52,13 @@ function doKeyUp(evt) {
             DownDown = false;
             break;
     }
-	// if (evt.keyCode == KEYS.SPACE) {
-		// SpaceBarDown = false;
-	// }
 }
 
 function processInput(entity) {
 	var vX=0;
 	var vZ=0;
-	var delta = (scene.joystick.deltaJoystickVector);
+	var activeScene = Game.scene[Game.activeScene];
+	var delta = activeScene.joystick.deltaJoystickVector;
 	
     if (UpDown && !DownDown || delta.y < -5) {
         vZ=1;
@@ -86,12 +80,14 @@ function processInput(entity) {
 		entity.rotation.y = Math.PI;
 		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI, entity.rotation.z);
     }
-	var velocity=new BABYLON.Vector3(vX, scene.gravity.y, vZ);
+	var velocity=new BABYLON.Vector3(vX, activeScene.gravity.y, vZ);
 	entity.moveWithCollisions(velocity);
 	
-	// if (SpaceBarDown == true) {
-		// entity.Attack = 1;
-	// }
+	if (activeScene.joystickAction._joystickPressed) {
+		if (activeScene.player.attacking==false) {
+			activeScene.player.mesh.playerAnimations.updateAttack(activeScene);
+		}
+	}
 
 }
 
