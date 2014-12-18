@@ -63,8 +63,28 @@ Game.initScenes = function() {
 			else if (Game.engine.loopCounter % (31 + this.enemyCounter) == 0) {
 				if (this.enemyCounter >= this.activeRoom.enemy.length) { 
 					this.enemyCounter = 0;
+					//open doors if all enemies are dead
+					if (this.activeRoom.enemiesDead) {
+						for (var doorLoop=0; doorLoop < this.activeRoom.doors.length; doorLoop++) {
+							if (this.activeRoom.doors[doorLoop].isOpen == false) {
+								this.activeRoom.doors[doorLoop].mesh.checkCollisions = false;
+								this.activeRoom.doors[doorLoop].mesh.isVisible = false;
+								this.activeRoom.doors[doorLoop].isOpen = true;
+								//apply to matching door
+								this.activeRoom.doors[doorLoop].pairedDoor.mesh.checkCollisions = false;
+								this.activeRoom.doors[doorLoop].pairedDoor.mesh.isVisible = false;
+								this.activeRoom.doors[doorLoop].pairedDoor.isOpen = true;
+							}
+						}
+					}
 				}
 				else {
+					if (this.enemyCounter == 0 ) {
+						this.activeRoom.enemiesDead = this.activeRoom.enemy[this.enemyCounter].isDead;
+					}
+					else {
+						this.activeRoom.enemiesDead = (this.activeRoom.enemiesDead && this.activeRoom.enemy[this.enemyCounter].isDead);
+					}
 					this.activeRoom.enemy[this.enemyCounter].velocity = GetPathVector(this.activeRoom.enemy[this.enemyCounter].mesh.position,this.player.mesh.position,{speed: this.activeRoom.enemy[this.enemyCounter].speed, tolerance: 12});
 					this.enemyCounter++;
 				}
@@ -89,17 +109,17 @@ Game.initScenes = function() {
 			var i_room=(this.activeRoom.row-1) * Game.map.width + this.activeRoom.col;
 			//disable torch lights
 			var arrayLength;
-			for (var doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
-				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
-				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
-				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
 			this.activeRoom=Game.map.rooms[i_room];
-			for (doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
-				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
-				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
-				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
 			}
 			
 			//set camera to new position
@@ -111,17 +131,17 @@ Game.initScenes = function() {
 			var i_room=(this.activeRoom.row) * Game.map.width + this.activeRoom.col+1;
 			//disable torch lights
 			var arrayLength;
-			for (var doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
-				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
-				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
-				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
 			this.activeRoom=Game.map.rooms[i_room];
-			for (doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
-				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
-				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
-				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
 			}
 			
 			//set camera to new position
@@ -133,17 +153,17 @@ Game.initScenes = function() {
 			var i_room=(this.activeRoom.row+1) * Game.map.width + this.activeRoom.col;
 			//disable torch lights
 			var arrayLength;
-			for (var doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
-				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
-				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
-				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
 			this.activeRoom=Game.map.rooms[i_room];
-			for (doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
-				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
-				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
-				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
 			}
 			
 			//set camera to new position
@@ -155,17 +175,17 @@ Game.initScenes = function() {
 			var i_room=(this.activeRoom.row) * Game.map.width + this.activeRoom.col-1;
 			//disable torch lights
 			var arrayLength;
-			for (var doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
-				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
-				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
-				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
 			this.activeRoom=Game.map.rooms[i_room];
-			for (doorIndex = 0; doorIndex < this.activeRoom.door.length; doorIndex++) {
-				arrayLength = this.activeRoom.door[doorIndex].Frame.length-1;
-				this.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
-				this.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
 			}
 			
 			//set camera to new position

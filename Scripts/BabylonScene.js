@@ -108,10 +108,10 @@ Game.CreateStartScene = function() {
     scene.registerBeforeRender(function(){
 		if (scene.isReady() && scene.rightTorch) {
 			var arrayLength = scene.doorFrame.length;
-			scene.doorFrame[arrayLength-1].torchFire[0].emitRate = getRandomInt(500, 1500);
-			scene.doorFrame[arrayLength-1].torchFire[0].emitRate = getRandomInt(600, 1600);
-			scene.doorFrame[arrayLength-1].torchFire[0].light.specular = new BABYLON.Color3(getRandomInt(3, 5)/10, .3, .3);
-			scene.doorFrame[arrayLength-1].torchFire[0].light.specular = new BABYLON.Color3(getRandomInt(3, 5)/10, .3, .3);
+			scene.doorFrame[arrayLength-1].torchFire[0].emitRate = Game.getRandomInt(500, 1500);
+			scene.doorFrame[arrayLength-1].torchFire[0].emitRate = Game.getRandomInt(600, 1600);
+			scene.doorFrame[arrayLength-1].torchFire[0].light.specular = new BABYLON.Color3(Game.getRandomInt(3, 5)/10, .3, .3);
+			scene.doorFrame[arrayLength-1].torchFire[0].light.specular = new BABYLON.Color3(Game.getRandomInt(3, 5)/10, .3, .3);
 		}
 	});
 
@@ -131,7 +131,7 @@ Game.CreateGameScene = function() {
     //var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
     var Alpha = 3*Math.PI/2;
     var Beta = Math.PI/16;
-    scene.camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, RoomHeight*13.2, new BABYLON.Vector3.Zero(), scene);
+    scene.camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, Game.RoomHeight*13.2, new BABYLON.Vector3.Zero(), scene);
 	scene.camera.attachControl(Game.canvas, true);
     //set camera to not move
     // scene.camera.lowerAlphaLimit = Alpha;
@@ -146,18 +146,44 @@ Game.CreateGameScene = function() {
 	scene.ambientLight.intensity = 1;
 	
 	createMaterials(scene);
-
     scene.rooms = Game.map.rooms;
     scene.door = 0;
 	scene.isLoaded=false;
-	BABYLON.SceneLoader.ImportMesh("", "Models3D/", "FunSword.b.js", scene, function (meshes, particleSystems) {
-		var m = meshes[0];
+
+	//create Asset Manager
+	scene.assetsManager = new BABYLON.AssetsManager(scene);
+	scene.assetsManager.useDefaultLoadingScreen=false;
+	
+	//create Asset Tasks
+	scene.playerTask = scene.assetsManager.addMeshTask("playerTask", "", "./Models3D/", "FunSword.b.js");
+	scene.doorFrameTask = scene.assetsManager.addMeshTask("doorFrameTask", "", "./Models3D/", "DoorFrame.b.js");
+	scene.torchTopTask = scene.assetsManager.addMeshTask("doorFrameTask", "", "./Models3D/", "TorchTopFrame.b.js");
+	scene.doorTask = scene.assetsManager.addMeshTask("doorTask", "", "./Models3D/", "Door.b.js");
+	
+	//Set functions to assign loaded meshes
+	scene.playerTask.onSuccess = function (task) {
+		var m = task.loadedMeshes[0];
 		m.isVisible = true;
-		
 		m.scaling = new BABYLON.Vector3(2, 2, 2);
 		m.rotation = new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/8);
-		//instantiate player
+		
 		scene.player = new Entity(m,{type: EntityType.Player, health: 4, damage: 1, speed: 1});
+	}
+	scene.doorFrameTask.onSuccess = function (task) {
+		scene.doorFrame = task.loadedMeshes;
+	}
+	scene.torchTopTask.onSuccess = function (task) {
+		scene.torchTop = task.loadedMeshes[0];
+	}
+	scene.doorTask.onSuccess = function (task) {
+		scene.doorMesh = task.loadedMeshes[2];
+		scene.doorMesh.isVisible = false;
+		scene.doorMesh.scaling = new BABYLON.Vector3(4.8, 4.8, 4.8);
+	}	
+	
+	//Set up Scene after all Tasks are complete
+	scene.assetsManager.onFinish = function (tasks) {
+	
 		//scene.player.mesh.showBoundingBox = true;
 		scene.player.mesh.checkCollisions = true;
 		//Set the ellipsoid around the camera (e.g. your player's size)
@@ -189,111 +215,140 @@ Game.CreateGameScene = function() {
 					}
 				}
 		}));
-		BABYLON.SceneLoader.ImportMesh("", "Models3D/", "DoorFrame.b.js", scene, function (meshes) {
-			scene.doorFrame = meshes;
-			
-			BABYLON.SceneLoader.ImportMesh("", "Models3D/", "TorchTopFrame.b.js", scene, function (newMeshes) {
-				scene.torchTop = newMeshes[0];
-				
-				scene.torchTop.isVisible = false;
-				scene.doorFrame[0].isVisible = false;
-				scene.doorFrame.push(scene.torchTop.clone());
-				scene.doorFrame.push(scene.torchTop.clone());
-				var arrayLength = scene.doorFrame.length;
-				for (var j=1;j < arrayLength;j++){
-					scene.doorFrame[j].parent = scene.doorFrame[0];
-					scene.doorFrame[j].isVisible = false;
-				}
-				//create left and right torch tops
-				scene.doorFrame[arrayLength-1].position = new BABYLON.Vector3(1.5,3.2,-1.7);
-				scene.doorFrame[arrayLength-2].position = new BABYLON.Vector3(-1.5,3.2,-1.7);
-				scene.doorFrame[0].scaling = new BABYLON.Vector3(4.8, 4.8, 4.8);
-				
-				//Draw Rooms
-				for (var i_room=0; i_room < Game.map.rooms.length; i_room++) {
-					if (Game.map.rooms[i_room].type != RoomType.Empty) {
-						//set room properties
-						scene.rooms[i_room].originOffset = new BABYLON.Vector3(Game.map.rooms[i_room].col*Game.map.rooms[i_room].width*Game.map.rooms[i_room].tiles[0].width,0,-Game.map.rooms[i_room].row*Game.map.rooms[i_room].height*Game.map.rooms[i_room].tiles[0].width);
-						scene.rooms[i_room].centerPosition = new BABYLON.Vector3((Game.map.rooms[i_room].width-1)/2*Game.map.rooms[i_room].tiles[0].width,0,(Game.map.rooms[i_room].height-1)/2*Game.map.rooms[i_room].tiles[0].width);
-						scene.rooms[i_room].index=i_room;
-						scene.rooms[i_room].enemy=[];
-						scene.rooms[i_room].door=[];
-						for (var i = 0; i < Game.map.rooms[i_room].tiles.length ; i++) {
-							scene.rooms[i_room].tiles[i].mesh = Game.drawTile(scene, Game.map.rooms[i_room].tiles[i],i);
-							// scene.rooms[i_room].tiles[i].mesh.useOctreeForRenderingSelection = true;
-							//reposition to room location
-							scene.rooms[i_room].tiles[i].mesh.position.x=scene.rooms[i_room].tiles[i].mesh.position.x+scene.rooms[i_room].originOffset.x;
-							scene.rooms[i_room].tiles[i].mesh.position.z=scene.rooms[i_room].tiles[i].mesh.position.z+scene.rooms[i_room].originOffset.z;
-							
-							scene.rooms[i_room].tiles[i].mesh.checkCollisions = true;
-							scene.rooms[i_room].tiles[i].mesh.tileId = i;
-							//create and position doors, adding the torch flame and light
-							if (scene.rooms[i_room].tiles[i].type == TileType.Door) {
-								var doorIndex = scene.rooms[i_room].door.push({Frame: []})-1;
-								scene.rooms[i_room].door[doorIndex].Frame.push(scene.doorFrame[0].clone())
-								scene.rooms[i_room].door[doorIndex].Frame[0].isVisible = true;
-								for (var j=1;j < scene.doorFrame.length;j++){
-									scene.rooms[i_room].door[doorIndex].Frame.push(scene.doorFrame[j].clone());
-									scene.rooms[i_room].door[doorIndex].Frame[j].parent = scene.rooms[i_room].door[doorIndex].Frame[0];
-									scene.rooms[i_room].door[doorIndex].Frame[j].isVisible = true;
-								}
-								scene.rooms[i_room].door[doorIndex].Frame[0].position = new BABYLON.Vector3(scene.rooms[i_room].tiles[i].mesh.position.x, -2,scene.rooms[i_room].tiles[i].mesh.position.z);
-								var doorRotation = ((scene.rooms[i_room].tiles[i].col==scene.rooms[i_room].width-1)*1 + (scene.rooms[i_room].tiles[i].row==scene.rooms[i_room].height-1)*2 + (scene.rooms[i_room].tiles[i].col==0)*3)*Math.PI/2;
-								scene.rooms[i_room].door[doorIndex].Frame[0].rotation = new BABYLON.Vector3(0, doorRotation, 0);
-								//attach fire to TorchTop
-								arrayLength = scene.doorFrame.length-1;
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire = [];
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire = [];
-								createTorchFire(scene, scene.rooms[i_room].door[doorIndex].Frame[arrayLength]);
-								createTorchFire(scene, scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1]);
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire[0].light.intensity = 3;
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire[0].light.intensity = 3;
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire[0].light.range = 40;
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire[0].light.range = 40;
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire[0].emitter = scene.rooms[i_room].door[doorIndex].Frame[arrayLength];
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire[0].emitter = scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1];
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(false);
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(false);
-								// Start the particle system
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength].torchFire[0].start();
-								scene.rooms[i_room].door[doorIndex].Frame[arrayLength-1].torchFire[0].start();
-							}
+		
+		//Set up initial door and torches
+		scene.torchTop.isVisible = false;
+		scene.doorFrame[0].isVisible = false;
+		scene.doorFrame.push(scene.torchTop.clone());
+		scene.doorFrame.push(scene.torchTop.clone());
+		var arrayLength = scene.doorFrame.length;
+		for (var j=1;j < arrayLength;j++){
+			scene.doorFrame[j].parent = scene.doorFrame[0];
+			scene.doorFrame[j].isVisible = false;
+		}
+		
+		//create left and right torch tops
+		scene.doorFrame[arrayLength-1].position = new BABYLON.Vector3(1.5,3.2,-1.7);
+		scene.doorFrame[arrayLength-2].position = new BABYLON.Vector3(-1.5,3.2,-1.7);
+		scene.doorFrame[0].scaling = new BABYLON.Vector3(4.8, 4.8, 4.8);
+		
+		//Draw Rooms
+		for (var i_room=0; i_room < Game.map.rooms.length; i_room++) {
+			if (Game.map.rooms[i_room].type != Game.RoomType.Empty) {
+				//set room properties
+				scene.rooms[i_room].originOffset = new BABYLON.Vector3(Game.map.rooms[i_room].col*Game.map.rooms[i_room].width*Game.map.rooms[i_room].tiles[0].width,0,-Game.map.rooms[i_room].row*Game.map.rooms[i_room].height*Game.map.rooms[i_room].tiles[0].width);
+				scene.rooms[i_room].centerPosition = new BABYLON.Vector3((Game.map.rooms[i_room].width-1)/2*Game.map.rooms[i_room].tiles[0].width,0,(Game.map.rooms[i_room].height-1)/2*Game.map.rooms[i_room].tiles[0].width);
+				scene.rooms[i_room].index=i_room;
+				scene.rooms[i_room].enemy=[];
+				scene.rooms[i_room].enemiesDead=false;
+				//scene.rooms[i_room].door=[];
+				for (var i = 0; i < Game.map.rooms[i_room].tiles.length ; i++) {
+					scene.rooms[i_room].tiles[i].mesh = Game.drawTile(scene, Game.map.rooms[i_room].tiles[i],i);
+					// scene.rooms[i_room].tiles[i].mesh.useOctreeForRenderingSelection = true;
+					//reposition to room location
+					scene.rooms[i_room].tiles[i].mesh.position.x=scene.rooms[i_room].tiles[i].mesh.position.x+scene.rooms[i_room].originOffset.x;
+					scene.rooms[i_room].tiles[i].mesh.position.z=scene.rooms[i_room].tiles[i].mesh.position.z+scene.rooms[i_room].originOffset.z;
+					
+					scene.rooms[i_room].tiles[i].mesh.checkCollisions = true;
+					scene.rooms[i_room].tiles[i].mesh.tileId = i;
+					//create and position doors, adding the torch flame and light
+					if (scene.rooms[i_room].tiles[i].type == Game.TileType.Door) {
+						var doorIndex = scene.rooms[i_room].tiles[i].doorIndex;
+						scene.rooms[i_room].doors[doorIndex].frame.push(scene.doorFrame[0].clone());
+						scene.rooms[i_room].doors[doorIndex].frame[0].isVisible = true;
+						for (var j=1;j < scene.doorFrame.length;j++) {
+							scene.rooms[i_room].doors[doorIndex].frame.push(scene.doorFrame[j].clone());
+							scene.rooms[i_room].doors[doorIndex].frame[j].parent = scene.rooms[i_room].doors[doorIndex].frame[0];
+							scene.rooms[i_room].doors[doorIndex].frame[j].isVisible = true;
 						}
+						scene.rooms[i_room].doors[doorIndex].frame[0].position = new BABYLON.Vector3(scene.rooms[i_room].tiles[i].mesh.position.x, -2,scene.rooms[i_room].tiles[i].mesh.position.z);
+						var doorRotation = ((scene.rooms[i_room].tiles[i].col==scene.rooms[i_room].width-1)*1 + (scene.rooms[i_room].tiles[i].row==scene.rooms[i_room].height-1)*2 + (scene.rooms[i_room].tiles[i].col==0)*3)*Math.PI/2;
+						scene.rooms[i_room].doors[doorIndex].frame[0].rotation = new BABYLON.Vector3(0, doorRotation, 0);
 						
-						if (Game.map.rooms[i_room].type == RoomType.Entrance) {
-							scene.camera.target = new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 0, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z);
-							//set active room to entrance
-							scene.activeRoom=Game.map.rooms[i_room];
-							//activate torch lights
-							for (doorIndex = 0; doorIndex < scene.activeRoom.door.length; doorIndex++) {
-								arrayLength = scene.activeRoom.door[doorIndex].Frame.length-1;
-								scene.activeRoom.door[doorIndex].Frame[arrayLength].torchFire[0].light.setEnabled(true);
-								scene.activeRoom.door[doorIndex].Frame[arrayLength-1].torchFire[0].light.setEnabled(true);
-							}
+						//set up door and matching door
+						scene.rooms[i_room].doors[doorIndex].mesh=scene.doorMesh.clone();
+						scene.rooms[i_room].doors[doorIndex].mesh.position = new BABYLON.Vector3(scene.rooms[i_room].tiles[i].mesh.position.x, -2,scene.rooms[i_room].tiles[i].mesh.position.z);
+						scene.rooms[i_room].doors[doorIndex].mesh.rotation = new BABYLON.Vector3(0, doorRotation, 0);
+						if (scene.rooms[i_room].tiles[i].col==scene.rooms[i_room].width-1) { // right
+							scene.rooms[i_room].doors[doorIndex].mesh.position.x-=5;
+							scene.rooms[i_room].doors[doorIndex].mesh.position.z+=5;
 						}
+						else if (scene.rooms[i_room].tiles[i].row==scene.rooms[i_room].height-1) { // bottom
+							scene.rooms[i_room].doors[doorIndex].mesh.position.x+=5;
+							scene.rooms[i_room].doors[doorIndex].mesh.position.z+=5;
+						}
+						else if (scene.rooms[i_room].tiles[i].col==0) { // left
+							scene.rooms[i_room].doors[doorIndex].mesh.position.x+=5;
+							scene.rooms[i_room].doors[doorIndex].mesh.position.z-=5;
+						}
+						else { // top
+							scene.rooms[i_room].doors[doorIndex].mesh.position.x-=5;
+							scene.rooms[i_room].doors[doorIndex].mesh.position.z-=5;
+						}
+						scene.rooms[i_room].doors[doorIndex].mesh.isVisible=true;
+						scene.rooms[i_room].doors[doorIndex].mesh.checkCollisions = true;
 						
-						//Spawn an enemy on some random tile
-						var maxEmenies = getRandomInt(1,3);
-						for (var iSpawn = 0; iSpawn < maxEmenies; iSpawn++) {
-							spawnEnemy(scene, scene.rooms[i_room]);
-						}
+						//attach fire to TorchTop
+						arrayLength = scene.doorFrame.length-1;
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength].torchFire = [];
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1].torchFire = [];
+						createTorchFire(scene, scene.rooms[i_room].doors[doorIndex].frame[arrayLength]);
+						createTorchFire(scene, scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1]);
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength].torchFire[0].light.intensity = 3;
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1].torchFire[0].light.intensity = 3;
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength].torchFire[0].light.range = 40;
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1].torchFire[0].light.range = 40;
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength].torchFire[0].emitter = scene.rooms[i_room].doors[doorIndex].frame[arrayLength];
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1].torchFire[0].emitter = scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1];
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+						// Start the particle system
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength].torchFire[0].start();
+						scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
 					}
 				}
-				var entranceIndex=scene.activeRoom.index;
-				x0=Game.map.rooms[entranceIndex].col*Game.map.rooms[entranceIndex].width*Game.map.rooms[entranceIndex].tiles[0].width+(Math.floor(Game.map.rooms[entranceIndex].width/2)*Game.map.rooms[entranceIndex].tiles[0].width);
-				z0=-Game.map.rooms[entranceIndex].row*Game.map.rooms[entranceIndex].height*Game.map.rooms[entranceIndex].tiles[0].width-((Game.map.rooms[entranceIndex].height-1)*Game.map.rooms[entranceIndex].tiles[0].width);
 				
-				scene.player.mesh.position = new BABYLON.Vector3(x0, 50, z0+10);
-				scene.player.mesh.applyGravity=true;
-				scene.isLoaded=true;
-			});
-		});
-    });
+				if (Game.map.rooms[i_room].type == Game.RoomType.Entrance) {
+					scene.camera.target = new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 0, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z);
+					//set active room to entrance
+					scene.activeRoom=Game.map.rooms[i_room];
+					//activate torch lights
+					for (doorIndex = 0; doorIndex < scene.activeRoom.doors.length; doorIndex++) {
+						arrayLength = scene.activeRoom.doors[doorIndex].frame.length-1;
+						scene.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
+						scene.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+					}
+				}
+				
+				//Spawn an enemy on some random tile
+				var maxEmenies = Game.getRandomInt(1,3);
+				for (var iSpawn = 0; iSpawn < maxEmenies; iSpawn++) {
+					spawnEnemy(scene, scene.rooms[i_room]);
+				}
+			}
+		}
+		var entranceIndex=scene.activeRoom.index;
+		x0=Game.map.rooms[entranceIndex].col*Game.map.rooms[entranceIndex].width*Game.map.rooms[entranceIndex].tiles[0].width+(Math.floor(Game.map.rooms[entranceIndex].width/2)*Game.map.rooms[entranceIndex].tiles[0].width);
+		z0=-Game.map.rooms[entranceIndex].row*Game.map.rooms[entranceIndex].height*Game.map.rooms[entranceIndex].tiles[0].width-((Game.map.rooms[entranceIndex].height-1)*Game.map.rooms[entranceIndex].tiles[0].width);
+		
+		scene.player.mesh.position = new BABYLON.Vector3(x0, 50, z0+10);
+		scene.player.mesh.applyGravity=true;
+		scene.isLoaded=true;
+	};
 	
-	scene.joystick = new BABYLON.GameFX.VirtualJoystick(true,"white");
-	scene.joystickAction = new BABYLON.GameFX.VirtualJoystick(false,"yellow");
-	//scene.joystick.deltaJoystickVector = new BABYLON.Vector2(0,0);
-	//scene.joystickAction._isPressed = false;
+	//Load all tasks
+	scene.assetsManager.load();
+	
+	if (Game.debug) {
+		scene.joystick = {};
+		scene.joystickAction = {};
+		scene.joystick.deltaJoystickVector = new BABYLON.Vector2(0,0);
+		scene.joystickAction._isPressed = false;
+	}
+	else {
+		scene.joystick = new BABYLON.GameFX.VirtualJoystick(true,"white");
+		scene.joystickAction = new BABYLON.GameFX.VirtualJoystick(false,"yellow");
+	}
 
     scene.registerBeforeRender(function(){
 		// if(scene.isErrthingReady) {
@@ -344,9 +399,9 @@ function spawnEnemy(activeScene, room) {
 	var enemyIndex = room.enemy.push(new Entity(new BABYLON.Mesh.CreateSphere("enemySphere-" + parseInt(index), 8.0, 8.0, activeScene), {type: EntityType.Sphere, health: 2, damage: 1, speed: 1})) - 1;
 	room.enemy[enemyIndex].index = enemyIndex;
 	
-	var randomTile = getRandomInt(0, (room.width*room.height)-1);
-	while (room.tiles[randomTile].type != TileType.Floor) {
-		randomTile = getRandomInt(0, (room.width*room.height)-1);
+	var randomTile = Game.getRandomInt(0, (room.width*room.height)-1);
+	while (room.tiles[randomTile].type != Game.TileType.Floor) {
+		randomTile = Game.getRandomInt(0, (room.width*room.height)-1);
 	}
 	var tileIndex = room.tiles[randomTile].row*room.tiles[randomTile].width + room.tiles[randomTile].col;
 	room.enemy[enemyIndex].mesh.position = new BABYLON.Vector3(room.tiles[randomTile].mesh.position.x, 1, room.tiles[randomTile].mesh.position.z);
@@ -371,6 +426,7 @@ function spawnEnemy(activeScene, room) {
 		if (activeScene.player.attacking == true) {
 			room.enemy[enemyIndex].health--;
 			if (room.enemy[enemyIndex].health <=0) {
+				room.enemy[enemyIndex].isDead=true;
 				room.enemy[enemyIndex].mesh.enemyAnimations.die(activeScene,room.enemy[enemyIndex]);
 			}
 			else {
@@ -700,7 +756,7 @@ function createMaterials(activeScene) {
 	//var activeScene = Game.scene[Game.activeScene];
 	//Create me some textures
 	//Tile Type detailed materials
-	var randomColor = new BABYLON.Color3(getRandomInt(0,10)/10, getRandomInt(0,10)/10, getRandomInt(0,10)/10);
+	var randomColor = new BABYLON.Color3(Game.getRandomInt(0,10)/10, Game.getRandomInt(0,10)/10, Game.getRandomInt(0,10)/10);
 	// randomColor =  new BABYLON.Color3(0,0,0); // awesome black tiles
 	//Wall
 	bjsHelper.tileType[0].material = new BABYLON.StandardMaterial("texture-" + bjsHelper.tileType[0].name, activeScene);

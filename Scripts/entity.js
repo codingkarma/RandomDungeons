@@ -13,6 +13,7 @@ function Entity(mesh, options) {
 			damage: 1,
 			speed: 1,
 			velocity: new BABYLON.Vector3(0,0,0),
-			attacking: 0
+			attacking: 0,
+			isDead: false
 		},options||{});
 }
