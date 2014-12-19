@@ -44,8 +44,7 @@ Game.GenerateRoom = function(options)
 			width: 13,
 			height: 15
 		},options||{});
-
-
+	
 	var room = {};
 	room.type = settings.type;
 	room.width = settings.width;
@@ -97,6 +96,13 @@ Game.GenerateBranch = function(map, startCol, startRow)
 	var prevDoorRow = 0;
 	var starDoorCol = 0;
 	var starDoorRow = 0;
+	var branches = 0;
+	
+	// increase count and check max
+	map.deepestRoom.currentCount++;
+	if (map.deepestRoom.currentCount > map.deepestRoom.maxCount) {
+		map.deepestRoom.maxCount = map.deepestRoom.currentCount;
+	}
 
 	//check which rooms are available
 	var checkRoom = [];
@@ -117,69 +123,89 @@ Game.GenerateBranch = function(map, startCol, startRow)
 	{
 		return;
 	}
-	//randomly choose which direction to go
-	var decision = Game.getRandomIntFromArray(checkRoom);
-	switch(decision) 
-	{
-		case 0:
-			startRow--;
-			//choose random door north
-			prevDoorCol=Game.getRandomInt(2,map.rooms[prevRow * map.width + prevCol].width-3);
-			prevDoorRow=0;
-			startDoorCol=prevDoorCol;
-			startDoorRow=map.rooms[startRow * map.width + startCol].height-1;
-			break;
-		case 1:
-			startCol++;
-			//choose random door east
-			prevDoorCol=map.rooms[prevRow * map.width + prevCol].width-1;
-			prevDoorRow=Game.getRandomInt(2,map.rooms[prevRow * map.width + prevCol].height-3);
-			startDoorCol=0;
-			startDoorRow=prevDoorRow;
-			break;
-		case 2:
-			startRow++;
-			//choose random door south
-			prevDoorCol=Game.getRandomInt(2,map.rooms[prevRow * map.width + prevCol].width-3);
-			prevDoorRow=map.rooms[prevRow * map.width + prevCol].height-1;
-			startDoorCol=prevDoorCol;
-			startDoorRow=0;
-			break;
-		case 3:
-			//choose random door west
-			startCol--;
-			prevDoorCol=0;
-			prevDoorRow=Game.getRandomInt(2,map.rooms[prevRow * map.width + prevCol].height-3);
-			startDoorCol=map.rooms[startRow * map.width + startCol].width-1;
-			startDoorRow=prevDoorRow;
-			break;
-	}
-	//check to see if it is in within bounds
-	if(map.rooms[startRow * map.width + startCol].type != Game.RoomType.Empty )
-	{
-		return;
-	}
-	else
-	{
-		var options = {type: Game.RoomType.Normal, height: Game.RoomHeight, width: Game.RoomWidth};
-		map.rooms[startRow * map.width + startCol] = Game.GenerateRoom(options);
-    	map.rooms[startRow * map.width + startCol].col = startCol;
-    	map.rooms[startRow * map.width + startCol].row = startRow;
-		//create door between the existing and generated room
-		//previous room
-		var prevTileIndex = prevDoorRow * map.rooms[prevRow * map.width + prevCol].width + prevDoorCol;
-		map.rooms[prevRow * map.width + prevCol].tiles[prevTileIndex].type=Game.TileType.Door;
-		//new room
-		var newTileIndex = startDoorRow * map.rooms[startRow * map.width + startCol].width + startDoorCol;
-		map.rooms[startRow * map.width + startCol].tiles[newTileIndex].type=Game.TileType.Door;
-		//associate the previous rooms door with the new rooms door by index
-		var prevIndex = map.rooms[prevRow * map.width + prevCol].doors.push(new Game.doorObject()) - 1;
-		map.rooms[prevRow * map.width + prevCol].tiles[prevTileIndex].doorIndex = prevIndex; // associate tile with door
-		var newIndex = map.rooms[startRow * map.width + startCol].doors.push(new Game.doorObject()) - 1;
-		map.rooms[startRow * map.width + startCol].tiles[newTileIndex].doorIndex = newIndex; // associate tile with door
-		map.rooms[prevRow * map.width + prevCol].doors[prevIndex].pairedDoor = map.rooms[startRow * map.width + startCol].doors[newIndex];
-		map.rooms[startRow * map.width + startCol].doors[newIndex].pairedDoor = map.rooms[prevRow * map.width + prevCol].doors[prevIndex];
-		Game.GenerateBranch(map, startCol, startRow);
+	
+	branches = (Game.getRandomInt(1,checkRoom.length));
+	
+	for (var branchLoop = 0; branchLoop < branches; branchLoop++) {
+		// reset startCol and startRow
+		startCol = prevCol;
+		startRow = prevRow;
+		//randomly choose which direction to go
+		if (checkRoom.length == 1) {
+			var decision = checkRoom[0];
+		}
+		else {
+			var decision = Game.getRandomIntFromArray(checkRoom);
+		}
+		switch(decision) 
+		{
+			case 0:
+				startRow--;
+				//choose random door north
+				prevDoorCol=Game.getRandomInt(2,map.rooms[prevRow * map.width + prevCol].width-3);
+				prevDoorRow=0;
+				startDoorCol=prevDoorCol;
+				startDoorRow=map.rooms[startRow * map.width + startCol].height-1;
+				break;
+			case 1:
+				startCol++;
+				//choose random door east
+				prevDoorCol=map.rooms[prevRow * map.width + prevCol].width-1;
+				prevDoorRow=Game.getRandomInt(2,map.rooms[prevRow * map.width + prevCol].height-3);
+				startDoorCol=0;
+				startDoorRow=prevDoorRow;
+				break;
+			case 2:
+				startRow++;
+				//choose random door south
+				prevDoorCol=Game.getRandomInt(2,map.rooms[prevRow * map.width + prevCol].width-3);
+				prevDoorRow=map.rooms[prevRow * map.width + prevCol].height-1;
+				startDoorCol=prevDoorCol;
+				startDoorRow=0;
+				break;
+			case 3:
+				//choose random door west
+				startCol--;
+				prevDoorCol=0;
+				prevDoorRow=Game.getRandomInt(2,map.rooms[prevRow * map.width + prevCol].height-3);
+				startDoorCol=map.rooms[startRow * map.width + startCol].width-1;
+				startDoorRow=prevDoorRow;
+				break;
+		}
+		//check to see if it is in within bounds
+		if(map.rooms[startRow * map.width + startCol].type != Game.RoomType.Empty )
+		{
+			return;
+		}
+		else
+		{
+			var options = {type: Game.RoomType.Normal, height: Game.RoomHeight, width: Game.RoomWidth};
+			map.rooms[startRow * map.width + startCol] = Game.GenerateRoom(options);
+			map.rooms[startRow * map.width + startCol].col = startCol;
+			map.rooms[startRow * map.width + startCol].row = startRow;
+			//create door between the existing and generated room
+			//previous room
+			var prevTileIndex = prevDoorRow * map.rooms[prevRow * map.width + prevCol].width + prevDoorCol;
+			map.rooms[prevRow * map.width + prevCol].tiles[prevTileIndex].type=Game.TileType.Door;
+			//new room
+			var newTileIndex = startDoorRow * map.rooms[startRow * map.width + startCol].width + startDoorCol;
+			map.rooms[startRow * map.width + startCol].tiles[newTileIndex].type=Game.TileType.Door;
+			//associate the previous rooms door with the new rooms door by index
+			var prevIndex = map.rooms[prevRow * map.width + prevCol].doors.push(new Game.doorObject()) - 1;
+			map.rooms[prevRow * map.width + prevCol].tiles[prevTileIndex].doorIndex = prevIndex; // associate tile with door
+			var newIndex = map.rooms[startRow * map.width + startCol].doors.push(new Game.doorObject()) - 1;
+			map.rooms[startRow * map.width + startCol].tiles[newTileIndex].doorIndex = newIndex; // associate tile with door
+			map.rooms[prevRow * map.width + prevCol].doors[prevIndex].pairedDoor = map.rooms[startRow * map.width + startCol].doors[newIndex];
+			map.rooms[startRow * map.width + startCol].doors[newIndex].pairedDoor = map.rooms[prevRow * map.width + prevCol].doors[prevIndex];
+			if (map.deepestRoom.currentCount == map.deepestRoom.maxCount) {
+				map.deepestRoom.col = startCol;
+				map.deepestRoom.row = startRow;
+			}
+			
+			Game.GenerateBranch(map, startCol, startRow);
+		}
+		map.deepestRoom.currentCount--;
+		checkRoom.splice(checkRoom.indexOf(decision),1);
 	}
 	return;
 }
@@ -199,6 +225,7 @@ Game.GenerateMap = function(mapHeight,mapWidth)
     map.rooms = [];
 	map.height = mapHeight;
 	map.width = mapWidth;
+	map.deepestRoom = {'row': 0, 'col': 0, 'currentCount': 0, 'maxCount': 0};
 	
 	//initialize Rooms
     for(var i = 0; i < map.height * map.width; i++)
@@ -225,6 +252,9 @@ Game.GenerateMap = function(mapHeight,mapWidth)
 	map.entranceRow=entranceRow;
 
     Game.GenerateBranch(map, entranceCol, entranceRow);
+	
+	//set Boss room
+	map.rooms[map.deepestRoom.row * map.width + map.deepestRoom.col].type = Game.RoomType.Boss;
 	
 	//Generate doors
 	// GenerateDoors(map);

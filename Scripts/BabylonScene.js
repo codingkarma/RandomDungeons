@@ -320,10 +320,15 @@ Game.CreateGameScene = function() {
 					}
 				}
 				
-				//Spawn an enemy on some random tile
-				var maxEmenies = Game.getRandomInt(1,3);
-				for (var iSpawn = 0; iSpawn < maxEmenies; iSpawn++) {
-					spawnEnemy(scene, scene.rooms[i_room]);
+				if (Game.map.rooms[i_room].type == Game.RoomType.Boss) {
+					spawnBoss(scene, scene.rooms[i_room]);
+				}
+				else {
+					//Spawn an enemy on some random tile
+					var maxEmenies = Game.getRandomInt(1,3);
+					for (var iSpawn = 0; iSpawn < maxEmenies; iSpawn++) {
+						spawnEnemy(scene, scene.rooms[i_room]);
+					}
 				}
 			}
 		}
@@ -397,6 +402,86 @@ function spawnEnemy(activeScene, room) {
 	//TO DO: Implement other enemy types, for now just a rolling ball, who has lost his chain
 	var index = room.enemy.length;
 	var enemyIndex = room.enemy.push(new Entity(new BABYLON.Mesh.CreateSphere("enemySphere-" + parseInt(index), 8.0, 8.0, activeScene), {type: EntityType.Sphere, health: 2, damage: 1, speed: 1})) - 1;
+	room.enemy[enemyIndex].index = enemyIndex;
+	
+	var randomTile = Game.getRandomInt(0, (room.width*room.height)-1);
+	while (room.tiles[randomTile].type != Game.TileType.Floor) {
+		randomTile = Game.getRandomInt(0, (room.width*room.height)-1);
+	}
+	var tileIndex = room.tiles[randomTile].row*room.tiles[randomTile].width + room.tiles[randomTile].col;
+	room.enemy[enemyIndex].mesh.position = new BABYLON.Vector3(room.tiles[randomTile].mesh.position.x, 1, room.tiles[randomTile].mesh.position.z);
+	room.enemy[enemyIndex].mesh.scaling = new BABYLON.Vector3(1, 1, 1);
+	room.enemy[enemyIndex].mesh.material =new activeScene.enemyMaterial();
+	//room.enemy[enemyIndex].mesh.showBoundingBox = true;
+	
+	room.enemy[enemyIndex].mesh.checkCollisions = true;
+	room.enemy[enemyIndex].mesh.applyGravity = true;
+	//Set the ellipsoid around the camera (e.g. your player's size)
+	room.enemy[enemyIndex].mesh.ellipsoid = new BABYLON.Vector3(2, 1, 2);
+	
+	//attach animations
+	room.enemy[enemyIndex].mesh.enemyAnimations = new enemyAnimations();
+	
+	// create intersect action
+	room.enemy[enemyIndex].mesh.actionManager = new BABYLON.ActionManager(activeScene);
+	// detect collision between enemy and player's weapon for an attack
+	room.enemy[enemyIndex].mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+	{ trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: activeScene.player.weaponMesh}, function (data) {
+		var test = data;
+		if (activeScene.player.attacking == true) {
+			room.enemy[enemyIndex].health--;
+			if (room.enemy[enemyIndex].health <=0) {
+				room.enemy[enemyIndex].isDead=true;
+				room.enemy[enemyIndex].mesh.enemyAnimations.die(activeScene,room.enemy[enemyIndex]);
+			}
+			else {
+				room.enemy[enemyIndex].mesh.enemyAnimations.takeDmg(activeScene,room.enemy[enemyIndex].mesh);
+			}
+		}
+	}));
+	
+	// Detect intersect between enemy and player's bodyMesh for an attack on player
+	room.enemy[enemyIndex].mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+	{ trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: activeScene.player.bodyMesh}, function (data) {
+		var test = data;
+		if (activeScene.player.attacking != true) {
+			activeScene.player.health--;
+			$('#dmg').text('Health: ' + parseInt(activeScene.player.health));
+			//TO DO:this can be handled better if we use knockout.js
+			if (activeScene.player.health == 3 ) {
+				$('#healthBar-4').hide();
+			}
+			else if (activeScene.player.health == 2 ) {
+				$('#healthBar-3').hide();
+			}
+			else if (activeScene.player.health == 1 ) {
+				$('#healthBar-2').hide();
+			}
+			else if (activeScene.player.health <= 0 ) {
+				$('#healthBar-1').hide();
+				activeScene.player.mesh.playerAnimations.die(activeScene,activeScene.player.mesh);
+			}
+			activeScene.player.mesh.playerAnimations.takeDmg(activeScene,activeScene.player.mesh);
+		}
+	}));
+	
+	room.enemy[enemyIndex].mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+	{ trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, parameter: activeScene.player.weaponMesh }, function (evt) {
+
+	}));
+	room.enemy[enemyIndex].mesh.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+	{ trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, parameter: activeScene.player.bodyMesh }, function (evt) {
+
+	}));
+
+}
+
+
+function spawnBoss(activeScene, room) {
+	//var activeScene = Game.scene[this.activeScene];
+	//TO DO: Implement other enemy types, for now just a rolling ball, who has lost his chain
+	var index = room.enemy.length;
+	var enemyIndex = room.enemy.push(new Entity(new BABYLON.Mesh.CreateSphere("enemySphere-" + parseInt(index), 12.0, 12.0, activeScene), {type: EntityType.Sphere, health: 6, damage: 1, speed: 1})) - 1;
 	room.enemy[enemyIndex].index = enemyIndex;
 	
 	var randomTile = Game.getRandomInt(0, (room.width*room.height)-1);
