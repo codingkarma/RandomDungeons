@@ -21,6 +21,7 @@ function dungeonComplete() {
 			Game.scene.splice(Game.scene.length-1, 1);
 			Game.map = {};
 			
+			Game.mapSize = Game.getRandomIntFromArray([2,3,5]);
 			Game.map = Game.GenerateMap(Game.mapSize,Game.mapSize);
 			Game.initGameScene();
 			Game.runRenderLoop();
@@ -43,6 +44,7 @@ function dungeonComplete() {
 		Game.scene.splice(Game.scene.length-1, 1);
 		Game.map = {};
 		
+		Game.mapSize = Game.getRandomIntFromArray([2,3,5]);
 		Game.map = Game.GenerateMap(Game.mapSize,Game.mapSize);
 		Game.initGameScene();
 		

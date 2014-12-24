@@ -408,7 +408,6 @@ Game.restartPlayer = function (scene) {
 	scene.player.health=4;
 	prepareHealthBars();
 	scene.player.mesh.position = new BABYLON.Vector3(scene.activeRoom.originOffset.x+scene.activeRoom.centerPosition.x, 10, scene.activeRoom.originOffset.z-2*scene.activeRoom.centerPosition.z+10);
-	scene.player.isVisible=true;
 }
 
 this.getScale = function () {
