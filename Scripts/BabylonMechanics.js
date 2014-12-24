@@ -1,5 +1,5 @@
 
-Game.initScenes = function() { 
+Game.initStartScene = function() {
 	var activeScene;
 	
 	// Create Start Scene
@@ -17,6 +17,10 @@ Game.initScenes = function() {
 			this.render();
 		}
 	};
+}
+	
+Game.initGameScene = function() {
+	var activeScene;
 	
 	// Create Game Scene
 	activeScene = Game.scene.push(Game.CreateGameScene(Game.engine)) - 1;
@@ -192,11 +196,6 @@ Game.initScenes = function() {
 			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
 		}
 	};
-	
-	// Resize
-	window.addEventListener("resize", function () {
-		Game.engine.resize();
-	});
 	
 }
 

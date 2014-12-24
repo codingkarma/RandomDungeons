@@ -168,6 +168,7 @@ Game.CreateGameScene = function() {
 		m.rotation = new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/8);
 		
 		scene.player = new Entity(m,{type: EntityType.Player, health: 4, damage: 1, speed: 1});
+		prepareHealthBars();
 	}
 	scene.doorFrameTask.onSuccess = function (task) {
 		scene.doorFrame = task.loadedMeshes;
@@ -312,6 +313,7 @@ Game.CreateGameScene = function() {
 					scene.camera.target = new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 0, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z);
 					//set active room to entrance
 					scene.activeRoom=Game.map.rooms[i_room];
+					scene.indexOfEntrance=i_room;
 					//activate torch lights
 					for (doorIndex = 0; doorIndex < scene.activeRoom.doors.length; doorIndex++) {
 						arrayLength = scene.activeRoom.doors[doorIndex].frame.length-1;
@@ -378,6 +380,35 @@ Game.CreateGameScene = function() {
 
     return scene;
 
+}
+
+Game.restartPlayer = function (scene) {
+	//reset camera
+	scene.octree = scene.createOrUpdateSelectionOctree(18, 2);
+	//going west
+	var i_room=scene.indexOfEntrance;
+	//disable torch lights
+	var arrayLength;
+	for (var doorIndex = 0; doorIndex < scene.activeRoom.doors.length; doorIndex++) {
+		arrayLength = scene.activeRoom.doors[doorIndex].frame.length-1;
+		scene.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
+		scene.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+	}
+	//set active room to entrance
+	scene.activeRoom=scene.rooms[i_room];
+	for (doorIndex = 0; doorIndex < scene.activeRoom.doors.length; doorIndex++) {
+		arrayLength = scene.activeRoom.doors[doorIndex].frame.length-1;
+		scene.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
+		scene.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+	}
+	
+	//set camera to new position
+	scene.camera.target = new BABYLON.Vector3(scene.activeRoom.originOffset.x+scene.activeRoom.centerPosition.x, 0, scene.activeRoom.originOffset.z-scene.activeRoom.centerPosition.z);
+	//reset player health and position
+	scene.player.health=4;
+	prepareHealthBars();
+	scene.player.mesh.position = new BABYLON.Vector3(scene.activeRoom.originOffset.x+scene.activeRoom.centerPosition.x, 10, scene.activeRoom.originOffset.z-2*scene.activeRoom.centerPosition.z+10);
+	scene.player.isVisible=true;
 }
 
 this.getScale = function () {
@@ -512,7 +543,7 @@ function spawnBoss(activeScene, room) {
 			room.enemy[enemyIndex].health--;
 			if (room.enemy[enemyIndex].health <=0) {
 				room.enemy[enemyIndex].isDead=true;
-				room.enemy[enemyIndex].mesh.enemyAnimations.die(activeScene,room.enemy[enemyIndex]);
+				room.enemy[enemyIndex].mesh.enemyAnimations.die(activeScene,room.enemy[enemyIndex],dungeonComplete());
 			}
 			else {
 				room.enemy[enemyIndex].mesh.enemyAnimations.takeDmg(activeScene,room.enemy[enemyIndex].mesh);
@@ -693,14 +724,14 @@ function playerAnimations() {
 			entity.animations[0] = entity.attackAnimation;
 		}
 		activeScene.beginAnimation(entity, 0, 15, false, 1.0, function () {
-			entity.dispose();
+			Game.restartPlayer(activeScene);
 		});
 	};
 }
 
 function enemyAnimations() {
 	
-	this.die = function (activeScene, entity) {
+	this.die = function (activeScene, entity,dieFunction) {
 		//var activeScene = Game.scene[Game.activeScene];
 		//create animations for player
 		entity.mesh.attackAnimation = new BABYLON.Animation("dieAnimation", "scaling", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
@@ -736,6 +767,9 @@ function enemyAnimations() {
 			entity.mesh.dispose();
 			entity.mesh.actionManager.actions = []; // remove actions
 			// activeScene.activeRoom.enemy.splice(entity.index, 1);
+			if (dieFunction != undefined) {
+				dieFunction(); // execute Callback function
+            }
 		});
 	};
 	

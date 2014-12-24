@@ -2,6 +2,7 @@
 var onStartScreen=1;
 var Game = new function () {
 	this.debug = false;
+	this.mapSize=2;
 	this.map = {};
 	this.canvas = document.getElementById("renderCanvas");
 	this.engine = new BABYLON.Engine(this.canvas, true);
@@ -23,18 +24,24 @@ $(document).ready(function () {
 		//TO DO: Display a different screen
 	} 
 	else {
-		Game.map = Game.GenerateMap(5,5);
-		Game.initScenes();
+		Game.map = Game.GenerateMap(Game.mapSize,Game.mapSize);
+		Game.initStartScene();
+		Game.initGameScene();
+		// Resize
+		window.addEventListener("resize", function () {
+			Game.engine.resize();
+		});
 		Game.runRenderLoop();
 		
 		$('#startGame').click(function () {
 			$('#modal').fadeOut(50, function () {
-					$('#modalDiv').html('');
-					Game.activeScene=Game.sceneType.Game;
-					Game.runRenderLoop();
-				});
-			$('#topMenu').fadeIn(200, function () {	});
-			$('#hotKeys').fadeIn(200, function () {	});
+				$('#modalDiv').html('');
+				Game.activeScene=Game.sceneType.Game;
+				Game.runRenderLoop();
+				prepareHealthBars();
+				$('#topMenu').fadeIn(200, function () {	});
+				$('#hotKeys').fadeIn(200, function () {	});
+			});
 		});
 	};
 });
