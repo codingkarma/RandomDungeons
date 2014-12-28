@@ -2,7 +2,7 @@
 var onStartScreen=1;
 var Game = new function () {
 	this.debug = false;
-	this.mapSize=2;
+	this.mapSize=8;
 	this.map = {};
 	this.canvas = document.getElementById("renderCanvas");
 	this.engine = new BABYLON.Engine(this.canvas, true);
@@ -41,6 +41,9 @@ $(document).ready(function () {
 				prepareHealthBars();
 				$('#topMenu').fadeIn(200, function () {	});
 				$('#hotKeys').fadeIn(200, function () {	});
+				if (Game.debug) {
+					$('#debugMenu').fadeIn(200, function () {	});
+				}
 			});
 		});
 	};

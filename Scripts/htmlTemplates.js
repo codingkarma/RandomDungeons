@@ -8,6 +8,9 @@ function dungeonComplete() {
 	});
 	$('#topMenu').fadeOut(200, function () {});
 	$('#hotKeys').fadeOut(200, function () {});
+	if (Game.debug) {
+		$('#debugMenu').fadeOut(200, function () {	});
+	}
 	
 	// create New Dungeon click function
 	$('#newDungeon').click(function () 
@@ -27,6 +30,9 @@ function dungeonComplete() {
 			Game.runRenderLoop();
 			$('#topMenu').fadeIn(200, function () {});
 			$('#hotKeys').fadeIn(200, function () {});
+			if (Game.debug) {
+				$('#debugMenu').fadeIn(200, function () {	});
+			}
 		});
 	});
 	
@@ -55,6 +61,9 @@ function dungeonComplete() {
 				Game.runRenderLoop();
 				$('#topMenu').fadeIn(200, function () {	});
 				$('#hotKeys').fadeIn(200, function () {	});
+				if (Game.debug) {
+					$('#debugMenu').fadeIn(200, function () {	});
+				}
 			});
 		});
 	});

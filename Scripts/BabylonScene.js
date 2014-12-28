@@ -242,9 +242,15 @@ Game.CreateGameScene = function() {
 				scene.rooms[i_room].index=i_room;
 				scene.rooms[i_room].enemy=[];
 				scene.rooms[i_room].enemiesDead=false;
+				//create parent tiles for the room
+				scene.rooms[i_room].parentTile = {'mesh': []};
+				for (var iParent=0; iParent < bjsHelper.tileType.length; iParent++) {
+					Game.createParentTiles(scene, scene.rooms[i_room], iParent);
+				}
+				
 				//scene.rooms[i_room].door=[];
 				for (var i = 0; i < Game.map.rooms[i_room].tiles.length ; i++) {
-					scene.rooms[i_room].tiles[i].mesh = Game.drawTile(scene, Game.map.rooms[i_room].tiles[i],i);
+					scene.rooms[i_room].tiles[i].mesh = Game.drawTile(scene.rooms[i_room], Game.map.rooms[i_room].tiles[i],i);
 					// scene.rooms[i_room].tiles[i].mesh.useOctreeForRenderingSelection = true;
 					//reposition to room location
 					scene.rooms[i_room].tiles[i].mesh.position.x=scene.rooms[i_room].tiles[i].mesh.position.x+scene.rooms[i_room].originOffset.x;
@@ -383,9 +389,6 @@ Game.CreateGameScene = function() {
 }
 
 Game.restartPlayer = function (scene) {
-	//reset camera
-	scene.octree = scene.createOrUpdateSelectionOctree(18, 2);
-	//going west
 	var i_room=scene.indexOfEntrance;
 	//disable torch lights
 	var arrayLength;
@@ -408,6 +411,7 @@ Game.restartPlayer = function (scene) {
 	scene.player.health=4;
 	prepareHealthBars();
 	scene.player.mesh.position = new BABYLON.Vector3(scene.activeRoom.originOffset.x+scene.activeRoom.centerPosition.x, 10, scene.activeRoom.originOffset.z-2*scene.activeRoom.centerPosition.z+10);
+	scene.octree = scene.createOrUpdateSelectionOctree(18, 2);
 }
 
 this.getScale = function () {
@@ -417,14 +421,24 @@ this.getScale = function () {
     return this.viewportScale;
 }
 
-Game.drawTile = function(activeScene, tile, index) {
+Game.createParentTiles = function (activeScene, room, type) {
+	// create box for the specific tile and scale it
+	room.parentTile.mesh[type] = new BABYLON.Mesh.CreateBox(bjsHelper.tileType[type].name + '-' + parseInt(type), 1.0, activeScene);
+    room.parentTile.mesh[type].scaling = bjsHelper.tileType[type].scale;
+    room.parentTile.mesh[type].material = bjsHelper.tileType[type].material;
+}
 
-    var newMesh = new BABYLON.Mesh.CreateBox(bjsHelper.tileType[tile.type].name + '-' + parseInt(index), 1.0, activeScene);
-    newMesh.scaling = bjsHelper.tileType[tile.type].scale;
-    newMesh.position = new BABYLON.Vector3(tile.col*tile.width, bjsHelper.tileType[tile.type].yOffset, -tile.row*tile.width);
-    newMesh.material = bjsHelper.tileType[tile.type].material;
+Game.drawTile = function(room, tile, index) {
+	// create instance based off of type
+	var newInstance = room.parentTile.mesh[tile.type].createInstance("mesh_" + parseInt(tile.type) + "-" + parseInt(index));
+    newInstance.position = new BABYLON.Vector3(tile.col*tile.width, bjsHelper.tileType[tile.type].yOffset, -tile.row*tile.width);
 
-    return newMesh;
+    return newInstance;
+}
+
+Game.activateRoom = function (activeRoom) {
+	//Make all meshes visible and turn collision checking on
+	
 }
 
 function spawnEnemy(activeScene, room) {

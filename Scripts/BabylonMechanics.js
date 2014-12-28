@@ -108,7 +108,6 @@ Game.initGameScene = function() {
 	Game.scene[activeScene].checkActiveRoom = function() {
 		var capacity = 18;
 		if (this.player.mesh.position.z > (this.activeRoom.originOffset.z)) {
-			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
 			//going north
 			var i_room=(this.activeRoom.row-1) * Game.map.width + this.activeRoom.col;
 			//disable torch lights
@@ -128,9 +127,9 @@ Game.initGameScene = function() {
 			
 			//set camera to new position
 			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
+			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
 		}
 		else if (this.player.mesh.position.x > (this.activeRoom.originOffset.x+this.activeRoom.width*this.activeRoom.tiles[0].width)) {
-			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
 			//going east
 			var i_room=(this.activeRoom.row) * Game.map.width + this.activeRoom.col+1;
 			//disable torch lights
@@ -150,9 +149,9 @@ Game.initGameScene = function() {
 			
 			//set camera to new position
 			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
+			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
 		}
 		else if (this.player.mesh.position.z < (this.activeRoom.originOffset.z - this.activeRoom.height*this.activeRoom.tiles[0].width)) {
-			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
 			//going south
 			var i_room=(this.activeRoom.row+1) * Game.map.width + this.activeRoom.col;
 			//disable torch lights
@@ -172,9 +171,9 @@ Game.initGameScene = function() {
 			
 			//set camera to new position
 			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
+			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
 		}
 		else if (this.player.mesh.position.x < (this.activeRoom.originOffset.x)) {
-			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
 			//going west
 			var i_room=(this.activeRoom.row) * Game.map.width + this.activeRoom.col-1;
 			//disable torch lights
@@ -194,6 +193,7 @@ Game.initGameScene = function() {
 			
 			//set camera to new position
 			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
+			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
 		}
 	};
 	
