@@ -1,4 +1,4 @@
-	Babylon.js Exporter version: 1.5.0, Blender version: 2.72 (sub 0)
+	Babylon.js Exporter version: 1.1.0, Blender version: 2.72 (sub 0)
 ========= Conversion from Blender to Babylon.js =========
 	Python World class constructor completed
 	processing begun of material:  StartScene.Material
@@ -22,6 +22,8 @@ Error encountered processing image file:  C:\GitHub\RandomDungeons\Models3D\torc
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  150
+	processing begun of light:  Lamp.002
+	processing begun of light:  Lamp.001
 	processing begun of mesh:  Cylinder
 		num positions      :  91
 		num normals        :  91
@@ -36,7 +38,8 @@ Error encountered processing image file:  C:\GitHub\RandomDungeons\Models3D\torc
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  312
-	processing begun of camera (FreeCamera):  Camera
+	processing begun of light:  Lamp
+	processing begun of camera:  Camera
 	processing begun of mesh:  Cube.000
 		num positions      :  69
 		num normals        :  69
@@ -58,9 +61,6 @@ Error encountered processing image file:  C:\GitHub\RandomDungeons\Models3D\torc
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  648
-	processing begun of light (POINT):  Lamp.002
-	processing begun of light (POINT):  Lamp.001
-	processing begun of light (POINT):  Lamp
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========

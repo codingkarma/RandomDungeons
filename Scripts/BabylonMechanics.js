@@ -14,6 +14,9 @@ Game.initStartScene = function() {
 			else {
 				Game.engine.loopCounter++;
 			}
+			if (Game.engine.loopCounter % 5 == 0) {
+				$('#fps').text('FPS: ' + Game.engine.getFps().toFixed());
+			}
 			this.render();
 		}
 	};
@@ -35,7 +38,7 @@ Game.initGameScene = function() {
 			//when everything is ready this gets executed once
 			if (this.isErrthingReady) {
 				for (i=0; i < this.activeRoom.enemy.length;i++) {
-					this.activeRoom.enemy[i].velocity = new BABYLON.Vector3(0,this.gravity.y,0);
+					this.activeRoom.enemy[i].velocity = {'direction' : new BABYLON.Vector3(0,this.gravity.y,0), 'angle': 0};
 				}
 				this.player.attacking=false;
 				this.player.mesh.currentFacingAngle = new BABYLON.Vector3(this.player.mesh.rotation.x, this.player.mesh.rotation.y, this.player.mesh.rotation.z);
@@ -60,11 +63,11 @@ Game.initGameScene = function() {
 					break;
 			}
 			if (Game.engine.loopCounter % 5 == 0) {
-				$('#fps').text('FPS: ' + BABYLON.Tools.GetFps().toFixed());
+				$('#fps').text('FPS: ' + Game.engine.getFps().toFixed());
 				//check what room the player is in
 				this.checkActiveRoom();
 			}
-			else if (Game.engine.loopCounter % (31 + this.enemyCounter) == 0) {
+			else if (Game.engine.loopCounter % (21 + this.enemyCounter) == 0) {
 				if (this.enemyCounter >= this.activeRoom.enemy.length) { 
 					this.enemyCounter = 0;
 					//open doors if all enemies are dead
@@ -90,14 +93,22 @@ Game.initGameScene = function() {
 						this.activeRoom.enemiesDead = (this.activeRoom.enemiesDead && this.activeRoom.enemy[this.enemyCounter].isDead);
 					}
 					this.activeRoom.enemy[this.enemyCounter].velocity = GetPathVector(this.activeRoom.enemy[this.enemyCounter].mesh.position,this.player.mesh.position,{speed: this.activeRoom.enemy[this.enemyCounter].speed, tolerance: 12});
+					this.activeRoom.enemy[this.enemyCounter].mesh.rotation.y = -this.activeRoom.enemy[this.enemyCounter].velocity.angle;
+					if (this.activeRoom.enemy[this.enemyCounter].velocity.direction.x == 0 && this.activeRoom.enemy[this.enemyCounter].mesh.enemyAnimations.animatable) {
+						this.activeRoom.enemy[this.enemyCounter].mesh.enemyAnimations.animatable.stop();
+						this.activeRoom.enemy[this.enemyCounter].mesh.enemyAnimations.animating=0;
+					}
+					else {
+						this.activeRoom.enemy[this.enemyCounter].mesh.enemyAnimations.move(this,this.activeRoom.enemy[this.enemyCounter]);
+					}
 					this.enemyCounter++;
 				}
 			}
 			
-			processInput(this.player.mesh);
+			processInput(this.player.mesh, this.player.speed);
 			//Need to update this every loop, I guess
 			for (i=0; i < this.activeRoom.enemy.length;i++) {
-				this.activeRoom.enemy[i].mesh.moveWithCollisions(this.activeRoom.enemy[i].velocity);
+				this.activeRoom.enemy[i].mesh.moveWithCollisions(this.activeRoom.enemy[i].velocity.direction);
 			}
 			
 			//Render scene and any changes
@@ -203,7 +214,9 @@ Game.runRenderLoop = function () {
 	Game.engine.stopRenderLoop();
 
 	// Once the scene is loaded, register a render loop to render it
-	Game.engine.runRenderLoop(function () { 
-		Game.scene[Game.activeScene].renderLoop();
+	setImmediate(function(){
+		Game.engine.runRenderLoop(function () { 
+			Game.scene[Game.activeScene].renderLoop();
+		});
 	});
 }

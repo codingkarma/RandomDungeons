@@ -1,5 +1,5 @@
 
-function GetPathVector(startPosition, endPosition, options)
+function GetPathVector0(startPosition, endPosition, options)
 {
 	var settings = $.extend({
 		speed: 1.0,
@@ -15,6 +15,50 @@ function GetPathVector(startPosition, endPosition, options)
 	}
 	else {
 		return new BABYLON.Vector3(-1*settings.speed*xDiff/startPosition.x, Game.scene[Game.activeScene].gravity.y, settings.speed*zDiff/startPosition.z);
+	}
+}
+
+function GetPathVector(startPosition, endPosition, options) {
+	var settings = $.extend({
+		speed: 1.0,
+		tolerance: 1.0
+	},options||{});
+	
+	var xDiff = endPosition.x-startPosition.x;
+	var zDiff = endPosition.z-startPosition.z;
+	var radius = Math.sqrt(xDiff*xDiff + zDiff*zDiff);
+	var angle = Math.atan2(zDiff, xDiff);// + (xDiff < 0)*(Math.PI) + ((zDiff < 0) && (xDiff > 0))*(2*Math.PI);
+	// if (angle < 0) {
+		// angle+=360;
+	// }
+
+	if(radius < settings.tolerance)
+	{
+		return {'direction': new BABYLON.Vector3(0, Game.scene[Game.activeScene].gravity.y, 0), 'angle': angle};
+	}
+	else {
+		return {'direction': new BABYLON.Vector3(settings.speed*Math.cos(angle), Game.scene[Game.activeScene].gravity.y, settings.speed*Math.sin(angle)), 'angle': angle};
+	}
+}
+
+function GetPathVectorScatter(startPosition, endPosition, options) {
+	//Uses Angle in degrees instead of radians to give some randomness
+	var settings = $.extend({
+		speed: 1.0,
+		tolerance: 1.0
+	},options||{});
+	
+	var xDiff = endPosition.x-startPosition.x;
+	var zDiff = endPosition.z-startPosition.z;
+	var radius = Math.sqrt(xDiff*xDiff + zDiff*zDiff);
+	var angle = Math.atan(zDiff/xDiff)*(180/Math.PI); + (xDiff < 0)*180 + ((zDiff < 0) && (xDiff > 0))*180;
+	
+	if(radius < settings.tolerance)
+	{
+		return new BABYLON.Vector3(0, Game.scene[Game.activeScene].gravity.y, 0);
+	}
+	else {
+		return new BABYLON.Vector3(settings.speed*Math.cos(angle), Game.scene[Game.activeScene].gravity.y, settings.speed*Math.sin(angle));
 	}
 }
 

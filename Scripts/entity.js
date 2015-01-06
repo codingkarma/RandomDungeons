@@ -1,6 +1,7 @@
 var EntityType = {
     Player: 0,
-    Sphere: 1
+    Sphere: 1,
+	Boss: 2
 };
 
 function Entity(mesh, options) {
@@ -12,7 +13,7 @@ function Entity(mesh, options) {
 			health: 1,
 			damage: 1,
 			speed: 1,
-			velocity: new BABYLON.Vector3(0,0,0),
+			velocity: {'direction': new BABYLON.Vector3(0,0,0), 'angle': 0},
 			attacking: 0,
 			isDead: false
 		},options||{});

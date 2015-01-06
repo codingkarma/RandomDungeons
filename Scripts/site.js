@@ -2,7 +2,7 @@
 var onStartScreen=1;
 var Game = new function () {
 	this.debug = false;
-	this.mapSize=8;
+	this.mapSize=2;
 	this.map = {};
 	this.canvas = document.getElementById("renderCanvas");
 	this.engine = new BABYLON.Engine(this.canvas, true);

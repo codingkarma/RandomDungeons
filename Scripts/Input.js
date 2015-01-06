@@ -54,7 +54,7 @@ function doKeyUp(evt) {
     }
 }
 
-function processInput(entity) {
+function processInput(entity,speed) {
 	var vX=0;
 	var vZ=0;
 	var activeScene = Game.scene[Game.activeScene];
@@ -62,26 +62,36 @@ function processInput(entity) {
 	
     if (UpDown && !DownDown || delta.y < -5) {
         vZ=1;
-		entity.rotation.y = Math.PI / 2;
-		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI / 2, entity.rotation.z);
+		// entity.rotation.y = Math.PI / 2;
+		// entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI / 2, entity.rotation.z);
     }
     else if (DownDown && !UpDown || delta.y > 5) {
         vZ=-1;
-		entity.rotation.y = -Math.PI / 2;
-		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, -Math.PI / 2, entity.rotation.z);
+		// entity.rotation.y = -Math.PI / 2;
+		// entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, -Math.PI / 2, entity.rotation.z);
     }
     if (LeftDown && !RightDown || delta.x < -5) {
         vX=-1;
-		entity.rotation.y = 0;
-		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, 0, entity.rotation.z);
+		// entity.rotation.y = 0;
+		// entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, 0, entity.rotation.z);
     }
     else if (RightDown && !LeftDown || delta.x > 5) {
         vX=1;
-		entity.rotation.y = Math.PI;
-		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI, entity.rotation.z);
+		// entity.rotation.y = Math.PI;
+		// entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI, entity.rotation.z);
     }
-	var velocity=new BABYLON.Vector3(vX, activeScene.gravity.y, vZ);
+	if (vX || vZ) {
+		var newRotation = -Math.atan2(vZ,vX) + Math.PI;
+		entity.rotation.y = newRotation;
+		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, newRotation, entity.rotation.z);
+		var waveValue = ((Game.engine.loopCounter*Game.engine.loopCounter) % 40)/40*Math.PI;
+		var velocity=new BABYLON.Vector3(speed*vX, .6*(Math.cos(waveValue)-.5), speed*vZ);
+	}
+	else {
+		var velocity=new BABYLON.Vector3(speed*vX, activeScene.gravity.y, speed*vZ);
+	}
 	entity.moveWithCollisions(velocity);
+	
 	
 	if (activeScene.joystickAction._joystickPressed) {
 		if (activeScene.player.attacking==false) {
