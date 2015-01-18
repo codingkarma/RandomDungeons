@@ -62,40 +62,31 @@ function processInput(entity,speed) {
 	
     if (UpDown && !DownDown || delta.y < -5) {
         vZ=1;
-		// entity.rotation.y = Math.PI / 2;
-		// entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI / 2, entity.rotation.z);
     }
     else if (DownDown && !UpDown || delta.y > 5) {
         vZ=-1;
-		// entity.rotation.y = -Math.PI / 2;
-		// entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, -Math.PI / 2, entity.rotation.z);
     }
     if (LeftDown && !RightDown || delta.x < -5) {
         vX=-1;
-		// entity.rotation.y = 0;
-		// entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, 0, entity.rotation.z);
     }
     else if (RightDown && !LeftDown || delta.x > 5) {
         vX=1;
-		// entity.rotation.y = Math.PI;
-		// entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, Math.PI, entity.rotation.z);
     }
 	if (vX || vZ) {
 		var newRotation = -Math.atan2(vZ,vX) + Math.PI;
-		entity.rotation.y = newRotation;
-		entity.currentFacingAngle = new BABYLON.Vector3(entity.rotation.x, newRotation, entity.rotation.z);
-		var waveValue = ((Game.engine.loopCounter*Game.engine.loopCounter) % 40)/40*Math.PI;
-		var velocity=new BABYLON.Vector3(speed*vX, .6*(Math.cos(waveValue)-.5), speed*vZ);
+		entity.mesh.rotation.y = newRotation;
+		entity.mesh.currentFacingAngle = new BABYLON.Vector3(entity.mesh.rotation.x, newRotation, entity.mesh.rotation.z);
+		//var waveValue = ((Game.engine.loopCounter*Game.engine.loopCounter) % 40)/40*Math.PI;
+		// entity.velocity.direction = new BABYLON.Vector3(speed*vX, .6*(Math.cos(waveValue)-.5), speed*vZ);
+		entity.velocity.direction = new BABYLON.Vector3(speed*vX, activeScene.gravity.y, speed*vZ);
 	}
 	else {
-		var velocity=new BABYLON.Vector3(speed*vX, activeScene.gravity.y, speed*vZ);
-	}
-	entity.moveWithCollisions(velocity);
-	
+		entity.velocity.direction = new BABYLON.Vector3(speed*vX, activeScene.gravity.y, speed*vZ);
+	}	
 	
 	if (activeScene.joystickAction._joystickPressed) {
 		if (activeScene.player.attacking==false) {
-			activeScene.player.mesh.playerAnimations.updateAttack(activeScene);
+			activeScene.player.mesh.playerAnimations.attack.start(activeScene, entity);
 		}
 	}
 

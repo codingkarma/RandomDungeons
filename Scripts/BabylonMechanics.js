@@ -29,20 +29,30 @@ Game.initGameScene = function() {
 	activeScene = Game.scene.push(Game.CreateGameScene(Game.engine)) - 1;
 	Game.scene[activeScene].enemyCounter=0;
 	Game.scene[activeScene].renderLoop = function () {
-		var i=0;
-		// rotate to give some animation
+			
 		if (!this.isErrthingReady) {
 			if (this.isReady() && this.isLoaded) {
 				this.isErrthingReady = true;
 			}
 			//when everything is ready this gets executed once
 			if (this.isErrthingReady) {
-				for (i=0; i < this.activeRoom.enemy.length;i++) {
+				for (var i=0; i < this.activeRoom.enemy.length; i++) {
 					this.activeRoom.enemy[i].velocity = {'direction' : new BABYLON.Vector3(0,this.gravity.y,0), 'angle': 0};
 				}
 				this.player.attacking=false;
 				this.player.mesh.currentFacingAngle = new BABYLON.Vector3(this.player.mesh.rotation.x, this.player.mesh.rotation.y, this.player.mesh.rotation.z);
-				this.octree = this.createOrUpdateSelectionOctree(18, 2);
+				this.octree = this.createOrUpdateSelectionOctree(64, 2);
+				if (Game.debug) {
+					this.debugLayer.show();
+					$('#DebugLayerStats').css({"bottom": "1em"});
+					$('#DebugLayerStats').css({"right": "1em"});
+					$('#DebugLayerDrawingCanvas').css({"width": "90%"});
+					$('#DebugLayerDrawingCanvas').css({"height": "90%"});
+				}
+				
+				//start game logic loop
+				this.logicLoop();
+				
 				// TO DO: Implement optimization (only availabe in BJS v2+)
 				// this.optimizeOptions = BABYLON.SceneOptimizerOptions.ModerateDegradationAllowed();
 				// this.optimizeOptions.targetFrameRate=30;
@@ -54,70 +64,13 @@ Game.initGameScene = function() {
 			}
 		}
 		else {
-			switch (Game.engine.loopCounter) {   
-				case 1000:
-					Game.engine.loopCounter=0;
-					break;
-				default:
-					Game.engine.loopCounter++;
-					break;
-			}
-			if (Game.engine.loopCounter % 5 == 0) {
-				$('#fps').text('FPS: ' + Game.engine.getFps().toFixed());
-				//check what room the player is in
-				this.checkActiveRoom();
-			}
-			else if (Game.engine.loopCounter % (21 + this.enemyCounter) == 0) {
-				if (this.enemyCounter >= this.activeRoom.enemy.length) { 
-					this.enemyCounter = 0;
-					//open doors if all enemies are dead
-					if (this.activeRoom.enemiesDead) {
-						for (var doorLoop=0; doorLoop < this.activeRoom.doors.length; doorLoop++) {
-							if (this.activeRoom.doors[doorLoop].isOpen == false) {
-								this.activeRoom.doors[doorLoop].mesh.checkCollisions = false;
-								this.activeRoom.doors[doorLoop].mesh.isVisible = false;
-								this.activeRoom.doors[doorLoop].isOpen = true;
-								//apply to matching door
-								this.activeRoom.doors[doorLoop].pairedDoor.mesh.checkCollisions = false;
-								this.activeRoom.doors[doorLoop].pairedDoor.mesh.isVisible = false;
-								this.activeRoom.doors[doorLoop].pairedDoor.isOpen = true;
-							}
-						}
-					}
-				}
-				else {
-					if (this.enemyCounter == 0 ) {
-						this.activeRoom.enemiesDead = this.activeRoom.enemy[this.enemyCounter].isDead;
-					}
-					else {
-						this.activeRoom.enemiesDead = (this.activeRoom.enemiesDead && this.activeRoom.enemy[this.enemyCounter].isDead);
-					}
-					this.activeRoom.enemy[this.enemyCounter].velocity = GetPathVector(this.activeRoom.enemy[this.enemyCounter].mesh.position,this.player.mesh.position,{speed: this.activeRoom.enemy[this.enemyCounter].speed, tolerance: 12});
-					this.activeRoom.enemy[this.enemyCounter].mesh.rotation.y = -this.activeRoom.enemy[this.enemyCounter].velocity.angle;
-					if (this.activeRoom.enemy[this.enemyCounter].velocity.direction.x == 0 && this.activeRoom.enemy[this.enemyCounter].mesh.enemyAnimations.animatable) {
-						this.activeRoom.enemy[this.enemyCounter].mesh.enemyAnimations.animatable.stop();
-						this.activeRoom.enemy[this.enemyCounter].mesh.enemyAnimations.animating=0;
-					}
-					else {
-						this.activeRoom.enemy[this.enemyCounter].mesh.enemyAnimations.move(this,this.activeRoom.enemy[this.enemyCounter]);
-					}
-					this.enemyCounter++;
-				}
-			}
-			
-			processInput(this.player.mesh, this.player.speed);
-			//Need to update this every loop, I guess
-			for (i=0; i < this.activeRoom.enemy.length;i++) {
-				this.activeRoom.enemy[i].mesh.moveWithCollisions(this.activeRoom.enemy[i].velocity.direction);
-			}
-			
 			//Render scene and any changes
 			this.render();
 		}
 	};
 	
 	Game.scene[activeScene].checkActiveRoom = function() {
-		var capacity = 18;
+		var capacity = 64;
 		if (this.player.mesh.position.z > (this.activeRoom.originOffset.z)) {
 			//going north
 			var i_room=(this.activeRoom.row-1) * Game.map.width + this.activeRoom.col;
@@ -129,7 +82,7 @@ Game.initGameScene = function() {
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
-			this.activeRoom=Game.map.rooms[i_room];
+			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
@@ -151,7 +104,7 @@ Game.initGameScene = function() {
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
-			this.activeRoom=Game.map.rooms[i_room];
+			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
@@ -173,7 +126,7 @@ Game.initGameScene = function() {
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
-			this.activeRoom=Game.map.rooms[i_room];
+			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
@@ -195,7 +148,7 @@ Game.initGameScene = function() {
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
-			this.activeRoom=Game.map.rooms[i_room];
+			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
@@ -220,3 +173,95 @@ Game.runRenderLoop = function () {
 		});
 	});
 }
+
+Game.mergeMeshes = function (meshName, arrayObj, scene) {
+    var arrayPos = [];
+    var arrayNormal = [];
+    var arrayUv = [];
+    var arrayUv2 = [];
+    var arrayColor = [];
+    var arrayMatricesIndices = [];
+    var arrayMatricesWeights = [];
+    var arrayIndice = [];
+    var savedPosition = [];
+    var savedNormal = [];
+    var newMesh = new BABYLON.Mesh(meshName, scene);
+    var UVKind = true;
+    var UV2Kind = true;
+    var ColorKind = true;
+    var MatricesIndicesKind = true;
+    var MatricesWeightsKind = true;
+
+    for (var i = 0; i != arrayObj.length ; i++) {
+        if (!arrayObj[i].isVerticesDataPresent([BABYLON.VertexBuffer.UVKind]))
+            UVKind = false;
+        if (!arrayObj[i].isVerticesDataPresent([BABYLON.VertexBuffer.UV2Kind]))
+            UV2Kind = false;
+        if (!arrayObj[i].isVerticesDataPresent([BABYLON.VertexBuffer.ColorKind]))
+            ColorKind = false;
+        if (!arrayObj[i].isVerticesDataPresent([BABYLON.VertexBuffer.MatricesIndicesKind]))
+            MatricesIndicesKind = false;
+        if (!arrayObj[i].isVerticesDataPresent([BABYLON.VertexBuffer.MatricesWeightsKind]))
+            MatricesWeightsKind = false;
+    }
+
+    for (i = 0; i != arrayObj.length ; i++) {
+        var ite = 0;
+        var iter = 0;
+        arrayPos[i] = arrayObj[i].getVerticesData(BABYLON.VertexBuffer.PositionKind);
+        arrayNormal[i] = arrayObj[i].getVerticesData(BABYLON.VertexBuffer.NormalKind);
+        if (UVKind)
+            arrayUv = arrayUv.concat(arrayObj[i].getVerticesData(BABYLON.VertexBuffer.UVKind));
+        if (UV2Kind)
+            arrayUv2 = arrayUv2.concat(arrayObj[i].getVerticesData(BABYLON.VertexBuffer.UV2Kind));
+        if (ColorKind)
+            arrayColor = arrayColor.concat(arrayObj[i].getVerticesData(BABYLON.VertexBuffer.ColorKind));
+        if (MatricesIndicesKind)
+            arrayMatricesIndices = arrayMatricesIndices.concat(arrayObj[i].getVerticesData(BABYLON.VertexBuffer.MatricesIndicesKind));
+        if (MatricesWeightsKind)
+            arrayMatricesWeights = arrayMatricesWeights.concat(arrayObj[i].getVerticesData(BABYLON.VertexBuffer.MatricesWeightsKind));
+
+        var maxValue = savedPosition.length / 3;
+
+        arrayObj[i].computeWorldMatrix(true);
+        var worldMatrix = arrayObj[i].getWorldMatrix();
+
+        for (var ite = 0 ; ite != arrayPos[i].length; ite += 3) {
+            var vertex = new BABYLON.Vector3.TransformCoordinates(new BABYLON.Vector3(arrayPos[i][ite], arrayPos[i][ite + 1], arrayPos[i][ite + 2]), worldMatrix);
+            savedPosition.push(vertex.x);
+            savedPosition.push(vertex.y);
+            savedPosition.push(vertex.z);
+        }
+
+        for (var iter = 0 ; iter != arrayNormal[i].length; iter += 3) {
+            var vertex = new BABYLON.Vector3.TransformNormal(new BABYLON.Vector3(arrayNormal[i][iter], arrayNormal[i][iter + 1], arrayNormal[i][iter + 2]), worldMatrix);
+            savedNormal.push(vertex.x);
+            savedNormal.push(vertex.y);
+            savedNormal.push(vertex.z);
+        }
+
+        var tmp = arrayObj[i].getIndices();
+        for (it = 0 ; it != tmp.length; it++) {
+            arrayIndice.push(tmp[it] + maxValue);
+        }
+        arrayIndice = arrayIndice.concat(tmp);
+
+        arrayObj[i].dispose(false);
+    }
+
+    newMesh.setVerticesData(BABYLON.VertexBuffer.PositionKind, savedPosition, false);
+    newMesh.setVerticesData(BABYLON.VertexBuffer.NormalKind, savedNormal, false);
+    if (arrayUv.length > 0)
+        newMesh.setVerticesData(BABYLON.VertexBuffer.UVKind, arrayUv, false);
+    if (arrayUv2.length > 0)
+        newMesh.setVerticesData(BABYLON.VertexBuffer.UV2Kind, arrayUv, false);
+    if (arrayColor.length > 0)
+        newMesh.setVerticesData(BABYLON.VertexBuffer.ColorKind, arrayUv, false);
+    if (arrayMatricesIndices.length > 0)
+        newMesh.setVerticesData(BABYLON.VertexBuffer.MatricesIndicesKind, arrayUv, false);
+    if (arrayMatricesWeights.length > 0)
+        newMesh.setVerticesData(BABYLON.VertexBuffer.MatricesWeightsKind, arrayUv, false);
+
+    newMesh.setIndices(arrayIndice);
+    return newMesh;
+};

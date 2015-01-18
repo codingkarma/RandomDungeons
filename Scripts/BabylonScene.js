@@ -206,7 +206,8 @@ Game.CreateGameScene = function() {
 		scene.player.weaponMesh.isVisible = false;
 		//scene.player.weaponMesh.showBoundingBox = true;
 		
-		scene.player.mesh.playerAnimations = new playerAnimations();
+		scene.player.mesh.playerAnimations = new Game.playerAnimations();
+		scene.player.mesh.playerAnimations.init(scene);
 		//set up the action manager for attacks
 		scene.actionManager = new BABYLON.ActionManager(scene);
 		// Detect player input, then play attack animation
@@ -214,7 +215,7 @@ Game.CreateGameScene = function() {
 		BABYLON.ActionManager.OnKeyDownTrigger, function (evt) {
 				if (evt.sourceEvent.keyCode == KEYS.SPACE) {
 					if (scene.player.attacking==false) {
-						scene.player.mesh.playerAnimations.updateAttack(scene);
+						scene.player.mesh.playerAnimations.attack.start(scene,scene.player);
 					}
 				}
 		}));
@@ -235,6 +236,12 @@ Game.CreateGameScene = function() {
 		scene.doorFrame[arrayLength-2].position = new BABYLON.Vector3(-1.5,3.2,-1.7);
 		scene.doorFrame[0].scaling = new BABYLON.Vector3(4.8, 4.8, 4.8);
 		
+		//create parent tiles for the room
+		scene.parentTile = {'mesh': []};
+		for (var iParent=0; iParent < bjsHelper.tileType.length; iParent++) {
+			Game.createParentTiles(scene, iParent);
+		}
+		
 		//Draw Rooms
 		for (var i_room=0; i_room < Game.map.rooms.length; i_room++) {
 			if (Game.map.rooms[i_room].type != Game.RoomType.Empty) {
@@ -244,15 +251,10 @@ Game.CreateGameScene = function() {
 				scene.rooms[i_room].index=i_room;
 				scene.rooms[i_room].enemy=[];
 				scene.rooms[i_room].enemiesDead=false;
-				//create parent tiles for the room
-				scene.rooms[i_room].parentTile = {'mesh': []};
-				for (var iParent=0; iParent < bjsHelper.tileType.length; iParent++) {
-					Game.createParentTiles(scene, scene.rooms[i_room], iParent);
-				}
 				
 				//scene.rooms[i_room].door=[];
 				for (var i = 0; i < Game.map.rooms[i_room].tiles.length ; i++) {
-					scene.rooms[i_room].tiles[i].mesh = Game.drawTile(scene.rooms[i_room], Game.map.rooms[i_room].tiles[i],i);
+					scene.rooms[i_room].tiles[i].mesh = Game.drawTile(scene, Game.map.rooms[i_room].tiles[i],i);
 					// scene.rooms[i_room].tiles[i].mesh.useOctreeForRenderingSelection = true;
 					//reposition to room location
 					scene.rooms[i_room].tiles[i].mesh.position.x=scene.rooms[i_room].tiles[i].mesh.position.x+scene.rooms[i_room].originOffset.x;
@@ -317,19 +319,6 @@ Game.CreateGameScene = function() {
 					}
 				}
 				
-				if (Game.map.rooms[i_room].type == Game.RoomType.Entrance) {
-					scene.camera.target = new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 0, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z);
-					//set active room to entrance
-					scene.activeRoom=Game.map.rooms[i_room];
-					scene.indexOfEntrance=i_room;
-					//activate torch lights
-					for (doorIndex = 0; doorIndex < scene.activeRoom.doors.length; doorIndex++) {
-						arrayLength = scene.activeRoom.doors[doorIndex].frame.length-1;
-						scene.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
-						scene.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
-					}
-				}
-				
 				if (Game.map.rooms[i_room].type == Game.RoomType.Boss) {
 					spawnBoss(scene, scene.rooms[i_room]);
 					Game.transportRing = new Game.createTransportRing(scene, scene.rooms[i_room]);
@@ -341,6 +330,23 @@ Game.CreateGameScene = function() {
 						spawnEnemy(scene, scene.rooms[i_room]);
 					}
 				}
+				
+				//Game.activateRoom(scene.rooms[i_room],scene.rooms[i_room]);
+				
+				if (Game.map.rooms[i_room].type == Game.RoomType.Entrance) {
+					scene.camera.target = new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 0, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z);
+					//set active room to entrance
+					scene.activeRoom=Game.map.rooms[i_room];
+					scene.indexOfEntrance=i_room;
+					//activate torch lights
+					for (doorIndex = 0; doorIndex < scene.activeRoom.doors.length; doorIndex++) {
+						arrayLength = scene.activeRoom.doors[doorIndex].frame.length-1;
+						scene.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
+						scene.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+					}
+					//Game.activateRoom(scene.activeRoom);
+				}
+				
 			}
 		}
 		var entranceIndex=scene.activeRoom.index;
@@ -366,9 +372,106 @@ Game.CreateGameScene = function() {
 		scene.joystickAction = new BABYLON.GameFX.VirtualJoystick(false,"yellow");
 	}
 
+	scene.logicLoop = function () {
+		//console.log("Before: " + (performance.now()-Game.logicLoopStart));
+		Game.logicLoopStart = performance.now();
+		scene.logicLoopId = setTimeout(function () {
+			// TO DO: Add a variable to keep track of time the difference in between how
+			// setTimeout is supposed to wait and how long it actually did
+			// TO DO: create variables to allow auto adjustment of looptime if time is always short
+			//console.log("After: " + (performance.now()-Game.logicLoopStart));
+			
+			//***LOGIC GOES HERE***//
+			var self = scene;
+			switch (Game.engine.loopCounter) {   
+				case 1000:
+					Game.engine.loopCounter=0;
+					break;
+				default:
+					Game.engine.loopCounter++;
+					break;
+			}
+			if (Game.engine.loopCounter % 5 == 0) {
+				//check what room the player is in
+				self.checkActiveRoom();
+			}
+			else if (Game.engine.loopCounter % (11 + self.enemyCounter) == 0) {
+				if (self.enemyCounter >= self.activeRoom.enemy.length) { 
+					self.enemyCounter = 0;
+					//open doors if all enemies are dead
+					if (self.activeRoom.enemiesDead) {
+						for (var doorLoop=0; doorLoop < self.activeRoom.doors.length; doorLoop++) {
+							if (self.activeRoom.doors[doorLoop].isOpen == false) {
+								self.activeRoom.doors[doorLoop].mesh.checkCollisions = false;
+								self.activeRoom.doors[doorLoop].mesh.isVisible = false;
+								self.activeRoom.doors[doorLoop].isOpen = true;
+								//apply to matching door
+								self.activeRoom.doors[doorLoop].pairedDoor.mesh.checkCollisions = false;
+								self.activeRoom.doors[doorLoop].pairedDoor.mesh.isVisible = false;
+								self.activeRoom.doors[doorLoop].pairedDoor.isOpen = true;
+							}
+						}
+					}
+				}
+				else {
+					if (self.enemyCounter == 0 ) {
+						self.activeRoom.enemiesDead = self.activeRoom.enemy[self.enemyCounter].isDead;
+					}
+					else {
+						self.activeRoom.enemiesDead = (self.activeRoom.enemiesDead && self.activeRoom.enemy[self.enemyCounter].isDead);
+					}
+					self.activeRoom.enemy[self.enemyCounter].velocity = GetPathVector(self.activeRoom.enemy[self.enemyCounter].mesh.position,self.player.mesh.position,{speed: self.activeRoom.enemy[self.enemyCounter].speed, tolerance: 12});
+					self.activeRoom.enemy[self.enemyCounter].mesh.rotation.y = -self.activeRoom.enemy[self.enemyCounter].velocity.angle;
+					if (self.activeRoom.enemy[self.enemyCounter].velocity.direction.x == 0 && self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animatable) {
+						self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animatable.stop();
+						self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animating=0;
+					}
+					else {
+						self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.move.start(self,self.activeRoom.enemy[self.enemyCounter]);
+					}
+					self.enemyCounter++;
+				}
+			}
+			processInput(self.player, self.player.speed);
+			
+			//***END LOGIC***//
+			
+			//*****NO LOGIC AFTER HERE******//
+			//determine what the next wait time should be
+			Game.logicLoopDeltaTime = (performance.now() - Game.logicLoopStart) - Game.logicLoopTimeDiff; // Get approx. loop time
+			//console.log("logicLoopDeltaTime: " + Game.logicLoopDeltaTime);
+			Game.logicLoopTimeDiff = Game.logicLoopTIME - Game.logicLoopDeltaTime; //Get different between Max LoopTime and Real Time dT_Loop
+			
+			if ( Game.logicLoopTimeDiff > 4)  {
+				Game.logicLoopWait = Game.logicLoopTimeDiff;
+				Game.logicLoopTimeDiff = 0;
+			}
+			else if (Game.logicLoopTimeDiff > -1000) {
+				Game.logicLoopWait = 4.20;
+				Game.logicLoopTimeDiff-=4.20;
+			}
+			else {
+				//something went wrong. reset vars
+				Game.logicLoopWait = 4.20;
+				Game.logicLoopTimeDiff = 0;
+			}
+			//console.log("logicLoopWait: " + Game.logicLoopWait);
+			//**********END******************//
+			// lastly call logic loop recursively
+			scene.logicLoop();
+		},Game.logicLoopWait);
+	}
+	
     scene.registerBeforeRender(function(){
-		// if(scene.isErrthingReady) {
-		// }
+		var self = scene;
+		var i=0;
+		
+		$('#fps').text('FPS: ' + Game.engine.getFps().toFixed());
+		//Need to update self every loop, I guess
+		for (i=0; i < self.activeRoom.enemy.length;i++) {
+			self.activeRoom.enemy[i].mesh.moveWithCollisions(self.activeRoom.enemy[i].velocity.direction);
+		}
+		self.player.mesh.moveWithCollisions(self.player.velocity.direction);
 	});
 
     //When click event is raised
@@ -414,7 +517,7 @@ Game.restartPlayer = function (scene) {
 	scene.player.health=4;
 	prepareHealthBars();
 	scene.player.mesh.position = new BABYLON.Vector3(scene.activeRoom.originOffset.x+scene.activeRoom.centerPosition.x, 10, scene.activeRoom.originOffset.z-2*scene.activeRoom.centerPosition.z+10);
-	scene.octree = scene.createOrUpdateSelectionOctree(18, 2);
+	scene.octree = scene.createOrUpdateSelectionOctree(64, 2);
 }
 
 this.getScale = function () {
@@ -424,24 +527,56 @@ this.getScale = function () {
     return this.viewportScale;
 }
 
-Game.createParentTiles = function (activeScene, room, type) {
+Game.createParentTiles = function (activeScene, type) {
 	// create box for the specific tile and scale it
-	room.parentTile.mesh[type] = new BABYLON.Mesh.CreateBox(bjsHelper.tileType[type].name + '-' + parseInt(type), 1.0, activeScene);
-    room.parentTile.mesh[type].scaling = bjsHelper.tileType[type].scale;
-    room.parentTile.mesh[type].material = bjsHelper.tileType[type].material;
+	activeScene.parentTile.mesh[type] = new BABYLON.Mesh.CreateBox(bjsHelper.tileType[type].name + '-' + parseInt(type), 1.0, activeScene);
+    activeScene.parentTile.mesh[type].scaling = bjsHelper.tileType[type].scale;
+    activeScene.parentTile.mesh[type].material = bjsHelper.tileType[type].material;
+    activeScene.parentTile.mesh[type].isVisible = false;
 }
 
-Game.drawTile = function(room, tile, index) {
+Game.drawTile = function(activeScene, tile, index) {
 	// create instance based off of type
-	var newInstance = room.parentTile.mesh[tile.type].createInstance("mesh_" + parseInt(tile.type) + "-" + parseInt(index));
+	var newInstance = activeScene.parentTile.mesh[tile.type].createInstance("mesh_" + parseInt(tile.type) + "-" + parseInt(index));
     newInstance.position = new BABYLON.Vector3(tile.col*tile.width, bjsHelper.tileType[tile.type].yOffset, -tile.row*tile.width);
+	newInstance.isVisible = true;
 
     return newInstance;
 }
 
-Game.activateRoom = function (activeRoom) {
-	//Make all meshes visible and turn collision checking on
-	
+Game.activateRoom = function (activeRoom, previousRoom) {
+	// Turn collision checking on
+	for (var i=0; i < activeRoom.tiles.length; i++) {
+		activeRoom.tiles[i].mesh.checkCollisions = true;
+		activeRoom.tiles[i].mesh.isVisible = true;
+	}
+	for (i=0; i < activeRoom.enemy.length; i++) {
+		activeRoom.enemy[i].mesh.checkCollisions = true;
+		activeRoom.enemy[i].mesh.applyGravity = true;
+		activeRoom.enemy[i].mesh.isVisible = true;
+	}
+	for (i=0; i < activeRoom.doors.length; i++) {
+		for (var j=0; j < activeRoom.doors[i].frame.length;j++) {
+			activeRoom.doors[i].frame[j].isVisible = true;
+		}
+	}
+	if (previousRoom != undefined) {
+		// Turn collision checking on
+		for (var i=0; i < previousRoom.tiles.length; i++) {
+			previousRoom.tiles[i].mesh.checkCollisions = false;
+			previousRoom.tiles[i].mesh.isVisible = false;
+		}
+		for (i=0; i < previousRoom.enemy.length; i++) {
+			previousRoom.enemy[i].mesh.checkCollisions = false;
+			previousRoom.enemy[i].mesh.applyGravity = false;
+			previousRoom.enemy[i].mesh.isVisible = false;
+		}
+		for (i=0; i < previousRoom.doors.length; i++) {
+			for (j=0; j < previousRoom.doors[i].frame.length;j++) {
+				previousRoom.doors[i].frame[j].isVisible = false;
+			}
+		}
+	}
 }
 
 Game.createTransportRing = function (activeScene, bossRoom) {
@@ -450,11 +585,16 @@ Game.createTransportRing = function (activeScene, bossRoom) {
 	bossRoom.transportRing.position = new BABYLON.Vector3(bossRoom.originOffset.x+bossRoom.centerPosition.x, .6, bossRoom.originOffset.z-2*bossRoom.centerPosition.z+10);
 	bossRoom.transportRing.isVisible=false;
 	bossRoom.transportRing.material = new activeScene.transportRingMaterial();
+	bossRoom.transportRing.material.diffuseTexture.refreshRate = 0;
+	bossRoom.transportRing.material.opacityTexture.refreshRate = 0;
 	
 	// create intersect action
 	bossRoom.transportRing.actionManager = new BABYLON.ActionManager(activeScene);
 	// detect collision between enemy and player's weapon for an attack
 	this.enableIntersect = function () {
+		bossRoom.transportRing.isVisible=true;
+		bossRoom.transportRing.material.diffuseTexture.refreshRate = 1;
+		bossRoom.transportRing.material.opacityTexture.refreshRate = 1;
 		bossRoom.transportRing.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
 		{ trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, parameter: activeScene.player.bodyMesh}, function (data) {
 			dungeonComplete();
@@ -485,7 +625,8 @@ function spawnEnemy(activeScene, room) {
 	room.enemy[enemyIndex].mesh.ellipsoid = new BABYLON.Vector3(4, 2, 4);
 	
 	//attach animations
-	room.enemy[enemyIndex].mesh.enemyAnimations = new enemyAnimations();
+	room.enemy[enemyIndex].mesh.enemyAnimations = new Game.enemyAnimations(room.enemy[enemyIndex].mesh);
+	room.enemy[enemyIndex].mesh.enemyAnimations.init(activeScene);
 	
 	// create intersect action
 	room.enemy[enemyIndex].mesh.actionManager = new BABYLON.ActionManager(activeScene);
@@ -497,10 +638,10 @@ function spawnEnemy(activeScene, room) {
 			room.enemy[enemyIndex].health--;
 			if (room.enemy[enemyIndex].health <=0) {
 				room.enemy[enemyIndex].isDead=true;
-				room.enemy[enemyIndex].mesh.enemyAnimations.die(activeScene,room.enemy[enemyIndex]);
+				room.enemy[enemyIndex].mesh.enemyAnimations.die.start(activeScene,room.enemy[enemyIndex]);
 			}
 			else {
-				room.enemy[enemyIndex].mesh.enemyAnimations.takeDmg(activeScene,room.enemy[enemyIndex].mesh);
+				room.enemy[enemyIndex].mesh.enemyAnimations.takeDmg.start(activeScene,room.enemy[enemyIndex]);
 			}
 		}
 	}));
@@ -524,9 +665,9 @@ function spawnEnemy(activeScene, room) {
 			}
 			else if (activeScene.player.health <= 0 ) {
 				$('#healthBar-1').hide();
-				activeScene.player.mesh.playerAnimations.die(activeScene,activeScene.player.mesh);
+				activeScene.player.mesh.playerAnimations.die.start(activeScene,activeScene.player);
 			}
-			activeScene.player.mesh.playerAnimations.takeDmg(activeScene,activeScene.player.mesh);
+			activeScene.player.mesh.playerAnimations.takeDmg.start(activeScene, activeScene.player);
 		}
 	}));
 	
@@ -565,7 +706,8 @@ function spawnBoss(activeScene, room) {
 	room.enemy[enemyIndex].mesh.ellipsoid = new BABYLON.Vector3(3, 3, 3);
 	
 	//attach animations
-	room.enemy[enemyIndex].mesh.enemyAnimations = new enemyAnimations();
+	room.enemy[enemyIndex].mesh.enemyAnimations = new Game.enemyAnimations(room.enemy[enemyIndex].mesh);
+	room.enemy[enemyIndex].mesh.enemyAnimations.init(activeScene);
 	
 	// create intersect action
 	room.enemy[enemyIndex].mesh.actionManager = new BABYLON.ActionManager(activeScene);
@@ -577,12 +719,11 @@ function spawnBoss(activeScene, room) {
 			room.enemy[enemyIndex].health--;
 			if (room.enemy[enemyIndex].health <=0) {
 				room.enemy[enemyIndex].isDead=true;
-				room.enemy[enemyIndex].mesh.enemyAnimations.die(activeScene,room.enemy[enemyIndex]);
-				room.transportRing.isVisible=true;
+				room.enemy[enemyIndex].mesh.enemyAnimations.die.start(activeScene,room.enemy[enemyIndex]);
 				Game.transportRing.enableIntersect();
 			}
 			else {
-				room.enemy[enemyIndex].mesh.enemyAnimations.takeDmg(activeScene,room.enemy[enemyIndex].mesh);
+				room.enemy[enemyIndex].mesh.enemyAnimations.takeDmg.start(activeScene,room.enemy[enemyIndex]);
 			}
 		}
 	}));
@@ -606,9 +747,9 @@ function spawnBoss(activeScene, room) {
 			}
 			else if (activeScene.player.health <= 0 ) {
 				$('#healthBar-1').hide();
-				activeScene.player.mesh.playerAnimations.die(activeScene,activeScene.player.mesh);
+				activeScene.player.mesh.playerAnimations.die.start(activeScene,activeScene.player);
 			}
-			activeScene.player.mesh.playerAnimations.takeDmg(activeScene,activeScene.player.mesh);
+			activeScene.player.mesh.playerAnimations.takeDmg.start(activeScene,activeScene.player);
 		}
 	}));
 	
@@ -623,8 +764,8 @@ function spawnBoss(activeScene, room) {
 
 }
 
-function playerAnimations() {
-	var self = this
+Game.playerAnimations = function(activeScene) {
+	var self = this;
 	self.animating = 0;
 	
 	self.updateIdle = function (activeScene) {
@@ -651,231 +792,296 @@ function playerAnimations() {
 		activeScene.player.mesh.animations.push(activeScene.idleAnimation);
 	};
 	
-	self.updateAttack = function (activeScene) {
-		//var activeScene = Game.scene[Game.activeScene];
-		// ensure no other animations are active
-		if (self.animating == 0) {
-			activeScene.player.attacking=true;
-			self.animating = 1;
-			//create animations for player
-			activeScene.attackAnimation = new BABYLON.Animation("attackAnimation", "rotation", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+	self.Attack = function(activeScene) {
+		var calculateKeys = function (animation) {
+			var keys = []
 			// Animation keys
-			activeScene.attackAnimation.tempKeys = [];
-			//At the animation key 0, the value of scaling is "1"
-			activeScene.attackAnimation.tempKeys.push({
+			keys.push({
 				frame: 0,
 				value: new BABYLON.Vector3(0, activeScene.player.mesh.currentFacingAngle.y + Math.PI/2.2, Math.PI/2)
 			});
-			activeScene.attackAnimation.tempKeys.push({
-				frame: 10,
+			keys.push({
+				frame: 20,
 				value: new BABYLON.Vector3(0, activeScene.player.mesh.currentFacingAngle.y - 0.8, Math.PI/2)
 			});
 			//Adding keys to the animation object
-			activeScene.attackAnimation.setKeys(activeScene.attackAnimation.tempKeys);
-			if (activeScene.player.mesh.animations == undefined) {
-				activeScene.player.mesh.animations.push(activeScene.attackAnimation);
-			}
-			else {
-				activeScene.player.mesh.animations[0] = activeScene.attackAnimation;
-			}
-			activeScene.beginAnimation(activeScene.player.mesh, 0, 10, false, 1.0, function () {
-				activeScene.player.attacking=false;
-				self.animating=0;
-				// Scene.player.Attack=0;
-				activeScene.player.mesh.rotation = new BABYLON.Vector3(Math.PI/6,activeScene.player.mesh.currentFacingAngle.y,Math.PI/8);
-			});
+			animation.setKeys(keys);
 		}
+		var create = function () {
+			//create animations for player
+			self.Attack.animation = new BABYLON.Animation("attackAnimation", "rotation", 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+			//Attach animation to player mesh
+			//activeScene.player.mesh.animations.push(self.Attack.animation);
+		}
+		this.start = function (activeScene, entity) {
+			if (self.animating == 0) {
+				entity.attacking=true;
+				self.animating = 1;
+				//Attach animation to player mesh
+				if (entity.mesh.animations == undefined) {
+					entity.mesh.animations.push(self.Attack.animation);
+				}
+				else {
+					entity.mesh.animations[0] = self.Attack.animation;
+				}
+				calculateKeys(self.Attack.animation);
+				entity.mesh.animatable = activeScene.beginAnimation(entity.mesh, 0, 20, false, 1.0, function () {
+					entity.attacking=false;
+					self.animating=0;
+					// Scene.player.Attack=0;
+					entity.mesh.rotation = new BABYLON.Vector3(Math.PI/6,entity.mesh.currentFacingAngle.y,Math.PI/8);
+				});
+			}
+		}
+		create(); // create animation
 	};
 	
-	self.takeDmg = function (activeScene, entity) {
-		//var activeScene = Game.scene[Game.activeScene];
-		// ensure no other animations are active
-		if (self.animating == 0) {
-			self.animating = 1;
+	self.TakeDmg = function(activeScene) {
+		var create = function () {
 			//create animations for player
-			entity.attackAnimation = new BABYLON.Animation("dieAnimation", "material.emissiveColor", 30, BABYLON.Animation.ANIMATIONTYPE_COLOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-			// Animation keys
-			entity.attackAnimation.tempKeys = [];
-			//At the animation key 0, the value of scaling is "1"
-			entity.attackAnimation.tempKeys.push({
+			self.TakeDmg.animation = new BABYLON.Animation("dieAnimation", "material.emissiveColor", 60, BABYLON.Animation.ANIMATIONTYPE_COLOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);// Animation keys
+			// create keys
+			var keys = [];
+			keys.push({
 				frame: 0,
 				value: new BABYLON.Color3(1,0,0)
 			});
-			entity.attackAnimation.tempKeys.push({
-				frame: 5,
+			keys.push({
+				frame: 10,
 				value: new BABYLON.Color3(0,0,0)
 			});
-			entity.attackAnimation.tempKeys.push({
-				frame: 10,
+			keys.push({
+				frame: 20,
 				value: new BABYLON.Color3(1,0,0)
 			});
-			entity.attackAnimation.tempKeys.push({
-				frame: 15,
+			keys.push({
+				frame: 30,
 				value: new BABYLON.Color3(0,0,0)
 			});
-			//Adding keys to the animation object
-			entity.attackAnimation.setKeys(entity.attackAnimation.tempKeys);
-			if (entity.animations == undefined) {
-				entity.animations.push(entity.attackAnimation);
-			}
-			else {
-				entity.animations[0] = entity.attackAnimation;
-			}
-			activeScene.beginAnimation(entity, 0,15, false, 1.0, function () {
-				self.animating=0;
-			});
+			//Add keys to the animation object
+			self.TakeDmg.animation.setKeys(keys);
+			//Attach animation to player mesh
+			//activeScene.player.mesh.animations.push(self.TakeDmg.animation);
 		}
+		this.start = function (activeScene, entity) {
+			if (self.animating == 0) {
+				self.animating = 1;
+				//Attach animation to player mesh
+				if (entity.mesh.animations == undefined) {
+					entity.mesh.animations.push(self.TakeDmg.animation);
+				}
+				else {
+					entity.mesh.animations[0] = self.TakeDmg.animation;
+				}
+				entity.mesh.animatable = activeScene.beginAnimation(entity.mesh, 0, 30, false, 1.0, function () {
+					self.animating=0;
+				});
+			}
+		}
+		create(); // create animation
 	};
 	
-	self.die = function (activeScene, entity) {
-		//var activeScene = Game.scene[Game.activeScene];
-		//create animations for player
-		entity.attackAnimation = new BABYLON.Animation("dieAnimation", "scaling", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-		// Animation keys
-		entity.attackAnimation.tempKeys = [];
-		var startScaling = entity.scaling;
-		//At the animation key 0, the value of scaling is "1"
-		entity.attackAnimation.tempKeys.push({
-			frame: 0,
-			value: startScaling.add(new BABYLON.Vector3(.1, .1, .1))
-		});
-		entity.attackAnimation.tempKeys.push({
-			frame: 5,
-			value: startScaling.subtract(new BABYLON.Vector3(.5, .5, .5))
-		});
-		entity.attackAnimation.tempKeys.push({
-			frame: 10,
-			value: startScaling.add(new BABYLON.Vector3(.4, .4, .4))
-		});
-		entity.attackAnimation.tempKeys.push({
-			frame: 15,
-			value: new BABYLON.Vector3(.25, .25, .25)
-		});
-		//Adding keys to the animation object
-		entity.attackAnimation.setKeys(entity.attackAnimation.tempKeys);
-		if (entity.animations == undefined) {
-			entity.animations.push(entity.attackAnimation);
+	self.Die = function(activeScene) {
+		var create = function () {
+			//create animations for player
+			self.Die.animation = new BABYLON.Animation("dieAnimation", "scaling", 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+			// create keys
+			var keys = [];
+			var startScaling = activeScene.player.mesh.scaling;
+			var endScaling = activeScene.player.mesh.scaling;
+			//At the animation key 0, the value of scaling is "1"
+			keys.push({
+				frame: 0,
+				value: startScaling.add(new BABYLON.Vector3(.1, .1, .1))
+			});
+			keys.push({
+				frame: 10,
+				value: startScaling.subtract(new BABYLON.Vector3(.5, .5, .5))
+			});
+			keys.push({
+				frame: 20,
+				value: startScaling.add(new BABYLON.Vector3(.4, .4, .4))
+			});
+			keys.push({
+				frame: 30,
+				value: endScaling
+			});
+			keys.push({
+				frame: 60,
+				value: endScaling
+			});
+			//Add keys to the animation object
+			self.Die.animation.setKeys(keys);
+			//Attach animation to player mesh
+			//activeScene.player.mesh.animations.push(self.Die.animation);
 		}
-		else {
-			entity.animations[0] = entity.attackAnimation;
+		this.start = function (activeScene, entity) {
+			entity.mesh.animatable.stop();
+			self.animating = 1;
+			//Attach animation to player mesh
+			if (entity.mesh.animations == undefined) {
+				entity.mesh.animations.push(self.Die.animation);
+			}
+			else {
+				entity.mesh.animations[0] = self.Die.animation;
+			}
+			entity.mesh.animatable = activeScene.beginAnimation(entity.mesh, 0, 60, false, 1.0, function () {
+				self.animating = 0;
+				Game.restartPlayer(activeScene);
+			});
 		}
-		activeScene.beginAnimation(entity, 0, 15, false, 1.0, function () {
-			Game.restartPlayer(activeScene);
-		});
+		create(); // create animation
 	};
+	
+	self.init = function (activeScene) {
+		this.attack = new self.Attack(activeScene);
+		this.takeDmg = new self.TakeDmg(activeScene);
+		this.die = new self.Die(activeScene);
+	}
 }
 
-function enemyAnimations() {
+Game.enemyAnimations = function(entityMesh) {
 	var self = this;
 	self.animating = 0;
 	
-	this.die = function (activeScene, entity,dieFunction) {
-		//var activeScene = Game.scene[Game.activeScene];
-		//create animations for player
-		entity.mesh.attackAnimation = new BABYLON.Animation("dieAnimation", "scaling", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-		// Animation keys
-		entity.mesh.attackAnimation.tempKeys = [];
-		var startScaling = entity.mesh.scaling;
-		//At the animation key 0, the value of scaling is "1"
-		entity.mesh.attackAnimation.tempKeys.push({
-			frame: 0,
-			value: startScaling.add(new BABYLON.Vector3(.1, .1, .1))
-		});
-		entity.mesh.attackAnimation.tempKeys.push({
-			frame: 5,
-			value: startScaling.subtract(new BABYLON.Vector3(.5, .5, .5))
-		});
-		entity.mesh.attackAnimation.tempKeys.push({
-			frame: 10,
-			value: startScaling.add(new BABYLON.Vector3(.4, .4, .4))
-		});
-		entity.mesh.attackAnimation.tempKeys.push({
-			frame: 15,
-			value: new BABYLON.Vector3(.25, .25, .25)
-		});
-		//Adding keys to the animation object
-		entity.mesh.attackAnimation.setKeys(entity.mesh.attackAnimation.tempKeys);
-		if (entity.mesh.animations == undefined) {
-			entity.mesh.animations.push(entity.mesh.attackAnimation);
+	self.Die = function(activeScene, entityMesh) {
+		var create = function () {
+			//create animations for player
+			self.Die.animation = new BABYLON.Animation("dieAnimation", "scaling", 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+			// create keys
+			var keys = [];
+			var startScaling = entityMesh.scaling;
+			var endScaling = entityMesh.scaling;
+			//At the animation key 0, the value of scaling is "1"
+			keys.push({
+				frame: 0,
+				value: startScaling.add(new BABYLON.Vector3(.1, .1, .1))
+			});
+			keys.push({
+				frame: 10,
+				value: startScaling.subtract(new BABYLON.Vector3(.5, .5, .5))
+			});
+			keys.push({
+				frame: 20,
+				value: startScaling.add(new BABYLON.Vector3(.4, .4, .4))
+			});
+			keys.push({
+				frame: 30,
+				value: endScaling.subtract(new BABYLON.Vector3(.5, .5, .5))
+			});
+			//Add keys to the animation object
+			self.Die.animation.setKeys(keys);
+			//Attach animation to player mesh
+			//activeScene.player.mesh.animations.push(self.Die.animation);
 		}
-		else {
-			entity.mesh.animations[0] = entity.mesh.attackAnimation;
+		this.start = function (activeScene, entity, dieFunction) {
+			self.animating = 1;
+			//Attach animation to player mesh
+			if (entity.mesh.animations == undefined) {
+				entity.mesh.animations.push(self.Die.animation);
+			}
+			else {
+				entity.mesh.animations[0] = self.Die.animation;
+				//entity.mesh.animatable.stop();
+			}
+			entity.mesh.animatable = activeScene.beginAnimation(entity.mesh, 0, 30, false, 1.0, function () {
+				entity.mesh.dispose();
+				entity.mesh.actionManager.actions = []; // remove actions
+				// activeScene.activeRoom.enemy.splice(entity.index, 1);
+				if (dieFunction != undefined) {
+					dieFunction(); // execute Callback function
+				}
+			});
 		}
-		activeScene.beginAnimation(entity.mesh, 0, 15, false, 1.0, function () {
-			entity.mesh.dispose();
-			entity.mesh.actionManager.actions = []; // remove actions
-			// activeScene.activeRoom.enemy.splice(entity.index, 1);
-			if (dieFunction != undefined) {
-				dieFunction(); // execute Callback function
-            }
-		});
+		create(); // create animation
 	};
 	
-	this.move = function (activeScene, entity) {
-		self.animating=1;
-		//create animations for player
-		entity.mesh.moveAnimation = new BABYLON.Animation("moveAnimation", "rotation", 30, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-		// Animation keys
-		entity.mesh.moveAnimation.tempKeys = [];
-		var startRotation = entity.mesh.rotation;
-		//At the animation key 0, the value of scaling is "1"
-		entity.mesh.moveAnimation.tempKeys.push({
-			frame: 0,
-			value: startRotation
-		});
-		// entity.mesh.moveAnimation.tempKeys.push({
-			// frame: 10,
-			// value: new BABYLON.Vector3(startRotation.x, -entity.velocity.angle, startRotation.z - Math.PI/3)
-		// });
-		entity.mesh.moveAnimation.tempKeys.push({
-			frame: 60,
-			value: startRotation.subtract(new BABYLON.Vector3(0, 0, 2*Math.PI))
-		});
-		//Adding keys to the animation object
-		entity.mesh.moveAnimation.setKeys(entity.mesh.moveAnimation.tempKeys);
-		if (entity.mesh.animations == undefined) {
-			entity.mesh.animations.push(entity.mesh.moveAnimation);
+	self.Move = function(activeScene, entityMesh) {
+		var calculateKeys = function (animation) {
+			var keys = [];
+			// Animation keys
+			var startRotation = entityMesh.rotation;
+			//At the animation key 0, the value of scaling is "1"
+			keys.push({
+				frame: 0,
+				value: startRotation
+			});
+			keys.push({
+				frame: 240,
+				value: startRotation.subtract(new BABYLON.Vector3(0, 0, 4*Math.PI))
+			});
+			//Adding keys to the animation object
+			animation.setKeys(keys);
 		}
-		else {
-			entity.mesh.animations[0] = entity.mesh.moveAnimation;
+		var create = function () {
+			//create animations for player
+			self.Move.animation = new BABYLON.Animation("moveAnimation", "rotation", 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+			//Attach animation to player mesh
+			//activeScene.player.mesh.animations.push(self.Attack.animation);
 		}
-		this.animatable = activeScene.beginAnimation(entity.mesh, 0, 60, true, 1.0);
+		this.start = function (activeScene, entity, dieFunction) {
+			self.animating = 1;
+			calculateKeys(self.Move.animation);
+			//Attach animation to player mesh
+			if (entity.mesh.animations == undefined) {
+				entity.mesh.animations.push(self.Move.animation);
+			}
+			else {
+				entity.mesh.animations[0] = self.Move.animation;
+				//entity.mesh.animatable.stop();
+			}
+			self.animatable = activeScene.beginAnimation(entity.mesh, 0, 240, true, 1.0);
+		}
+		create(); // create animation
 	};
 	
-	this.takeDmg = function (activeScene, entityMesh) {
-		//var activeScene = Game.scene[Game.activeScene];
-		//create animations for player
-		entityMesh.attackAnimation = new BABYLON.Animation("dieAnimation", "material.emissiveColor", 30, BABYLON.Animation.ANIMATIONTYPE_COLOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-		// Animation keys
-		entityMesh.attackAnimation.tempKeys = [];
-		//At the animation key 0, the value of scaling is "1"
-		entityMesh.attackAnimation.tempKeys.push({
-			frame: 0,
-			value: new BABYLON.Color3(1,0,0)
-		});
-		entityMesh.attackAnimation.tempKeys.push({
-			frame: 5,
-			value: new BABYLON.Color3(0,0,0)
-		});
-		entityMesh.attackAnimation.tempKeys.push({
-			frame: 10,
-			value: new BABYLON.Color3(1,0,0)
-		});
-		entityMesh.attackAnimation.tempKeys.push({
-			frame: 15,
-			value: new BABYLON.Color3(0,0,0)
-		});
-		//Adding keys to the animation object
-		entityMesh.attackAnimation.setKeys(entityMesh.attackAnimation.tempKeys);
-		if (entityMesh.animations == undefined) {
-			entityMesh.animations.push(entityMesh.attackAnimation);
-		}
-		else {
-			entityMesh.animations[0] = entityMesh.attackAnimation;
-		}
-		activeScene.beginAnimation(entityMesh, 0,15, false, 1.0);
-	};
+	self.init = function (activeScene) {
+		this.die = new self.Die(activeScene, entityMesh);
+		this.move = new self.Move(activeScene, entityMesh);
+		this.takeDmg = new self.TakeDmg(activeScene);
+	}
 	
+	self.TakeDmg = function(activeScene) {
+		var create = function () {
+			//create animations for player
+			self.TakeDmg.animation = new BABYLON.Animation("dieAnimation", "material.emissiveColor", 60, BABYLON.Animation.ANIMATIONTYPE_COLOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);// Animation keys
+			// create keys
+			var keys = [];
+			keys.push({
+				frame: 0,
+				value: new BABYLON.Color3(1,0,0)
+			});
+			keys.push({
+				frame: 10,
+				value: new BABYLON.Color3(0,0,0)
+			});
+			keys.push({
+				frame: 20,
+				value: new BABYLON.Color3(1,0,0)
+			});
+			keys.push({
+				frame: 30,
+				value: new BABYLON.Color3(0,0,0)
+			});
+			//Add keys to the animation object
+			self.TakeDmg.animation.setKeys(keys);
+			//Attach animation to player mesh
+			//activeScene.player.mesh.animations.push(self.TakeDmg.animation);
+		}
+		this.start = function (activeScene, entity) {
+				//Attach animation to player mesh
+				if (entity.mesh.animations == undefined) {
+					entity.mesh.animations.push(self.TakeDmg.animation);
+				}
+				else {
+					entity.mesh.animations[0] = self.TakeDmg.animation;
+				}
+				entity.mesh.animatable = activeScene.beginAnimation(entity.mesh, 0, 30, false, 1.0, function () {
+					//self.animating=0;
+				});
+		}
+		create(); // create animation
+	}
 }
 
 function createTorchFire(activeScene, attachTo) {
@@ -981,7 +1187,7 @@ function createMaterials(activeScene) {
 	// activeScene.tileMaterialSword.specularColor = new BABYLON.Color3(0, 0, 0);
 	
 	activeScene.enemyMaterial = function () {
-		var marbleTexture = new BABYLON.MarbleProceduralTexture("marble",  Game.getRandomIntFromArray([256,512,1024]), activeScene);
+		var marbleTexture = new BABYLON.MarbleProceduralTexture("marble",  128, activeScene);
 		marbleTexture.numberOfBricksHeight = Game.getRandomInt(1,5);
 		marbleTexture.numberOfBricksWidth = Game.getRandomInt(1,5);
 		
@@ -989,7 +1195,7 @@ function createMaterials(activeScene) {
 		this.ambientTexture = marbleTexture;
 	}
 	activeScene.transportRingMaterial = function () {
-		var fireTexture = new BABYLON.FireProceduralTexture("fire", 512, activeScene);
+		var fireTexture = new BABYLON.FireProceduralTexture("fire", 128, activeScene);
 		fireTexture.fireColors = BABYLON.FireProceduralTexture.PurpleFireColors;
 		
 		$.extend(this,new BABYLON.StandardMaterial("transportRingMaterial", activeScene));
