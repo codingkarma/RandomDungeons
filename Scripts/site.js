@@ -14,13 +14,6 @@ var Game = new function () {
 		Game: 1
 	};
 	this.activeScene = this.sceneType.Start;
-	
-	// Logic loop variables
-	this.logicLoopStart=0; // Initial Loop Time
-	this.logicLoopDeltaTime = 0; // Delta Time of loop
-	this.logicLoopTimeDiff = 0; // Difference between LoopTime and dT_Loop
-	this.logicLoopTIME = 50; // Desired loop time in milliseconds
-	this.logicLoopWait=4.20; // Wait time for setTimeout
 }
 
 $(document).ready(function () {

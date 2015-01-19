@@ -1,6 +1,6 @@
 function dungeonComplete() {
 	//stop logic Loop
-	clearTimeout(Game.scene[Game.activeScene].logicLoopId);
+	Game.scene[Game.activeScene].timedLogicLoop.stop();
 	$('#modalDiv').html(' \
 		<div class=\"modalText">You have completed the dungeon!</div><br /> \
 		<div class=\"modalButton\" id=\"newDungeon\">New Dungeon</div><br /> \

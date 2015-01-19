@@ -51,7 +51,8 @@ Game.initGameScene = function() {
 				}
 				
 				//start game logic loop
-				this.logicLoop();
+				this.timedLogicLoop = new timedLoop(this.logicLoop,50);
+				this.timedLogicLoop.start();
 				
 				// TO DO: Implement optimization (only availabe in BJS v2+)
 				// this.optimizeOptions = BABYLON.SceneOptimizerOptions.ModerateDegradationAllowed();
@@ -78,6 +79,9 @@ Game.initGameScene = function() {
 			var arrayLength;
 			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				// Start the particle system
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].stop();
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].stop();
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
@@ -85,6 +89,9 @@ Game.initGameScene = function() {
 			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				// Start the particle system
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
 			}
@@ -100,6 +107,9 @@ Game.initGameScene = function() {
 			var arrayLength;
 			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				// Start the particle system
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].stop();
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].stop();
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
@@ -107,6 +117,9 @@ Game.initGameScene = function() {
 			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				// Start the particle system
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
 			}
@@ -122,6 +135,9 @@ Game.initGameScene = function() {
 			var arrayLength;
 			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				// Start the particle system
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].stop();
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].stop();
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
@@ -129,6 +145,9 @@ Game.initGameScene = function() {
 			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				// Start the particle system
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
 			}
@@ -144,6 +163,9 @@ Game.initGameScene = function() {
 			var arrayLength;
 			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				// Start the particle system
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].stop();
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].stop();
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
@@ -151,6 +173,9 @@ Game.initGameScene = function() {
 			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+				// Start the particle system
+				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();
+				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
 				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
 			}

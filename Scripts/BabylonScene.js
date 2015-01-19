@@ -313,9 +313,6 @@ Game.CreateGameScene = function() {
 						scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1].torchFire[0].emitter = scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1];
 						scene.rooms[i_room].doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
 						scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
-						// Start the particle system
-						scene.rooms[i_room].doors[doorIndex].frame[arrayLength].torchFire[0].start();
-						scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
 					}
 				}
 				
@@ -341,6 +338,8 @@ Game.CreateGameScene = function() {
 					//activate torch lights
 					for (doorIndex = 0; doorIndex < scene.activeRoom.doors.length; doorIndex++) {
 						arrayLength = scene.activeRoom.doors[doorIndex].frame.length-1;
+						scene.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();
+						scene.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
 						scene.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
 						scene.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
 					}
@@ -373,96 +372,55 @@ Game.CreateGameScene = function() {
 	}
 
 	scene.logicLoop = function () {
-		//console.log("Before: " + (performance.now()-Game.logicLoopStart));
-		Game.logicLoopStart = performance.now();
-		scene.logicLoopId = setTimeout(function () {
-			// TO DO: Add a variable to keep track of time the difference in between how
-			// setTimeout is supposed to wait and how long it actually did
-			// TO DO: create variables to allow auto adjustment of looptime if time is always short
-			//console.log("After: " + (performance.now()-Game.logicLoopStart));
-			
-			//***LOGIC GOES HERE***//
-			var self = scene;
-			switch (Game.engine.loopCounter) {   
-				case 1000:
-					Game.engine.loopCounter=0;
-					break;
-				default:
-					Game.engine.loopCounter++;
-					break;
-			}
-			if (Game.engine.loopCounter % 5 == 0) {
-				//check what room the player is in
-				self.checkActiveRoom();
-			}
-			else if (Game.engine.loopCounter % (11 + self.enemyCounter) == 0) {
-				if (self.enemyCounter >= self.activeRoom.enemy.length) { 
-					self.enemyCounter = 0;
-					//open doors if all enemies are dead
-					if (self.activeRoom.enemiesDead) {
-						for (var doorLoop=0; doorLoop < self.activeRoom.doors.length; doorLoop++) {
-							if (self.activeRoom.doors[doorLoop].isOpen == false) {
-								self.activeRoom.doors[doorLoop].mesh.checkCollisions = false;
-								self.activeRoom.doors[doorLoop].mesh.isVisible = false;
-								self.activeRoom.doors[doorLoop].isOpen = true;
-								//apply to matching door
-								self.activeRoom.doors[doorLoop].pairedDoor.mesh.checkCollisions = false;
-								self.activeRoom.doors[doorLoop].pairedDoor.mesh.isVisible = false;
-								self.activeRoom.doors[doorLoop].pairedDoor.isOpen = true;
-							}
-						}
-					}
+		var self = scene;
+		switch (Game.engine.loopCounter) {   
+			case 500:
+				Game.engine.loopCounter=0;
+				break;
+			default:
+				Game.engine.loopCounter++;
+				break;
+		}
+		//check what room the player is in
+		self.checkActiveRoom();
+		$('#lps').text('LPS: ' + self.timedLogicLoop.getLoopTime().toFixed());
+		if (!self.activeRoom.enemiesDead) {
+			for (self.enemyCounter = 0; self.enemyCounter < self.activeRoom.enemy.length; self.enemyCounter++) {
+				if (self.enemyCounter == 0 ) {
+					self.activeRoom.enemiesDead = self.activeRoom.enemy[self.enemyCounter].isDead;
 				}
 				else {
-					if (self.enemyCounter == 0 ) {
-						self.activeRoom.enemiesDead = self.activeRoom.enemy[self.enemyCounter].isDead;
-					}
-					else {
-						self.activeRoom.enemiesDead = (self.activeRoom.enemiesDead && self.activeRoom.enemy[self.enemyCounter].isDead);
-					}
-					self.activeRoom.enemy[self.enemyCounter].velocity = GetPathVector(self.activeRoom.enemy[self.enemyCounter].mesh.position,self.player.mesh.position,{speed: self.activeRoom.enemy[self.enemyCounter].speed, tolerance: 12});
-					self.activeRoom.enemy[self.enemyCounter].mesh.rotation.y = -self.activeRoom.enemy[self.enemyCounter].velocity.angle;
-					if (self.activeRoom.enemy[self.enemyCounter].velocity.direction.x == 0 && self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animatable) {
-						self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animatable.stop();
-						self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animating=0;
-					}
-					else {
-						self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.move.start(self,self.activeRoom.enemy[self.enemyCounter]);
-					}
-					self.enemyCounter++;
+					self.activeRoom.enemiesDead = (self.activeRoom.enemiesDead && self.activeRoom.enemy[self.enemyCounter].isDead);
+				}
+				self.activeRoom.enemy[self.enemyCounter].velocity = GetPathVector(self.activeRoom.enemy[self.enemyCounter].mesh.position,self.player.mesh.position,{speed: self.activeRoom.enemy[self.enemyCounter].speed, tolerance: 12});
+				self.activeRoom.enemy[self.enemyCounter].mesh.rotation.y = -self.activeRoom.enemy[self.enemyCounter].velocity.angle;
+				if (self.activeRoom.enemy[self.enemyCounter].velocity.direction.x == 0 && self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animatable) {
+					self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animatable.stop();
+					self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animating=0;
+				}
+				else {
+					self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.move.start(self,self.activeRoom.enemy[self.enemyCounter]);
 				}
 			}
-			processInput(self.player, self.player.speed);
-			
-			//***END LOGIC***//
-			
-			//*****NO LOGIC AFTER HERE******//
-			//determine what the next wait time should be
-			Game.logicLoopDeltaTime = (performance.now() - Game.logicLoopStart) - Game.logicLoopTimeDiff; // Get approx. loop time
-			//console.log("logicLoopDeltaTime: " + Game.logicLoopDeltaTime);
-			Game.logicLoopTimeDiff = Game.logicLoopTIME - Game.logicLoopDeltaTime; //Get different between Max LoopTime and Real Time dT_Loop
-			
-			if ( Game.logicLoopTimeDiff > 4)  {
-				Game.logicLoopWait = Game.logicLoopTimeDiff;
-				Game.logicLoopTimeDiff = 0;
+			//open doors if all enemies are dead
+			if (self.activeRoom.enemiesDead) {
+				for (var doorLoop=0; doorLoop < self.activeRoom.doors.length; doorLoop++) {
+					if (self.activeRoom.doors[doorLoop].isOpen == false) {
+						self.activeRoom.doors[doorLoop].mesh.checkCollisions = false;
+						self.activeRoom.doors[doorLoop].mesh.isVisible = false;
+						self.activeRoom.doors[doorLoop].isOpen = true;
+						//apply to matching door
+						self.activeRoom.doors[doorLoop].pairedDoor.mesh.checkCollisions = false;
+						self.activeRoom.doors[doorLoop].pairedDoor.mesh.isVisible = false;
+						self.activeRoom.doors[doorLoop].pairedDoor.isOpen = true;
+					}
+				}
 			}
-			else if (Game.logicLoopTimeDiff > -1000) {
-				Game.logicLoopWait = 4.20;
-				Game.logicLoopTimeDiff-=4.20;
-			}
-			else {
-				//something went wrong. reset vars
-				Game.logicLoopWait = 4.20;
-				Game.logicLoopTimeDiff = 0;
-			}
-			//console.log("logicLoopWait: " + Game.logicLoopWait);
-			//**********END******************//
-			// lastly call logic loop recursively
-			scene.logicLoop();
-		},Game.logicLoopWait);
-	}
+		}
+		processInput(self.player, self.player.speed);
+	};
 	
-    scene.registerBeforeRender(function(){
+	scene.moveMeshes = function () {
 		var self = scene;
 		var i=0;
 		
@@ -472,6 +430,10 @@ Game.CreateGameScene = function() {
 			self.activeRoom.enemy[i].mesh.moveWithCollisions(self.activeRoom.enemy[i].velocity.direction);
 		}
 		self.player.mesh.moveWithCollisions(self.player.velocity.direction);
+	}
+	
+    scene.registerBeforeRender(function(){
+		scene.moveMeshes();
 	});
 
     //When click event is raised
@@ -1088,7 +1050,7 @@ function createTorchFire(activeScene, attachTo) {
 	//var activeScene = Game.scene[Game.activeScene];
 	
 	// Create a particle system
-	var index = attachTo.torchFire.push(new BABYLON.ParticleSystem("particles", 1000, activeScene)) - 1;
+	var index = attachTo.torchFire.push(new BABYLON.ParticleSystem("particles", 512, activeScene)) - 1;
 
     //Texture of each particle
     attachTo.torchFire[index].particleTexture = new BABYLON.Texture("./Textures/flame.png", activeScene);
