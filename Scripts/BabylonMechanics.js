@@ -55,9 +55,10 @@ Game.initGameScene = function() {
 				this.timedLogicLoop.start();
 				
 				// TO DO: Implement optimization (only availabe in BJS v2+)
+				//BABYLON.SceneOptimizer.OptimizeAsync(Game.scene[Game.activeScene]);
 				// this.optimizeOptions = BABYLON.SceneOptimizerOptions.ModerateDegradationAllowed();
-				// this.optimizeOptions.targetFrameRate=30;
-				// BABYLON.SceneOptimizer.OptimizeAsync(scene, this.optimizeOptions, function() {
+				// this.optimizeOptions.targetFrameRate=60;
+				// BABYLON.SceneOptimizer.OptimizeAsync(Game.scene[activeScene], this.optimizeOptions, function() {
 				   // // On success
 				// }, function() {
 				   // // FPS target not reached
@@ -75,6 +76,8 @@ Game.initGameScene = function() {
 		if (this.player.mesh.position.z > (this.activeRoom.originOffset.z)) {
 			//going north
 			var i_room=(this.activeRoom.row-1) * Game.map.width + this.activeRoom.col;
+			// this.gravity.y = 0;
+			// this.player.mesh.position.z+=5;
 			//disable torch lights
 			var arrayLength;
 			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
@@ -86,6 +89,7 @@ Game.initGameScene = function() {
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
+			//Game.activateRoom(this.rooms[i_room],this.activeRoom);
 			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
@@ -99,10 +103,13 @@ Game.initGameScene = function() {
 			//set camera to new position
 			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
 			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
+			this.gravity.y = -9.81;
 		}
 		else if (this.player.mesh.position.x > (this.activeRoom.originOffset.x+this.activeRoom.width*this.activeRoom.tiles[0].width)) {
 			//going east
 			var i_room=(this.activeRoom.row) * Game.map.width + this.activeRoom.col+1;
+			// this.gravity.y = 0;
+			// this.player.mesh.position.x+=5;
 			//disable torch lights
 			var arrayLength;
 			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
@@ -114,6 +121,7 @@ Game.initGameScene = function() {
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
+			//Game.activateRoom(this.rooms[i_room],this.activeRoom);
 			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
@@ -127,10 +135,13 @@ Game.initGameScene = function() {
 			//set camera to new position
 			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
 			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
+			this.gravity.y = -9.81;
 		}
 		else if (this.player.mesh.position.z < (this.activeRoom.originOffset.z - this.activeRoom.height*this.activeRoom.tiles[0].width)) {
 			//going south
 			var i_room=(this.activeRoom.row+1) * Game.map.width + this.activeRoom.col;
+			// this.gravity.y = 0;
+			// this.player.mesh.position.z-=15;
 			//disable torch lights
 			var arrayLength;
 			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
@@ -142,6 +153,7 @@ Game.initGameScene = function() {
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
+			//Game.activateRoom(this.rooms[i_room],this.activeRoom);
 			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
@@ -155,10 +167,13 @@ Game.initGameScene = function() {
 			//set camera to new position
 			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
 			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
+			this.gravity.y = -9.81;
 		}
 		else if (this.player.mesh.position.x < (this.activeRoom.originOffset.x)) {
 			//going west
 			var i_room=(this.activeRoom.row) * Game.map.width + this.activeRoom.col-1;
+			// this.gravity.y = 0;
+			// this.player.mesh.position.x-=25;
 			//disable torch lights
 			var arrayLength;
 			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
@@ -170,6 +185,7 @@ Game.initGameScene = function() {
 				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 			}
 			//set active room to entrance
+			//Game.activateRoom(this.rooms[i_room],this.activeRoom);
 			this.activeRoom=this.rooms[i_room];
 			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
 				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
@@ -183,6 +199,7 @@ Game.initGameScene = function() {
 			//set camera to new position
 			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
 			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
+			this.gravity.y = -9.81;
 		}
 	};
 	

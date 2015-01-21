@@ -14,6 +14,13 @@ var Game = new function () {
 		Game: 1
 	};
 	this.activeScene = this.sceneType.Start;
+	
+	this.performance = new function () {
+		this.quality = 1;
+		this.particleDensity;
+		this.viewDistance = 200;
+		
+	}
 }
 
 $(document).ready(function () {

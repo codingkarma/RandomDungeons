@@ -223,6 +223,7 @@ Game.CreateGameScene = function() {
 		//Set up initial door and torches
 		scene.torchTop.isVisible = false;
 		scene.doorFrame[0].isVisible = false;
+		scene.doorFrame[0].addLODLevel(Game.performance.viewDistance, null);
 		scene.doorFrame.push(scene.torchTop.clone());
 		scene.doorFrame.push(scene.torchTop.clone());
 		var arrayLength = scene.doorFrame.length;
@@ -315,6 +316,7 @@ Game.CreateGameScene = function() {
 						scene.rooms[i_room].doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
 					}
 				}
+				//Game.activateRoom(scene.rooms[i_room],scene.rooms[i_room]);
 				
 				if (Game.map.rooms[i_room].type == Game.RoomType.Boss) {
 					spawnBoss(scene, scene.rooms[i_room]);
@@ -331,6 +333,7 @@ Game.CreateGameScene = function() {
 				//Game.activateRoom(scene.rooms[i_room],scene.rooms[i_room]);
 				
 				if (Game.map.rooms[i_room].type == Game.RoomType.Entrance) {
+					//Game.activateRoom(scene.rooms[i_room]);
 					scene.camera.target = new BABYLON.Vector3(scene.rooms[i_room].originOffset.x+scene.rooms[i_room].centerPosition.x, 0, scene.rooms[i_room].originOffset.z-scene.rooms[i_room].centerPosition.z);
 					//set active room to entrance
 					scene.activeRoom=Game.map.rooms[i_room];
@@ -495,6 +498,8 @@ Game.createParentTiles = function (activeScene, type) {
     activeScene.parentTile.mesh[type].scaling = bjsHelper.tileType[type].scale;
     activeScene.parentTile.mesh[type].material = bjsHelper.tileType[type].material;
     activeScene.parentTile.mesh[type].isVisible = false;
+	
+	activeScene.parentTile.mesh[type].addLODLevel(Game.performance.viewDistance, null);
 }
 
 Game.drawTile = function(activeScene, tile, index) {

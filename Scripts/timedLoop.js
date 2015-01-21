@@ -20,7 +20,7 @@ timedLoop = function(logicFunction, desiredLoopTime, functionData) {
 	
 	self.start = function () {
 		loopStart = performance.now();
-		loopId = setTimeout(function () {
+		self.loopId = setTimeout(function () {
 			actualWait = performance.now() - loopStart;
 			waitDifference = waitDifference*.6 + .4*(actualWait - loopWait);
 			//don't let waitDifference grow larger than the loopWait
@@ -39,7 +39,7 @@ timedLoop = function(logicFunction, desiredLoopTime, functionData) {
 			loopAverage = loopAverage*.8 + .2*(nowTime - previousTime);
 			
 			//determine what the next wait time should be
-			loopDeltaTime = (performance.now() - loopStart); //- loopTimeDiff; // Get approx. loop time
+			//loopDeltaTime = (performance.now() - loopStart); //- loopTimeDiff; // Get approx. loop time
 			loopWait = loopTIME - waitDifference;
 			//**********END******************//
 			self.start(); // lastly call logic loop recursively
