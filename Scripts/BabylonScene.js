@@ -397,12 +397,14 @@ Game.CreateGameScene = function() {
 				}
 				self.activeRoom.enemy[self.enemyCounter].velocity = GetPathVector(self.activeRoom.enemy[self.enemyCounter].mesh.position,self.player.mesh.position,{speed: self.activeRoom.enemy[self.enemyCounter].speed, tolerance: 12});
 				self.activeRoom.enemy[self.enemyCounter].mesh.rotation.y = -self.activeRoom.enemy[self.enemyCounter].velocity.angle;
-				if (self.activeRoom.enemy[self.enemyCounter].velocity.direction.x == 0 && self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animatable) {
-					self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animatable.stop();
-					self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animating=0;
-				}
-				else {
-					self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.move.start(self,self.activeRoom.enemy[self.enemyCounter]);
+				if (self.activeRoom.enemy[self.enemyCounter].action == self.activeRoom.enemy[self.enemyCounter].actionType.Move) {
+					if (self.activeRoom.enemy[self.enemyCounter].velocity.direction.x == 0 && self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animatable) {
+						self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animatable.stop();
+						self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.animating=0;
+					}
+					else {
+						self.activeRoom.enemy[self.enemyCounter].mesh.enemyAnimations.move.start(self,self.activeRoom.enemy[self.enemyCounter]);
+					}
 				}
 			}
 			//open doors if all enemies are dead
@@ -430,7 +432,9 @@ Game.CreateGameScene = function() {
 		$('#fps').text('FPS: ' + Game.engine.getFps().toFixed());
 		//Need to update self every loop, I guess
 		for (i=0; i < self.activeRoom.enemy.length;i++) {
-			self.activeRoom.enemy[i].mesh.moveWithCollisions(self.activeRoom.enemy[i].velocity.direction);
+			if (self.activeRoom.enemy[i].action == 0) {
+				self.activeRoom.enemy[i].mesh.moveWithCollisions(self.activeRoom.enemy[i].velocity.direction);
+			}
 		}
 		self.player.mesh.moveWithCollisions(self.player.velocity.direction);
 	}
@@ -942,6 +946,8 @@ Game.enemyAnimations = function(entityMesh) {
 			//activeScene.player.mesh.animations.push(self.Die.animation);
 		}
 		this.start = function (activeScene, entity, dieFunction) {
+			self.animatable.stop();
+			entity.action = entity.actionType.Die;
 			self.animating = 1;
 			//Attach animation to player mesh
 			if (entity.mesh.animations == undefined) {
@@ -951,7 +957,7 @@ Game.enemyAnimations = function(entityMesh) {
 				entity.mesh.animations[0] = self.Die.animation;
 				//entity.mesh.animatable.stop();
 			}
-			entity.mesh.animatable = activeScene.beginAnimation(entity.mesh, 0, 30, false, 1.0, function () {
+			self.animatable = activeScene.beginAnimation(entity.mesh, 0, 30, false, 1.0, function () {
 				entity.mesh.dispose();
 				entity.mesh.actionManager.actions = []; // remove actions
 				// activeScene.activeRoom.enemy.splice(entity.index, 1);
@@ -987,6 +993,7 @@ Game.enemyAnimations = function(entityMesh) {
 			//activeScene.player.mesh.animations.push(self.Attack.animation);
 		}
 		this.start = function (activeScene, entity, dieFunction) {
+			entity.action = entity.actionType.Move;
 			self.animating = 1;
 			calculateKeys(self.Move.animation);
 			//Attach animation to player mesh
@@ -997,16 +1004,12 @@ Game.enemyAnimations = function(entityMesh) {
 				entity.mesh.animations[0] = self.Move.animation;
 				//entity.mesh.animatable.stop();
 			}
-			self.animatable = activeScene.beginAnimation(entity.mesh, 0, 240, true, 1.0);
+			self.animatable = activeScene.beginAnimation(entity.mesh, 0, 240, true, 1.0, function () {
+				self.animating = 0;
+			});
 		}
 		create(); // create animation
 	};
-	
-	self.init = function (activeScene) {
-		this.die = new self.Die(activeScene, entityMesh);
-		this.move = new self.Move(activeScene, entityMesh);
-		this.takeDmg = new self.TakeDmg(activeScene);
-	}
 	
 	self.TakeDmg = function(activeScene) {
 		var create = function () {
@@ -1019,15 +1022,15 @@ Game.enemyAnimations = function(entityMesh) {
 				value: new BABYLON.Color3(1,0,0)
 			});
 			keys.push({
-				frame: 10,
+				frame: 20,
 				value: new BABYLON.Color3(0,0,0)
 			});
 			keys.push({
-				frame: 20,
+				frame: 40,
 				value: new BABYLON.Color3(1,0,0)
 			});
 			keys.push({
-				frame: 30,
+				frame: 60,
 				value: new BABYLON.Color3(0,0,0)
 			});
 			//Add keys to the animation object
@@ -1036,18 +1039,27 @@ Game.enemyAnimations = function(entityMesh) {
 			//activeScene.player.mesh.animations.push(self.TakeDmg.animation);
 		}
 		this.start = function (activeScene, entity) {
-				//Attach animation to player mesh
-				if (entity.mesh.animations == undefined) {
-					entity.mesh.animations.push(self.TakeDmg.animation);
-				}
-				else {
-					entity.mesh.animations[0] = self.TakeDmg.animation;
-				}
-				entity.mesh.animatable = activeScene.beginAnimation(entity.mesh, 0, 30, false, 1.0, function () {
-					//self.animating=0;
-				});
+			self.animatable.stop();
+			entity.action = entity.actionType.TakeDmg;
+			self.animating = 1;
+			//Attach animation to player mesh
+			if (entity.mesh.animations == undefined) {
+				entity.mesh.animations.push(self.TakeDmg.animation);
+			}
+			else {
+				entity.mesh.animations[0] = self.TakeDmg.animation;
+			}
+			self.animatable = activeScene.beginAnimation(entity.mesh, 0, 60, false, 1.0, function () {
+				entity.action = entity.actionType.Move;
+			});
 		}
 		create(); // create animation
+	}
+	
+	self.init = function (activeScene) {
+		this.die = new self.Die(activeScene, entityMesh);
+		this.move = new self.Move(activeScene, entityMesh);
+		this.takeDmg = new self.TakeDmg(activeScene);
 	}
 }
 

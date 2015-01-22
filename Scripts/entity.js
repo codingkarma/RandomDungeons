@@ -7,6 +7,12 @@ var EntityType = {
 function Entity(mesh, options) {
 
 	this.mesh = mesh;
+	this.actionType = {
+		Move: 0,
+		Attack: 1,
+		TakeDmg: 2,
+		Die: 3
+	}
 
 	$.extend(this,{
 			type: EntityType.Sphere,
@@ -15,6 +21,7 @@ function Entity(mesh, options) {
 			speed: 1,
 			velocity: {'direction': new BABYLON.Vector3(0,0,0), 'angle': 0},
 			attacking: 0,
+			action: 0,
 			isDead: false
 		},options||{});
 }
