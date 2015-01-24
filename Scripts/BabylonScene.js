@@ -187,6 +187,10 @@ Game.CreateGameScene = function() {
 	//Set up Scene after all Tasks are complete
 	scene.assetsManager.onFinish = function (tasks) {
 	
+		// Create Player shadow, which will be the parent mesh
+		// scene.player.bodyMesh =  BABYLON.Mesh.CreateCylinder("playerBodyMesh", 0, 5, 5, 10, scene);
+		// scene.player.bodyMesh.isVisible = true;
+		
 		//scene.player.mesh.showBoundingBox = true;
 		scene.player.mesh.checkCollisions = true;
 		//Set the ellipsoid around the camera (e.g. your player's size)
@@ -200,7 +204,7 @@ Game.CreateGameScene = function() {
 		//scene.player.bodyMesh.showBoundingBox = true;
 		// scene.player.bodyMesh.rotation = new BABYLON.Vector3(Math.PI/6, Math.PI/2, Math.PI/8);
 		
-		scene.player.weaponMesh =  BABYLON.Mesh.CreateCylinder("playerWeaponMesh", 4.2, 1, 1, 10, scene);	
+		scene.player.weaponMesh =  BABYLON.Mesh.CreateCylinder("playerWeaponMesh", 4.2, .5, .5, 10, scene);	
 		scene.player.weaponMesh.parent = scene.player.mesh;
 		scene.player.weaponMesh.position.y=3.5;
 		scene.player.weaponMesh.isVisible = false;
@@ -428,15 +432,21 @@ Game.CreateGameScene = function() {
 	scene.moveMeshes = function () {
 		var self = scene;
 		var i=0;
+		var tempVal;
+		var animationRatio = self.getAnimationRatio();
 		
 		$('#fps').text('FPS: ' + Game.engine.getFps().toFixed());
 		//Need to update self every loop, I guess
 		for (i=0; i < self.activeRoom.enemy.length;i++) {
-			if (self.activeRoom.enemy[i].action == 0) {
-				self.activeRoom.enemy[i].mesh.moveWithCollisions(self.activeRoom.enemy[i].velocity.direction);
+			if (self.activeRoom.enemy[i].action == 0 && self.activeRoom.enemy[i].isDead == false) {
+				//tempVal = new BABYLON.Vector3(self.activeRoom.enemy[i].velocity.direction.x*animationRatio,self.activeRoom.enemy[i].velocity.direction.y*animationRatio,self.activeRoom.enemy[i].velocity.direction.z*animationRatio);
+				tempVal = self.activeRoom.enemy[i].velocity.direction.multiply(new BABYLON.Vector3(animationRatio,animationRatio,animationRatio));
+				self.activeRoom.enemy[i].mesh.moveWithCollisions(tempVal);
 			}
 		}
-		self.player.mesh.moveWithCollisions(self.player.velocity.direction);
+		//tempVal = new BABYLON.Vector3(self.player.velocity.direction.x*animationRatio,self.player.velocity.direction.y*animationRatio,self.player.velocity.direction.z*animationRatio);
+		tempVal = self.player.velocity.direction.multiply(new BABYLON.Vector3(animationRatio,animationRatio,animationRatio));
+		self.player.mesh.moveWithCollisions(tempVal);
 	}
 	
     scene.registerBeforeRender(function(){

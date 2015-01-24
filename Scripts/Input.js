@@ -53,27 +53,53 @@ function doKeyUp(evt) {
             break;
     }
 }
+function lookupTableATan2() {
+	var ltArray = [[],[],[]];
+	ltArray[0][0] = 0;
+	ltArray[0][1] = Math.atan2(0,1);
+	ltArray[0][2] = Math.atan2(0,-1);
+	ltArray[1][0] = Math.atan2(1,0);
+	ltArray[2][0] = Math.atan2(-1,0);
+	ltArray[1][1] = Math.atan2(1,1);
+	ltArray[1][2] = Math.atan2(1,-1);
+	ltArray[2][1] = Math.atan2(-1,1);
+	ltArray[2][2] = Math.atan2(-1,-1);
+	
+	return ltArray;
+}
 
 function processInput(entity,speed) {
 	var vX=0;
+	var iX=0;
 	var vZ=0;
+	var iZ=0;
 	var activeScene = Game.scene[Game.activeScene];
 	var delta = activeScene.joystick.deltaJoystickVector;
 	
     if (UpDown && !DownDown || delta.y < -5) {
         vZ=1;
+		iZ=1;
     }
     else if (DownDown && !UpDown || delta.y > 5) {
         vZ=-1;
+		iZ=2;
     }
+	else {
+		iZ=0;
+	}
     if (LeftDown && !RightDown || delta.x < -5) {
         vX=-1;
+		iX=2;
     }
     else if (RightDown && !LeftDown || delta.x > 5) {
         vX=1;
+		iX=1;
     }
+	else {
+		iX=0;
+	}
 	if (vX || vZ) {
-		var newRotation = -Math.atan2(vZ,vX) + Math.PI;
+		var newRotation = -Game.ltArray[iZ][iX] + Math.PI;
 		entity.mesh.rotation.y = newRotation;
 		entity.mesh.currentFacingAngle = new BABYLON.Vector3(entity.mesh.rotation.x, newRotation, entity.mesh.rotation.z);
 		//var waveValue = ((Game.engine.loopCounter*Game.engine.loopCounter) % 40)/40*Math.PI;

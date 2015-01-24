@@ -14,12 +14,12 @@ var Game = new function () {
 		Game: 1
 	};
 	this.activeScene = this.sceneType.Start;
+	this.ltArray = lookupTableATan2();
 	
 	this.performance = new function () {
 		this.quality = 1;
 		this.particleDensity;
 		this.viewDistance = 200;
-		
 	}
 }
 
