@@ -15,6 +15,10 @@ var Game = new function () {
 	};
 	this.activeScene = this.sceneType.Start;
 	this.ltArray = lookupTableATan2();
+	this.activeRooms=0;
+	this.difficultyLevel = 1;
+	this.enemyCount = 0;
+	this.bossCount = 0;
 	
 	this.performance = new function () {
 		this.quality = 1;
@@ -24,7 +28,7 @@ var Game = new function () {
 }
 
 $(document).ready(function () {
-
+	
 	// Check support
 	if (!BABYLON.Engine.isSupported()) {
 		window.alert('Browser not supported');

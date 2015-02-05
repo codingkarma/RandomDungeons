@@ -27,17 +27,14 @@ function GetPathVector(startPosition, endPosition, options) {
 	var xDiff = endPosition.x-startPosition.x;
 	var zDiff = endPosition.z-startPosition.z;
 	var radius = Math.sqrt(xDiff*xDiff + zDiff*zDiff);
-	var angle = Math.atan2(zDiff, xDiff);// + (xDiff < 0)*(Math.PI) + ((zDiff < 0) && (xDiff > 0))*(2*Math.PI);
-	// if (angle < 0) {
-		// angle+=360;
-	// }
+	var angle = Math.atan2(zDiff, xDiff);
 
 	if(radius < settings.tolerance)
 	{
-		return {'direction': new BABYLON.Vector3(0, Game.scene[Game.activeScene].gravity.y, 0), 'angle': angle};
+		return {'direction': new BABYLON.Vector3(0, Game.scene[Game.activeScene].gravity.y, 0), 'angle': angle, 'magnitude': radius};
 	}
 	else {
-		return {'direction': new BABYLON.Vector3(settings.speed*Math.cos(angle), Game.scene[Game.activeScene].gravity.y, settings.speed*Math.sin(angle)), 'angle': angle};
+		return {'direction': new BABYLON.Vector3(settings.speed*Math.cos(angle), Game.scene[Game.activeScene].gravity.y, settings.speed*Math.sin(angle)), 'angle': angle, 'magnitude': radius};
 	}
 }
 

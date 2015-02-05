@@ -99,15 +99,19 @@ function processInput(entity,speed) {
 		iX=0;
 	}
 	if (vX || vZ) {
-		var newRotation = -Game.ltArray[iZ][iX] + Math.PI;
+		var angle = Game.ltArray[iZ][iX];
+		var newRotation = -angle + entity.mesh.rotationOffset.y;
 		entity.mesh.rotation.y = newRotation;
 		entity.mesh.currentFacingAngle = new BABYLON.Vector3(entity.mesh.rotation.x, newRotation, entity.mesh.rotation.z);
 		//var waveValue = ((Game.engine.loopCounter*Game.engine.loopCounter) % 40)/40*Math.PI;
 		// entity.velocity.direction = new BABYLON.Vector3(speed*vX, .6*(Math.cos(waveValue)-.5), speed*vZ);
 		entity.velocity.direction = new BABYLON.Vector3(speed*vX, activeScene.gravity.y, speed*vZ);
+		entity.velocity.angle = angle;
+		entity.mesh.playerAnimations.move.start(activeScene, entity);
 	}
 	else {
 		entity.velocity.direction = new BABYLON.Vector3(speed*vX, activeScene.gravity.y, speed*vZ);
+		entity.mesh.playerAnimations.idle.start(activeScene, entity);
 	}	
 	
 	if (activeScene.joystickAction._joystickPressed) {

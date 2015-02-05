@@ -72,136 +72,56 @@ Game.initGameScene = function() {
 	};
 	
 	Game.scene[activeScene].checkActiveRoom = function() {
-		var capacity = 64;
 		if (this.player.mesh.position.z > (this.activeRoom.originOffset.z)) {
 			//going north
 			var i_room=(this.activeRoom.row-1) * Game.map.width + this.activeRoom.col;
-			// this.gravity.y = 0;
-			// this.player.mesh.position.z+=5;
-			//disable torch lights
-			var arrayLength;
-			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
-				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
-				// Start the particle system
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].stop();
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].stop();
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
-			}
-			//set active room to entrance
-			//Game.activateRoom(this.rooms[i_room],this.activeRoom);
-			this.activeRoom=this.rooms[i_room];
-			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
-				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
-				// Start the particle system
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
-			}
-			
-			//set camera to new position
-			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
-			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
-			this.gravity.y = -9.81;
+			this.changeActiveRoom(i_room);
 		}
 		else if (this.player.mesh.position.x > (this.activeRoom.originOffset.x+this.activeRoom.width*this.activeRoom.tiles[0].width)) {
 			//going east
 			var i_room=(this.activeRoom.row) * Game.map.width + this.activeRoom.col+1;
-			// this.gravity.y = 0;
-			// this.player.mesh.position.x+=5;
-			//disable torch lights
-			var arrayLength;
-			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
-				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
-				// Start the particle system
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].stop();
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].stop();
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
-			}
-			//set active room to entrance
-			//Game.activateRoom(this.rooms[i_room],this.activeRoom);
-			this.activeRoom=this.rooms[i_room];
-			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
-				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
-				// Start the particle system
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
-			}
-			
-			//set camera to new position
-			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
-			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
-			this.gravity.y = -9.81;
+			this.changeActiveRoom(i_room);
 		}
 		else if (this.player.mesh.position.z < (this.activeRoom.originOffset.z - this.activeRoom.height*this.activeRoom.tiles[0].width)) {
 			//going south
 			var i_room=(this.activeRoom.row+1) * Game.map.width + this.activeRoom.col;
-			// this.gravity.y = 0;
-			// this.player.mesh.position.z-=15;
-			//disable torch lights
-			var arrayLength;
-			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
-				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
-				// Start the particle system
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].stop();
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].stop();
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
-			}
-			//set active room to entrance
-			//Game.activateRoom(this.rooms[i_room],this.activeRoom);
-			this.activeRoom=this.rooms[i_room];
-			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
-				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
-				// Start the particle system
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
-			}
-			
-			//set camera to new position
-			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
-			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
-			this.gravity.y = -9.81;
+			this.changeActiveRoom(i_room);
 		}
 		else if (this.player.mesh.position.x < (this.activeRoom.originOffset.x)) {
 			//going west
 			var i_room=(this.activeRoom.row) * Game.map.width + this.activeRoom.col-1;
-			// this.gravity.y = 0;
-			// this.player.mesh.position.x-=25;
-			//disable torch lights
-			var arrayLength;
-			for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
-				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
-				// Start the particle system
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].stop();
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].stop();
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
-			}
-			//set active room to entrance
-			//Game.activateRoom(this.rooms[i_room],this.activeRoom);
-			this.activeRoom=this.rooms[i_room];
-			for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
-				arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
-				// Start the particle system
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
-				this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
-				this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
-			}
-			
-			//set camera to new position
-			this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
-			this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
-			this.gravity.y = -9.81;
+			this.changeActiveRoom(i_room);
 		}
 	};
+	Game.scene[activeScene].changeActiveRoom = function (i_room) {
+		var capacity = 64;
+		//disable torch lights
+		var arrayLength;
+		for (var doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+			arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+			// Start the particle system
+			this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].stop();
+			this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].stop();
+			this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
+			this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+		}
+		//set active room to entrance
+		//Game.activateRoom(this.rooms[i_room],this.activeRoom);
+		this.activeRoom=this.rooms[i_room];
+		for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+			arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
+			// Start the particle system
+			this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();
+			this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].start();
+			this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(true);
+			this.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(true);
+		}
+		//set camera to new position
+		this.camera.target = new BABYLON.Vector3(this.activeRoom.originOffset.x+this.activeRoom.centerPosition.x, 0, this.activeRoom.originOffset.z-this.activeRoom.centerPosition.z);
+		this.octree = this.createOrUpdateSelectionOctree(capacity, 2);
+		this.gravity.y = -9.81;
+	}
+	
 	
 }
 

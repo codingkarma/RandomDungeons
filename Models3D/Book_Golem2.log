@@ -1,0 +1,225 @@
+	Babylon.js Exporter version: 1.5.0, Blender version: 2.72 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Python World class constructor completed
+	processing begun of material:  Book_Golem2.Material
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.001
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.002
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.003
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.004
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.005
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.006
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.007
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.008
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.009
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.010
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.011
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.012
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.013
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.014
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.015
+	Diffuse texture found
+	processing begun of material:  Book_Golem2.Material.016
+	Diffuse texture found
+	processing begun of skeleton:  Skeleton, id:  0
+	processing begun of bone:  pelvis, index:  0
+	animation begun of bone:  pelvis
+	processing begun of bone:  stomach, index:  1
+	animation begun of bone:  stomach
+	processing begun of bone:  chest, index:  2
+	animation begun of bone:  chest
+	processing begun of bone:  neck, index:  3
+	animation begun of bone:  neck
+	processing begun of bone:  head, index:  4
+	animation begun of bone:  head
+	processing begun of bone:  shoulder.L, index:  5
+	animation begun of bone:  shoulder.L
+	processing begun of bone:  bicep.L, index:  6
+	animation begun of bone:  bicep.L
+	processing begun of bone:  forearm.L, index:  7
+	animation begun of bone:  forearm.L
+	processing begun of bone:  hand.L, index:  8
+	animation begun of bone:  hand.L
+	processing begun of bone:  shoulder.R, index:  9
+	animation begun of bone:  shoulder.R
+	processing begun of bone:  bicep.R, index:  10
+	animation begun of bone:  bicep.R
+	processing begun of bone:  forearm.R, index:  11
+	animation begun of bone:  forearm.R
+	processing begun of bone:  hand.R, index:  12
+	animation begun of bone:  hand.R
+	processing complete of skeleton:  Skeleton
+	processing begun of mesh:  Book_Shoulder
+		num positions      :  3894
+		num normals        :  3894
+		num uvs            :  7788
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  3894
+		num skeletonWeights:  15576
+		num skeletonIndices:  15576
+	processing begun of mesh:  Book_HandR
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_ForearmR
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_BicepR
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_Shoulder.003
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_Chest
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_Torso_0.002
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_Torso_0
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_Neck
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_Torso_0.001
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_Shoulder.001
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_BicepL
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_ForearmL
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_HandL
+		num positions      :  4374
+		num normals        :  4374
+		num uvs            :  8748
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  4374
+		num skeletonWeights:  17496
+		num skeletonIndices:  17496
+	processing begun of mesh:  Book_Head
+		num positions      :  3894
+		num normals        :  3894
+		num uvs            :  7788
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  3894
+		num skeletonWeights:  15576
+		num skeletonIndices:  15576
+	processing begun of mesh:  Scroll
+		num positions      :  30246
+		num normals        :  30246
+		num uvs            :  60492
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  30246
+		num skeletonWeights:  120984
+		num skeletonIndices:  120984
+	processing begun of mesh:  Book_Shoulder.002
+		num positions      :  3894
+		num normals        :  3894
+		num uvs            :  7788
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  3894
+		num skeletonWeights:  15576
+		num skeletonIndices:  15576
+	processing begun of camera (FreeCamera):  Camera
+	processing begun of light (SUN):  Sun
+	processing begun of light (POINT):  Point.001
+	processing begun of light (POINT):  Point
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========

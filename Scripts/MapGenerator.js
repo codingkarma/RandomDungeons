@@ -124,6 +124,7 @@ Game.GenerateBranch = function(map, startCol, startRow)
 		return;
 	}
 	
+	//TO DO: Change according to difficulty
 	branches = (Game.getRandomInt(1,checkRoom.length));
 	
 	for (var branchLoop = 0; branchLoop < branches; branchLoop++) {

@@ -22,7 +22,7 @@ function dungeonComplete() {
 			
 			Game.engine.scenes[Game.engine.scenes.length-1].dispose();
 			Game.engine.scenes.splice(Game.engine.scenes.length-1, 1);
-			Game.scene[Game.scene.length-1].dispose();
+			//Game.scene[Game.scene.length-1].dispose();
 			Game.scene.splice(Game.scene.length-1, 1);
 			Game.map = {};
 			
@@ -48,7 +48,7 @@ function dungeonComplete() {
 		Game.runRenderLoop();
 		Game.engine.scenes[Game.engine.scenes.length-1].dispose();
 		Game.engine.scenes.splice(Game.engine.scenes.length-1, 1);
-		Game.scene[Game.scene.length-1].dispose();
+		//Game.scene[Game.scene.length-1].dispose();
 		Game.scene.splice(Game.scene.length-1, 1);
 		Game.map = {};
 		
