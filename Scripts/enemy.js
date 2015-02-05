@@ -6,7 +6,7 @@ Game.EnemyType = {
 
 Game.BossType = {
 	StoneBall: 0,
-	FlyingBook: 1
+	BookGolem: 1
 	//Skeleton: 2
 }
 
@@ -14,7 +14,7 @@ Game.enemyFactory = function(activeScene, enemyType) {
 	switch(enemyType) {
 		case Game.EnemyType.FlyingBook:
 			// New up entity with params
-			var newEntity = new Entity(activeScene.enemies[0].meshes[0].clone("enemyMesh-" + Game.enemyCount), {type: EntityType.Enemy, health: 2, damage: 1, speed: .2, action: 0, weapon: {'name': 'Self', 'type': WeaponType.Melee, 'range': 8, 'dmgModifier': 0, 'speedModifier': .75}});
+			var newEntity = new Entity(activeScene.enemies[0].meshes[0].clone("enemyMesh-" + Game.enemyCount), {type: EntityType.Enemy, health: 2, damage: 1, speed: .2, action: 0, weapon: {'name': 'Self', 'type': WeaponType.Melee, 'range': 12, 'dmgModifier': 0, 'speedModifier': .75}});
 			newEntity.mesh.skeleton = activeScene.enemies[0].skeletons[0].clone("enemySkeleton-" + Game.enemyCount);
 			newEntity.skeletons = newEntity.mesh.skeleton;
 			newEntity.mesh.material = activeScene.enemies[0].meshes[0].material.clone();
@@ -56,9 +56,9 @@ Game.enemyFactory = function(activeScene, enemyType) {
 
 Game.bossFactory = function(activeScene, bossType) {
 	switch(bossType) {
-		case Game.BossType.FlyingBook:
+		case Game.BossType.BookGolem:
 			// New up entity with params
-			var newEntity = new Entity(activeScene.bosses[0].meshes[0].clone("bossMesh-" + Game.bossCount), {type: EntityType.Boss, health: 6, damage: 1, speed: .2, action: 0, weapon: {'name': 'Fists', 'type': WeaponType.Melee, 'range': 10, 'dmgModifier': 0, 'speedModifier': .5}});
+			var newEntity = new Entity(activeScene.bosses[0].meshes[0].clone("bossMesh-" + Game.bossCount), {type: EntityType.Boss, health: 6, damage: 1, speed: .2, action: 0, weapon: {'name': 'Fists', 'type': WeaponType.Melee, 'range': 16, 'dmgModifier': 0, 'speedModifier': .5}});
 			newEntity.mesh.skeleton = activeScene.bosses[0].skeletons[0].clone("bossSkeleton-" + Game.bossCount);
 			newEntity.skeletons = newEntity.mesh.skeleton;
 			newEntity.meshes = [];
@@ -73,7 +73,7 @@ Game.bossFactory = function(activeScene, bossType) {
 			// Assign Rotation Offset
 			newEntity.mesh.rotationOffset = new BABYLON.Vector3(0,-Math.PI/2,0);
 			
-			newEntity.mesh.type = Game.BossType.FlyingBook;
+			newEntity.mesh.type = Game.BossType.BookGolem;
 			//attach animations
 			newEntity.mesh.enemyAnimations = new Game.importedAnimations(newEntity);
 			newEntity.mesh.enemyAnimations.init(activeScene);
