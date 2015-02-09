@@ -14,12 +14,12 @@ Game.enemyFactory = function(activeScene, enemyType) {
 	switch(enemyType) {
 		case Game.EnemyType.FlyingBook:
 			// New up entity with params
-			var newEntity = new Entity(activeScene.enemies[0].meshes[0].clone("enemyMesh-" + Game.enemyCount), {type: EntityType.Enemy, health: 2, damage: 1, speed: .2, action: 0, weapon: {'name': 'Self', 'type': WeaponType.Melee, 'range': 12, 'dmgModifier': 0, 'speedModifier': .75}});
+			var newEntity = new Entity(activeScene.enemies[0].meshes[0].clone("enemyMesh-" + Game.enemyCount), {type: EntityType.Enemy, health: 2, damage: 1, speed: .2, action: 0, pathing: 1, weapon: [{'name': 'Self', 'type': WeaponType.Melee, 'range': 12, 'dmgModifier': 0, 'speedModifier': 1}]});
 			newEntity.mesh.skeleton = activeScene.enemies[0].skeletons[0].clone("enemySkeleton-" + Game.enemyCount);
 			newEntity.skeletons = newEntity.mesh.skeleton;
 			newEntity.mesh.material = activeScene.enemies[0].meshes[0].material.clone();
 			newEntity.mesh.scaling = new BABYLON.Vector3(2, 2, 2);
-			newEntity.mesh.ellipsoid = new BABYLON.Vector3(4, 4, 4);
+			newEntity.mesh.ellipsoid = new BABYLON.Vector3(3, 4, 3);
 			// Assign Rotation Offset
 			newEntity.mesh.rotationOffset = new BABYLON.Vector3(0,-Math.PI/2,0);
 			
@@ -36,7 +36,7 @@ Game.enemyFactory = function(activeScene, enemyType) {
 			break;
 		default:
 			// Enemy Sphere
-			var newEntity = new Entity(activeScene.enemies[activeScene.enemies.length-1].meshes[0].clone(), {type: EntityType.Enemy, health: 2, damage: 1, speed: .2, action: 1, weapon: {'name': 'None', 'type': WeaponType.Melee, 'range': 0, 'dmgModifier': 0, 'speedModifier': 1}});
+			var newEntity = new Entity(activeScene.enemies[activeScene.enemies.length-1].meshes[0].clone(), {type: EntityType.Enemy, health: 2, damage: 1, speed: .2, action: 1, weapon: [{'name': 'None', 'type': WeaponType.Melee, 'range': 0, 'dmgModifier': 0, 'speedModifier': 1}]});
 			newEntity.mesh.material = activeScene.enemies[[activeScene.enemies.length-1]].meshes[0].material.clone();
 			newEntity.mesh.type = Game.EnemyType.StoneBall;
 			newEntity.mesh.rotationOffset = new BABYLON.Vector3(0,0,0);
@@ -58,7 +58,17 @@ Game.bossFactory = function(activeScene, bossType) {
 	switch(bossType) {
 		case Game.BossType.BookGolem:
 			// New up entity with params
-			var newEntity = new Entity(activeScene.bosses[0].meshes[0].clone("bossMesh-" + Game.bossCount), {type: EntityType.Boss, health: 6, damage: 1, speed: .2, action: 0, weapon: {'name': 'Fists', 'type': WeaponType.Melee, 'range': 16, 'dmgModifier': 0, 'speedModifier': .5}});
+			var newEntity = new Entity(activeScene.bosses[0].meshes[0].clone("bossMesh-" + Game.bossCount), {type: EntityType.Boss, health: 12, damage: 1, speed: .2, action: 0, pathing: 1, 
+				attack: [
+				{type: 0, weapon: 0},
+				{type: 1, weapon: 1},
+				{type: 2, weapon: 2}],
+				weapon: [
+				{'name': 'Fists', 'type': WeaponType.Melee, 'range': 16, 'dmgModifier': 0, 'speedModifier': .75},
+				{'name': 'Fists', 'type': WeaponType.Melee, 'range': 40, 'dmgModifier': 0, 'speedModifier': .5},
+				{'name': 'Fists', 'type': WeaponType.Melee, 'range': 28, 'dmgModifier': 0, 'speedModifier': .75}]
+			});
+			
 			newEntity.mesh.skeleton = activeScene.bosses[0].skeletons[0].clone("bossSkeleton-" + Game.bossCount);
 			newEntity.skeletons = newEntity.mesh.skeleton;
 			newEntity.meshes = [];
@@ -69,7 +79,7 @@ Game.bossFactory = function(activeScene, bossType) {
 			}
 			newEntity.mesh.material = activeScene.bosses[0].meshes[0].material.clone();
 			newEntity.mesh.scaling = new BABYLON.Vector3(3, 3, 3);
-			newEntity.mesh.ellipsoid = new BABYLON.Vector3(6, 2, 4);
+			newEntity.mesh.ellipsoid = new BABYLON.Vector3(4, 2, 3);
 			// Assign Rotation Offset
 			newEntity.mesh.rotationOffset = new BABYLON.Vector3(0,-Math.PI/2,0);
 			
@@ -84,10 +94,14 @@ Game.bossFactory = function(activeScene, bossType) {
 			newEntity.attackKeys = [];
 			newEntity.attackKeys.push(50);
 			newEntity.attackKeys.push(80);
+			newEntity.attackKeys.push(90);
+			newEntity.attackKeys.push(125);
+			newEntity.attackKeys.push(135);
+			newEntity.attackKeys.push(165);
 			break;
 		default:
 			// Enemy Sphere
-			var newEntity = new Entity(activeScene.bosses[activeScene.bosses.length-1].meshes[0].clone(), {type: EntityType.Boss, health: 6, damage: 1, speed: .1, action: 1, weapon: {'name': 'None', 'type': WeaponType.Melee, 'range': 0, 'dmgModifier': 0, 'speedModifier': 1}});
+			var newEntity = new Entity(activeScene.bosses[activeScene.bosses.length-1].meshes[0].clone(), {type: EntityType.Boss, health: 6, damage: 1, speed: .3, action: 1, weapon: [{'name': 'None', 'type': WeaponType.Melee, 'range': 0, 'dmgModifier': 0, 'speedModifier': 1}]});
 			newEntity.mesh.material = activeScene.bosses[[activeScene.bosses.length-1]].meshes[0].material.clone();
 			newEntity.mesh.type = Game.BossType.StoneBall;
 			newEntity.mesh.rotationOffset = new BABYLON.Vector3(0,0,0);
@@ -105,18 +119,98 @@ Game.bossFactory = function(activeScene, bossType) {
 	return newEntity;
 }
 
+Game.processEnemies = function(self) {
+	if (!self.activeRoom.enemiesDead) {
+		for (self.enemyCounter = 0; self.enemyCounter < self.activeRoom.enemy.length; self.enemyCounter++) {
+			var activeEnemy = self.activeRoom.enemy[self.enemyCounter];
+			if (self.enemyCounter == 0 ) {
+				self.activeRoom.enemiesDead = activeEnemy.isDead;
+			}
+			else {
+				self.activeRoom.enemiesDead = (self.activeRoom.enemiesDead && activeEnemy.isDead);
+			}
+			switch (activeEnemy.pathing) {
+				case 1:
+					activeEnemy.velocity = GetPathVector(activeEnemy.mesh.position,self.player.mesh.position,{speed: activeEnemy.speed, tolerance: 12});
+					activeEnemy.mesh.rotation.y = -activeEnemy.velocity.angle + activeEnemy.mesh.rotationOffset.y;
+					break;
+				default:
+					activeEnemy.velocity = $.extend(activeEnemy.velocity, getPointingVector(activeEnemy.mesh, self.player.mesh));
+					var diff = activeEnemy.mesh.position.subtract(activeEnemy.mesh.previousPosition);
+					var iZ = 0; var vZ = 0;
+					var iX = 0; var vX = 0;
+					if (activeEnemy.counter > 4 || !(activeEnemy.velocity.direction.x || activeEnemy.velocity.direction.z) || (Game.getRandomInt(0,100) < 3)) {
+						activeEnemy.counter=0;
+						var whichDirection = Game.getRandomInt(0,3);
+						switch (whichDirection) {
+							case 0:
+								vZ=1;
+								iZ=1;
+								break;
+							case 1:
+								vZ=-1;
+								iZ=2;
+								break;
+							case 2:
+								vX=1;
+								iX=1;
+								break;
+							case 3:
+								vX=-1;
+								iX=2;
+								break;
+							default:
+						}
+						activeEnemy.mesh.rotation.y = -Game.ltArray[iZ][iX] + activeEnemy.mesh.rotationOffset.y;
+						activeEnemy.velocity.direction = new BABYLON.Vector3(activeEnemy.speed*vX, self.gravity.y, activeEnemy.speed*vZ);
+					}
+					else if ((Math.abs(diff.x) <= .01)*Math.abs(activeEnemy.velocity.direction.x) || (Math.abs(diff.z) <= .01)*Math.abs(activeEnemy.velocity.direction.z)) {
+						activeEnemy.counter++;
+					}
+			}
+			if (activeEnemy.velocity.magnitude <= activeEnemy.weapon[activeEnemy.activeAttack].range) {
+				// TODO: Create a AttackManager for handling how often Enemies attack
+				if(Game.getRandomInt(0,1)) {
+					activeEnemy.mesh.enemyAnimations.attack.start(self,activeEnemy);
+				}
+			}
+			else if (activeEnemy.velocity.direction.x == 0 && activeEnemy.velocity.direction.z == 0) {
+				activeEnemy.action = activeEnemy.actionType.Idle;
+				activeEnemy.mesh.enemyAnimations.idle.start(self,activeEnemy);
+			}
+			else {
+				activeEnemy.mesh.enemyAnimations.move.start(self,activeEnemy);
+			}
+		}
+		//open doors if all enemies are dead
+		if (self.activeRoom.enemiesDead) {
+			for (var doorLoop=0; doorLoop < self.activeRoom.doors.length; doorLoop++) {
+				if (self.activeRoom.doors[doorLoop].isOpen == false) {
+					self.activeRoom.doors[doorLoop].mesh.checkCollisions = false;
+					self.activeRoom.doors[doorLoop].mesh.isVisible = false;
+					self.activeRoom.doors[doorLoop].isOpen = true;
+					//apply to matching door
+					self.activeRoom.doors[doorLoop].pairedDoor.mesh.checkCollisions = false;
+					self.activeRoom.doors[doorLoop].pairedDoor.mesh.isVisible = false;
+					self.activeRoom.doors[doorLoop].pairedDoor.isOpen = true;
+				}
+			}
+		}
+	}
+}
+
 Game.createNativeEnemies = function(scene) {
 	// Create small stone ball
 	var index = scene.enemies.push({ meshes: [] }) - 1;
 	scene.enemies[index].meshes[0] = new BABYLON.Mesh.CreateSphere("enemyStoneBall", 8.0, 8.0, scene);
 	scene.enemies[index].meshes[0].material = new scene.enemyMaterial();
-	scene.enemies[index].meshes[0].ellipsoid = new BABYLON.Vector3(4, 2, 4);
+	scene.enemies[index].meshes[0].ellipsoid = new BABYLON.Vector3(3, 2, 3);
 	
 	// Create Big Boss stone ball
 	var index = scene.bosses.push({ meshes: [] }) - 1;
 	scene.bosses[index].meshes[0] = new BABYLON.Mesh.CreateSphere("bossStoneBall", 12.0, 12.0, scene);
 	scene.bosses[index].meshes[0].material = new scene.enemyMaterial();
-	scene.bosses[index].meshes[0].ellipsoid = new BABYLON.Vector3(10, 5, 10);
+	scene.bosses[index].meshes[0].ellipsoid = new BABYLON.Vector3(4, 5, 4);
 }
 
 Game.spawnEnemy = function(activeScene, room) {
@@ -295,7 +389,7 @@ Game.animationsStoneBall = function(entityMesh) {
 				value: startRotation
 			});
 			keys.push({
-				frame: 240,
+				frame: 120,
 				value: startRotation.subtract(new BABYLON.Vector3(0, 0, 4*Math.PI))
 			});
 			//Adding keys to the animation object
@@ -319,7 +413,7 @@ Game.animationsStoneBall = function(entityMesh) {
 				entity.mesh.animations[0] = self.Move.animation;
 				//entity.mesh.animatable.stop();
 			}
-			self.animatable = activeScene.beginAnimation(entity.mesh, 0, 240, true, 1.0, function () {
+			self.animatable = activeScene.beginAnimation(entity.mesh, 0, 120, true, 1.0, function () {
 				self.animating = 0;
 			});
 		}
@@ -440,9 +534,12 @@ Game.importedAnimations = function(entity) {
 					entity.mesh.animatable.stop();
 				}
 				entity.action=entity.actionType.Attack;
-				entity.mesh.animatable = activeScene.beginAnimation(entity.skeletons, entity.attackKeys[0], entity.attackKeys[1], false, 1*entity.weapon.speedModifier, function () {
+				entity.mesh.animatable = activeScene.beginAnimation(entity.skeletons, entity.attackKeys[entity.attack[entity.activeAttack].type*2], entity.attackKeys[entity.attack[entity.activeAttack].type*2+1], false, 1*entity.weapon[entity.activeAttack].speedModifier, function () {
 					Game.detectEnemyHit(activeScene, entity);
 					entity.action=entity.actionType.Idle;
+					if (entity.type == EntityType.Boss) {
+						entity.activeAttack = Game.getRandomInt(0,(entity.attack.length)-1);
+					}
 				});
 			}
 		}

@@ -52,6 +52,9 @@ Game.initGameScene = function() {
 				
 				//start game logic loop
 				this.timedLogicLoop = new timedLoop(this.logicLoop,50);
+				// setTimeout(function (activeScene) {
+					// activeScene.timedLogicLoop.start();
+				// },500, this);
 				this.timedLogicLoop.start();
 				
 				// TO DO: Implement optimization (only availabe in BJS v2+)

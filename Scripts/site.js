@@ -44,19 +44,6 @@ $(document).ready(function () {
 		});
 		Game.runRenderLoop();
 		
-		$('#startGame').click(function () {
-			$('#modal').fadeOut(50, function () {
-				$('#modalDiv').html('');
-				Game.activeScene=Game.sceneType.Game;
-				Game.runRenderLoop();
-				prepareHealthBars();
-				$('#topMenu').fadeIn(200, function () {	});
-				$('#hotKeys').fadeIn(200, function () {	});
-				if (Game.debug) {
-					$('#debugMenu').fadeIn(200, function () {	});
-				}
-			});
-		});
 	};
 });
 

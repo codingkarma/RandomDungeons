@@ -157,6 +157,11 @@
 }
 /*END - Modal CSS*/
 
+#startGame {
+	cursor: default;
+	color: #282828;
+}
+
 @font-face {
     font-family: "OpenSans";
     src: url("../Fonts/OpenSans-Regular.ttf");

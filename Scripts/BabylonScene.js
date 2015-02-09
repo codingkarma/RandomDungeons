@@ -102,6 +102,23 @@ Game.CreateStartScene = function() {
 			scene.doorFrame[arrayLength-1].torchFire[0].start();
 			scene.doorFrame[arrayLength-2].torchFire[0].start();
 			scene.isLoaded=true;
+			
+			// Allow Game to be started
+			$('#startGame').click(function () {
+				$('#modal').fadeOut(50, function () {
+					$('#modalDiv').html('');
+					Game.activeScene=Game.sceneType.Game;
+					Game.runRenderLoop();
+					prepareHealthBars();
+					$('#topMenu').fadeIn(200, function () {	});
+					$('#hotKeys').fadeIn(200, function () {	});
+					if (Game.debug) {
+						$('#debugMenu').fadeIn(200, function () {	});
+					}
+				});
+			});
+			$('#startGame').css({"cursor": "pointer", "color": "#DDDDDD"});
+			$('#startGame').html("Start Game");
 		});
 	});
 
@@ -289,7 +306,7 @@ Game.CreateGameScene = function() {
 											Game.transportRing.enableIntersect();
 										}
 									}
-									else {
+									else if (scene.activeRoom.enemy[i_enemy].type != EntityType.Boss) {
 										scene.activeRoom.enemy[i_enemy].mesh.enemyAnimations.takeDmg.start(scene,scene.activeRoom.enemy[i_enemy]);
 									}
 								}
@@ -470,46 +487,7 @@ Game.CreateGameScene = function() {
 		}
 		$('#lps').text('LPS: ' + self.timedLogicLoop.getLoopTime().toFixed());
 		$('#fps').text('FPS: ' + Game.engine.getFps().toFixed());
-		if (!self.activeRoom.enemiesDead) {
-			for (self.enemyCounter = 0; self.enemyCounter < self.activeRoom.enemy.length; self.enemyCounter++) {
-				var activeEnemy = self.activeRoom.enemy[self.enemyCounter];
-				if (self.enemyCounter == 0 ) {
-					self.activeRoom.enemiesDead = activeEnemy.isDead;
-				}
-				else {
-					self.activeRoom.enemiesDead = (self.activeRoom.enemiesDead && activeEnemy.isDead);
-				}
-				activeEnemy.velocity = GetPathVector(activeEnemy.mesh.position,self.player.mesh.position,{speed: activeEnemy.speed, tolerance: 12});
-				activeEnemy.mesh.rotation.y = -activeEnemy.velocity.angle + activeEnemy.mesh.rotationOffset.y;
-				if (activeEnemy.velocity.magnitude <= activeEnemy.weapon.range) {
-					// TODO: Create a AttackManager for handling how often Enemies attack
-					if(Game.getRandomInt(0,1)) {
-						activeEnemy.mesh.enemyAnimations.attack.start(scene,activeEnemy);
-					}
-				}
-				else if (activeEnemy.velocity.direction.x == 0) {
-					activeEnemy.action = activeEnemy.actionType.Idle;
-					activeEnemy.mesh.enemyAnimations.idle.start(self,activeEnemy);
-				}
-				else {
-					activeEnemy.mesh.enemyAnimations.move.start(self,activeEnemy);
-				}
-			}
-			//open doors if all enemies are dead
-			if (self.activeRoom.enemiesDead) {
-				for (var doorLoop=0; doorLoop < self.activeRoom.doors.length; doorLoop++) {
-					if (self.activeRoom.doors[doorLoop].isOpen == false) {
-						self.activeRoom.doors[doorLoop].mesh.checkCollisions = false;
-						self.activeRoom.doors[doorLoop].mesh.isVisible = false;
-						self.activeRoom.doors[doorLoop].isOpen = true;
-						//apply to matching door
-						self.activeRoom.doors[doorLoop].pairedDoor.mesh.checkCollisions = false;
-						self.activeRoom.doors[doorLoop].pairedDoor.mesh.isVisible = false;
-						self.activeRoom.doors[doorLoop].pairedDoor.isOpen = true;
-					}
-				}
-			}
-		}
+		Game.processEnemies(self);
 		processInput(self.player, self.player.speed);
 		//check what room the player is in
 		self.checkActiveRoom();
@@ -524,7 +502,7 @@ Game.CreateGameScene = function() {
 		//Need to update self every loop, I guess
 		for (i=0; i < self.activeRoom.enemy.length;i++) {
 			if (self.activeRoom.enemy[i].action == 1 && self.activeRoom.enemy[i].isDead == false) {
-				//tempVal = new BABYLON.Vector3(self.activeRoom.enemy[i].velocity.direction.x*animationRatio,self.activeRoom.enemy[i].velocity.direction.y*animationRatio,self.activeRoom.enemy[i].velocity.direction.z*animationRatio);
+				self.activeRoom.enemy[i].mesh.previousPosition = new BABYLON.Vector3(self.activeRoom.enemy[i].mesh.position.x,self.activeRoom.enemy[i].mesh.position.y,self.activeRoom.enemy[i].mesh.position.z);
 				tempVal = self.activeRoom.enemy[i].velocity.direction.multiply(new BABYLON.Vector3(animationRatio,animationRatio,animationRatio));
 				self.activeRoom.enemy[i].mesh.moveWithCollisions(tempVal);
 			}
@@ -689,7 +667,7 @@ Game.playerAnimations = function(activeScene) {
 					entity.mesh.animatable.stop();
 				}
 				entity.action = entity.actionType.Move;
-				entity.mesh.animatable = activeScene.beginAnimation(self.Move.animation, 0, 40, false, 1.0, function () {
+				entity.mesh.animatable = activeScene.beginAnimation(self.Move.animation, 0, 40, false, 1.3, function () {
 					entity.action=entity.actionType.Idle;
 					// entity.weaponMesh.rotation = new BABYLON.Vector3(Math.PI/6,entity.mesh.currentFacingAngle.y + Math.PI/2,Math.PI/8);
 				});

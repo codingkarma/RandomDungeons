@@ -12,7 +12,7 @@ Game.sanitizeAngle = function (angle) {
 }
 
 Game.detectCollision = function(source, target) {
-	if (target.velocity.magnitude <= source.weapon.range) {
+	if (target.velocity.magnitude <= source.weapon[source.activeAttack].range) {
 		// TODO: This is pretty much haxxord together, re-evaluate later
 		var sourceAngle = source.velocity.angle;
 		var targetAngle = target.velocity.angle;
@@ -32,7 +32,7 @@ Game.detectCollision = function(source, target) {
 }
 
 Game.detectEnemyHit = function(scene, activeEnemy) {
-	if ((activeEnemy.velocity.magnitude <= activeEnemy.weapon.range) && (activeEnemy.action != activeEnemy.actionType.Attack)) {
+	if ((activeEnemy.velocity.magnitude <= activeEnemy.weapon[activeEnemy.activeAttack].range) && (activeEnemy.action != activeEnemy.actionType.Attack)) {
 		if (!scene.player.isDead) {
 			scene.player.health--;
 			$('#dmg').text('Health: ' + parseInt(scene.player.health));

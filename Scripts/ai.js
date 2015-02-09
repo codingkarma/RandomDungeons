@@ -38,6 +38,15 @@ function GetPathVector(startPosition, endPosition, options) {
 	}
 }
 
+function getPointingVector(sourceMesh, targetMesh) {
+	var xDiff = targetMesh.position.x-sourceMesh.position.x;
+	var zDiff = targetMesh.position.z-sourceMesh.position.z;
+	var radius = Math.sqrt(xDiff*xDiff + zDiff*zDiff);
+	var angle = Math.atan2(zDiff, xDiff);
+
+	return {'angle': angle, 'magnitude': radius};
+}
+
 function GetPathVectorScatter(startPosition, endPosition, options) {
 	//Uses Angle in degrees instead of radians to give some randomness
 	var settings = $.extend({
