@@ -485,7 +485,7 @@ Game.CreateGameScene = function() {
 				Game.engine.loopCounter++;
 				break;
 		}
-		$('#lps').text('LPS: ' + self.timedLogicLoop.getLoopTime().toFixed());
+		$('#lps').text('LPS: ' + timedLoop.getLoopTime().toFixed());
 		$('#fps').text('FPS: ' + Game.engine.getFps().toFixed());
 		Game.processEnemies(self);
 		processInput(self.player, self.player.speed);
@@ -540,12 +540,31 @@ Game.restartPlayer = function (scene) {
 	var i_room=scene.indexOfEntrance;
 	//disable torch lights
 	var arrayLength;
-	for (var doorIndex = 0; doorIndex < scene.activeRoom.doors.length; doorIndex++) {
+	var numDoors = scene.activeRoom.doors.length;
+	for (var doorIndex = 0; doorIndex < numDoors; doorIndex++) {
 		arrayLength = scene.activeRoom.doors[doorIndex].frame.length-1;
 		scene.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].stop();
 		scene.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].stop();
 		scene.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].light.setEnabled(false);
 		scene.activeRoom.doors[doorIndex].frame[arrayLength-1].torchFire[0].light.setEnabled(false);
+	}
+	// Reset boss
+	if (scene.activeRoom.type == Game.RoomType.Boss) {
+		for ( var iLoop=0; iLoop < scene.activeRoom.enemy.length; iLoop++) {
+			if (scene.activeRoom.enemy.type == EntityType.Boss) {
+				scene.activeRoom.enemy.health=scene.activeRoom.enemy.maxHealth;
+			}
+		}
+	}
+	if (numDoors == 1) {
+		// close door behind character
+		scene.activeRoom.doors[0].mesh.checkCollisions = false;
+		scene.activeRoom.doors[0].mesh.isVisible = false;
+		scene.activeRoom.doors[0].isOpen = true;
+		//apply to matching door
+		scene.activeRoom.doors[0].pairedDoor.mesh.checkCollisions = false;
+		scene.activeRoom.doors[0].pairedDoor.mesh.isVisible = false;
+		scene.activeRoom.doors[0].pairedDoor.isOpen = true;
 	}
 	//set active room to entrance
 	scene.activeRoom=scene.rooms[i_room];
@@ -560,7 +579,7 @@ Game.restartPlayer = function (scene) {
 	//set camera to new position
 	scene.camera.target = new BABYLON.Vector3(scene.activeRoom.originOffset.x+scene.activeRoom.centerPosition.x, 0, scene.activeRoom.originOffset.z-scene.activeRoom.centerPosition.z);
 	//reset player health and position
-	scene.player.health=4;
+	scene.player.health=scene.player.maxHealth;
 	prepareHealthBars();
 	scene.player.mesh.position = new BABYLON.Vector3(scene.activeRoom.originOffset.x+scene.activeRoom.centerPosition.x, 10, scene.activeRoom.originOffset.z-2*scene.activeRoom.centerPosition.z+10);
 	scene.octree = scene.createOrUpdateSelectionOctree(64, 2);

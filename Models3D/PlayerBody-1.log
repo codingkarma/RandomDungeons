@@ -2,6 +2,7 @@
 ========= Conversion from Blender to Babylon.js =========
 	Python World class constructor completed
 	processing begun of material:  PlayerBody_1.Material
+	Diffuse texture found
 	processing begun of material:  PlayerBody_1.Material.002
 	Diffuse texture found
 	processing begun of material:  PlayerBody_1.Standard
@@ -66,14 +67,15 @@
 	animation begun of bone:  foot.R
 	processing complete of skeleton:  Skeleton
 	processing begun of mesh:  Body
-		num positions      :  4800
-		num normals        :  4800
-		num uvs            :  0
+		processing begun of multimaterial:  PlayerBody_1.Multimaterial#0
+		num positions      :  4836
+		num normals        :  4836
+		num uvs            :  9672
 		num uvs2           :  0
 		num colors         :  0
-		num indices        :  4800
-		num skeletonWeights:  19200
-		num skeletonIndices:  19200
+		num indices        :  4836
+		num skeletonWeights:  19344
+		num skeletonIndices:  19344
 	processing begun of mesh:  Sword
 		num positions      :  2388
 		num normals        :  2388
@@ -91,6 +93,10 @@
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  372
+	FCurve animation processing begun for:  Lamp.002
+	processing begun of light (POINT):  Lamp.002
+	FCurve animation processing begun for:  Lamp.001
+	processing begun of light (POINT):  Lamp.001
 	FCurve animation processing begun for:  Lamp
 	processing begun of light (POINT):  Lamp
 ========= Writing of scene file started =========

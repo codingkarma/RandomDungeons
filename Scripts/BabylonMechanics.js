@@ -51,11 +51,16 @@ Game.initGameScene = function() {
 				}
 				
 				//start game logic loop
-				this.timedLogicLoop = new timedLoop(this.logicLoop,50);
-				// setTimeout(function (activeScene) {
-					// activeScene.timedLogicLoop.start();
-				// },500, this);
-				this.timedLogicLoop.start();
+				//timedLoop = TimedLoop();
+				timedLoop.registerFunction(this.logicLoop);
+				timedLoop.start();
+				
+				// timedLoop1 = new TimedLoop("second");
+				// timedLoop1.registerFunction(function () {
+					// console.log("Test" + timedLoop1.loopId);
+				// });
+				// timedLoop1.setLoopTime(1000);
+				// timedLoop1.start();
 				
 				// TO DO: Implement optimization (only availabe in BJS v2+)
 				//BABYLON.SceneOptimizer.OptimizeAsync(Game.scene[Game.activeScene]);
@@ -111,7 +116,23 @@ Game.initGameScene = function() {
 		//set active room to entrance
 		//Game.activateRoom(this.rooms[i_room],this.activeRoom);
 		this.activeRoom=this.rooms[i_room];
-		for (doorIndex = 0; doorIndex < this.activeRoom.doors.length; doorIndex++) {
+		
+		var numDoors = this.activeRoom.doors.length;
+		if (numDoors == 1 && this.activeRoom.enemiesDead==false) {
+			// close door behind character
+			setTimeout(function (self) {
+				if (self.activeRoom.doors[0].isOpen == true) {
+					self.activeRoom.doors[0].mesh.checkCollisions = true;
+					self.activeRoom.doors[0].mesh.isVisible = true;
+					self.activeRoom.doors[0].isOpen = false;
+					//apply to matching door
+					self.activeRoom.doors[0].pairedDoor.mesh.checkCollisions = true;
+					self.activeRoom.doors[0].pairedDoor.mesh.isVisible = true;
+					self.activeRoom.doors[0].pairedDoor.isOpen = false;
+				}
+			},2000, this);
+		}
+		for (doorIndex = 0; doorIndex < numDoors; doorIndex++) {
 			arrayLength = this.activeRoom.doors[doorIndex].frame.length-1;
 			// Start the particle system
 			this.activeRoom.doors[doorIndex].frame[arrayLength].torchFire[0].start();

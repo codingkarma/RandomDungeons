@@ -22,19 +22,23 @@ function Entity(mesh, options) {
 	}
 
 	$.extend(this,{
-			weaponMesh: {},
-			type: EntityType.Enemy,
-			health: 1,
-			damage: 1,
-			weapon: [{'name': 'Steel Sword', 'type': WeaponType.Melee, 'range': 16, 'dmgModifier': 0, 'speedModifier': 1}],
-			speed: 1,
-			velocity: {'direction': new BABYLON.Vector3(0,0,0), 'angle': 0, 'magnitude': 0},
-			attacking: 0,
-			action: 0,
-			attack: [{type: 0, weapon: 0}],
-			activeAttack: 0,
-			counter: 0,
-			pathing: 0,
-			isDead: false
-		},options||{});
+		weaponMesh: {},
+		type: EntityType.Enemy,
+		health: 1,
+		maxHealth: 1,
+		damage: 1,
+		weapon: [{'name': 'Steel Sword', 'type': WeaponType.Melee, 'range': 16, 'dmgModifier': 0, 'speedModifier': 1}],
+		speed: 1,
+		velocity: {'direction': new BABYLON.Vector3(0,0,0), 'angle': 0, 'magnitude': 0},
+		attacking: 0,
+		action: 0,
+		attack: [{type: 0, weapon: 0}],
+		activeAttack: 0,
+		counter: 0,
+		pathing: 0,
+		isDead: false
+	},options||{});
+	
+	this.maxHealth=this.health;
+		
 }
