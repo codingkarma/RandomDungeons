@@ -551,8 +551,8 @@ Game.restartPlayer = function (scene) {
 	// Reset boss
 	if (scene.activeRoom.type == Game.RoomType.Boss) {
 		for ( var iLoop=0; iLoop < scene.activeRoom.enemy.length; iLoop++) {
-			if (scene.activeRoom.enemy.type == EntityType.Boss) {
-				scene.activeRoom.enemy.health=scene.activeRoom.enemy.maxHealth;
+			if (scene.activeRoom.enemy[iLoop].type == EntityType.Boss) {
+				scene.activeRoom.enemy[iLoop].health=scene.activeRoom.enemy[iLoop].maxHealth;
 			}
 		}
 	}
