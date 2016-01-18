@@ -71,8 +71,11 @@
 				// Get total elapsed time in between calls and get average
 				previousTime = nowTime;
 				nowTime = performance.now();
+				var timeDiff = nowTime - previousTime;
 				// Apply first order filter to reduce spikes in average
-				loopAverage = loopAverage*.8 + .2*(nowTime - previousTime);
+				if (timeDiff < 200) {
+					loopAverage = loopAverage*.8 + .2*(timeDiff);
+				}
 				
 				//determine what the next wait time should be
 				loopWait = loopTIME - waitDifference;

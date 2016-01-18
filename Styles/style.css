@@ -6,7 +6,7 @@
 .container {
     position: absolute;
     /* background-image: linear-gradient(0deg, #888888, #EEEEEE); */
-    background-image: linear-gradient(0deg, #020202, #242424);
+    background-image: linear-gradient(0deg, #020202, #000000);
 	width: 100%;
 	height: 100%;
 	margin: 0em;
@@ -22,8 +22,7 @@
 .fps {
 	color: white;
 	position: absolute;
-	top: 0em;
-	right: 0em;
+	right: .4em;
 	margin: .1em;
 }
 
@@ -46,11 +45,11 @@
 	border-bottom: solid 1px;
 	border-color: #A8A8A8;
 	border-radius: 0em 0em .5em .5em;
-	height: 1.4em;
+	height: 2em;
 	position: absolute;
 	top: 0em;
 	left: calc(28% - 11em);
-	padding: .2em;
+	padding: .4em;
 }
 
 .healthBar {
@@ -155,12 +154,29 @@
 .modalButton:hover {
 	color: #888888;
 }
-/*END - Modal CSS*/
 
-#startGame {
+.loadingGame {
 	cursor: default;
 	color: #282828;
 }
+
+#aboutModal {
+	display: none;
+}
+.aboutText {
+	font-family: OpenSans;
+	font-size: 2em;
+	color: #DDDDDD;
+}
+.aboutText a {
+	color: #22AAAA;
+	text-decoration: none;
+}.aboutText a:hover{
+	color: #226666;
+	text-decoration: none;
+}
+/*END - Modal CSS*/
+
 
 @font-face {
     font-family: "OpenSans";

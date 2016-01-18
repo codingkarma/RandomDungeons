@@ -10,7 +10,7 @@ function dungeonComplete() {
 		Game.engine.stopRenderLoop();
 	});
 	$('#topMenu').fadeOut(200, function () {});
-	$('#hotKeys').fadeOut(200, function () {});
+	// $('#hotKeys').fadeOut(200, function () {});
 	if (Game.debug) {
 		$('#debugMenu').fadeOut(200, function () {	});
 	}
@@ -32,7 +32,7 @@ function dungeonComplete() {
 			Game.initGameScene();
 			Game.runRenderLoop();
 			$('#topMenu').fadeIn(200, function () {});
-			$('#hotKeys').fadeIn(200, function () {});
+			// $('#hotKeys').fadeIn(200, function () {});
 			if (Game.debug) {
 				$('#debugMenu').fadeIn(200, function () {	});
 			}
@@ -63,7 +63,7 @@ function dungeonComplete() {
 				Game.activeScene=Game.sceneType.Game;
 				Game.runRenderLoop();
 				$('#topMenu').fadeIn(200, function () {	});
-				$('#hotKeys').fadeIn(200, function () {	});
+				// $('#hotKeys').fadeIn(200, function () {	});
 				if (Game.debug) {
 					$('#debugMenu').fadeIn(200, function () {	});
 				}

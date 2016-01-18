@@ -24,7 +24,7 @@ Game.CreateStartScene = function() {
     //var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 1, -15), scene);
     var Alpha = 3*Math.PI/2;
     var Beta = 0.00000001;
-    scene.camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, 40, new BABYLON.Vector3.Zero(), scene);
+    scene.camera = new BABYLON.ArcRotateCamera("Camera", Alpha, Beta, 50, new BABYLON.Vector3.Zero(), scene);
 	scene.camera.attachControl(Game.canvas, true);
     // //set camera to not move
     scene.camera.lowerAlphaLimit = Alpha;
@@ -36,7 +36,7 @@ Game.CreateStartScene = function() {
 	scene.ambientLight.diffuse = new BABYLON.Color3(.98, .95, .9);
 	scene.ambientLight.specular = new BABYLON.Color3(.1, .1, .1);
 	scene.ambientLight.groundColor = new BABYLON.Color3(.1, .1, .1);
-	scene.ambientLight.intensity = .1;
+	scene.ambientLight.intensity = .2;
 	
 	scene.light= new BABYLON.PointLight("Omni", new BABYLON.Vector3(0, 20, 0), scene);
 	scene.light.diffuse = new BABYLON.Color3(.18, .15, .1);
@@ -47,12 +47,13 @@ Game.CreateStartScene = function() {
 	scene.leftWall.scaling = new BABYLON.Vector3(40,10,30);
 	scene.leftWall.position = new BABYLON.Vector3(-30,0,0);
 	scene.leftWall.material = new BABYLON.StandardMaterial("textureWall", scene);
-	scene.leftWall.material.diffuseTexture = new BABYLON.Texture('./Textures/Wall_Texture.png', scene);
-	scene.leftWall.material.diffuseTexture.uScale=uvScale;
-	scene.leftWall.material.diffuseTexture.vScale=uvScale;
-	scene.leftWall.material.bumpTexture = new BABYLON.Texture('./Textures/Wall_BumpTexture.png', scene);
-	scene.leftWall.material.bumpTexture.uScale=uvScale;
-	scene.leftWall.material.bumpTexture.vScale=uvScale;
+	// scene.leftWall.material.diffuseTexture = new BABYLON.Texture('./Textures/Wall_Texture.png', scene);
+	scene.leftWall.material.diffuseTexture = new BABYLON.Texture('./Textures/texture_Stone_004.jpg', scene);
+	scene.leftWall.material.diffuseTexture.uScale=-uvScale/2.9;
+	scene.leftWall.material.diffuseTexture.vScale=uvScale/2;
+	// scene.leftWall.material.bumpTexture = new BABYLON.Texture('./Textures/Wall_BumpTexture.png', scene);
+	// scene.leftWall.material.bumpTexture.uScale=uvScale;
+	// scene.leftWall.material.bumpTexture.vScale=uvScale;
 	// scene.leftWall.material.diffuseColor = new BABYLON.Color3(1, 1, 1);
 	
 	scene.rigthWall = new BABYLON.Mesh.CreateBox('rightWall',1.0,scene);
@@ -65,12 +66,12 @@ Game.CreateStartScene = function() {
 	scene.floor.position = new BABYLON.Vector3(0,0,-15);
 	scene.floor.material = new BABYLON.StandardMaterial("textureFloor", scene);
 	scene.floor.material.diffuseTexture = new BABYLON.Texture('./Textures/Floor_Tile-1.png', scene);
-	scene.floor.material.diffuseTexture.uScale=20;
-	scene.floor.material.diffuseTexture.vScale=20;
-	scene.floor.material.diffuseColor = new BABYLON.Color3(0.6, 0.6, 0.6);
+	scene.floor.material.diffuseTexture.uScale=10;
+	scene.floor.material.diffuseTexture.vScale=10;
+	scene.floor.material.diffuseColor = new BABYLON.Color3(0.35, 0.45, 0.6);
 	
 	scene.isLoaded=false;
-	BABYLON.SceneLoader.ImportMesh("", "Models3D/", "StartScene.b.js", scene, function (meshes) {
+	BABYLON.SceneLoader.ImportMesh("", "Models3D/", "StartScene_noBump.b.js", scene, function (meshes) {
 		scene.doorFrame = meshes;
 		
 		BABYLON.SceneLoader.ImportMesh("", "Models3D/", "TorchTopFrame.b.js", scene, function (newMeshes) {
@@ -86,8 +87,10 @@ Game.CreateStartScene = function() {
 				scene.doorFrame[j].isVisible = true;
 			}
 			//create left and right torch tops
-			scene.doorFrame[arrayLength-1].position = new BABYLON.Vector3(1.5,3.2,-1.7);
-			scene.doorFrame[arrayLength-2].position = new BABYLON.Vector3(-1.5,3.2,-1.7);
+			scene.doorFrame[arrayLength-1].position = new BABYLON.Vector3(1.5,3.25,-1.7);
+			scene.doorFrame[arrayLength-1].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
+			scene.doorFrame[arrayLength-2].position = new BABYLON.Vector3(-1.5,3.25,-1.7);
+			scene.doorFrame[arrayLength-2].scaling = new BABYLON.Vector3(0.9, 0.9, 0.9);
 			scene.doorFrame[0].scaling = new BABYLON.Vector3(6.5, 6, 6);
 			scene.doorFrame[0].rotation = new BABYLON.Vector3(Math.PI/2, 0, 0);
 			scene.doorFrame[0].position = new BABYLON.Vector3(0, -2, -14.5);
@@ -111,14 +114,14 @@ Game.CreateStartScene = function() {
 					Game.runRenderLoop();
 					prepareHealthBars();
 					$('#topMenu').fadeIn(200, function () {	});
-					$('#hotKeys').fadeIn(200, function () {	});
+					// $('#hotKeys').fadeIn(200, function () {	});
 					if (Game.debug) {
 						$('#debugMenu').fadeIn(200, function () {	});
 					}
 				});
 			});
-			$('#startGame').css({"cursor": "pointer", "color": "#DDDDDD"});
 			$('#startGame').html("Start Game");
+			$('#startGame').removeClass("loadingGame");
 		});
 	});
 
