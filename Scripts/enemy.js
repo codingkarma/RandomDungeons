@@ -1,23 +1,56 @@
+/***START - Psuedo Enums**********/
+// Used to associated index to Enemy Type
 Game.EnemyType = {
 	StoneBall: 0,
 	FlyingBook: 1
 	//Skeleton: 2
 }
-
 Game.BossType = {
 	StoneBall: 0,
 	BookGolem: 1
 	//Skeleton: 2
 }
+Game.PathingType = {
+	Follow: 0,
+	Patrol: 1,
+	StraightAttack: 2,
+	Hold: 3,
+}
+
+/***END - Psuedo Enums**********/
+
+
+Game.associateEnemywTask = function (name, index) {
+	switch(name) {
+		case "stoneBallTask":
+			Game.EnemyType.StoneBall = index;
+			break;
+		case "flyingBookTask":
+			Game.EnemyType.FlyingBook = index;
+			break;
+	}
+}
+
+Game.associateBosswTask = function (name, index) {
+	switch(name) {
+		case "stoneBall_BossTask":
+			Game.BossType.StoneBall = index;
+			break;
+		case "bookGolem_BossTask":
+			Game.BossType.BookGolem = index;
+			break;
+	}
+}
 
 Game.enemyFactory = function(activeScene, enemyType) {
+	// Consider adjusting to use index/EnemyType only and not switch case statement
 	switch(enemyType) {
 		case Game.EnemyType.FlyingBook:
 			// New up entity with params
-			var newEntity = new Entity(activeScene.enemies[0].meshes[0].clone("enemyMesh-" + Game.enemyCount), {type: EntityType.Enemy, health: 2, damage: 1, speed: .2, action: 0, pathing: 1, weapon: [{'name': 'Self', 'type': WeaponType.Melee, 'range': 12, 'dmgModifier': 0, 'speedModifier': 1}]});
-			newEntity.mesh.skeleton = activeScene.enemies[0].skeletons[0].clone("enemySkeleton-" + Game.enemyCount);
+			var newEntity = new Entity(activeScene.enemies[Game.EnemyType.FlyingBook].meshes[0].clone("enemyMesh-" + Game.enemyCount), {type: EntityType.Enemy, health: 2, damage: 1, speed: .2, action: 0, pathing: Game.PathingType.Follow, weapon: [{'name': 'Self', 'type': WeaponType.Melee, 'range': 12, 'dmgModifier': 0, 'speedModifier': 1}]});
+			newEntity.mesh.skeleton = activeScene.enemies[Game.EnemyType.FlyingBook].skeletons[0].clone("enemySkeleton-" + Game.enemyCount);
 			newEntity.skeletons = newEntity.mesh.skeleton;
-			newEntity.mesh.material = activeScene.enemies[0].meshes[0].material.clone();
+			newEntity.mesh.material = activeScene.enemies[Game.EnemyType.FlyingBook].meshes[0].material.clone();
 			newEntity.mesh.scaling = new BABYLON.Vector3(2, 2, 2);
 			newEntity.mesh.ellipsoid = new BABYLON.Vector3(3, 4, 3);
 			// Assign Rotation Offset
@@ -35,9 +68,12 @@ Game.enemyFactory = function(activeScene, enemyType) {
 			newEntity.attackKeys.push(130);
 			break;
 		default:
-			// Enemy Sphere
-			var newEntity = new Entity(activeScene.enemies[activeScene.enemies.length-1].meshes[0].clone(), {type: EntityType.Enemy, health: 2, damage: 1, speed: .2, action: 1, weapon: [{'name': 'None', 'type': WeaponType.Melee, 'range': 0, 'dmgModifier': 0, 'speedModifier': 1}]});
-			newEntity.mesh.material = activeScene.enemies[[activeScene.enemies.length-1]].meshes[0].material.clone();
+			// Enemy Stone Ball
+			var newEntity = new Entity(activeScene.enemies[Game.EnemyType.StoneBall].meshes[0].clone("enemyMesh-" + Game.enemyCount), {type: EntityType.Enemy, health: 2, damage: 1, speed: .2, action: 1, weapon: [{'name': 'None', 'type': WeaponType.Melee, 'range': 0, 'dmgModifier': 0, 'speedModifier': 1}]});
+			newEntity.mesh.material = activeScene.enemies[Game.EnemyType.StoneBall].meshes[0].material.clone();
+			newEntity.mesh.scaling = new BABYLON.Vector3(4, 4, 4);
+			newEntity.mesh.ellipsoid = new BABYLON.Vector3(4, 2.2, 4);
+			
 			newEntity.mesh.type = Game.EnemyType.StoneBall;
 			newEntity.mesh.rotationOffset = new BABYLON.Vector3(0,0,0);
 			//attach animations
@@ -58,7 +94,7 @@ Game.bossFactory = function(activeScene, bossType) {
 	switch(bossType) {
 		case Game.BossType.BookGolem:
 			// New up entity with params
-			var newEntity = new Entity(activeScene.bosses[0].meshes[0].clone("bossMesh-" + Game.bossCount), {type: EntityType.Boss, health: 12, damage: 1, speed: .2, action: 0, pathing: 1, 
+			var newEntity = new Entity(activeScene.bosses[Game.BossType.BookGolem].meshes[0].clone("bossMesh-" + Game.bossCount), {type: EntityType.Boss, health: 12, damage: 1, speed: .2, action: 0, pathing: Game.PathingType.Follow, 
 				attack: [
 				{type: 0, weapon: 0},
 				{type: 1, weapon: 1},
@@ -69,15 +105,15 @@ Game.bossFactory = function(activeScene, bossType) {
 				{'name': 'Fists', 'type': WeaponType.Melee, 'range': 28, 'dmgModifier': 0, 'speedModifier': .75}]
 			});
 			
-			newEntity.mesh.skeleton = activeScene.bosses[0].skeletons[0].clone("bossSkeleton-" + Game.bossCount);
+			newEntity.mesh.skeleton = activeScene.bosses[Game.BossType.BookGolem].skeletons[0].clone("bossSkeleton-" + Game.bossCount);
 			newEntity.skeletons = newEntity.mesh.skeleton;
 			newEntity.meshes = [];
-			for (var i = 1; i < activeScene.bosses[0].meshes.length; i++) {
-				newEntity.meshes.push(activeScene.bosses[0].meshes[i].clone());
+			for (var i = 1; i < activeScene.bosses[Game.BossType.BookGolem].meshes.length; i++) {
+				newEntity.meshes.push(activeScene.bosses[Game.BossType.BookGolem].meshes[i].clone());
 				newEntity.meshes[i-1].parent = newEntity.mesh;
 				newEntity.meshes[i-1].skeleton = newEntity.mesh.skeleton;
 			}
-			newEntity.mesh.material = activeScene.bosses[0].meshes[0].material.clone();
+			newEntity.mesh.material = activeScene.bosses[Game.BossType.BookGolem].meshes[0].material.clone();
 			newEntity.mesh.scaling = new BABYLON.Vector3(3, 3, 3);
 			newEntity.mesh.ellipsoid = new BABYLON.Vector3(4, 2, 3);
 			// Assign Rotation Offset
@@ -100,9 +136,15 @@ Game.bossFactory = function(activeScene, bossType) {
 			newEntity.attackKeys.push(165);
 			break;
 		default:
-			// Enemy Sphere
-			var newEntity = new Entity(activeScene.bosses[activeScene.bosses.length-1].meshes[0].clone(), {type: EntityType.Boss, health: 6, damage: 1, speed: .3, action: 1, weapon: [{'name': 'None', 'type': WeaponType.Melee, 'range': 0, 'dmgModifier': 0, 'speedModifier': 1}]});
-			newEntity.mesh.material = activeScene.bosses[[activeScene.bosses.length-1]].meshes[0].material.clone();
+			// Enemy StoneBall
+			// var newEntity = new Entity(activeScene.bosses[activeScene.bosses.length-1].meshes[0].clone(), {type: EntityType.Boss, health: 4, damage: 1, speed: .3, action: 1, weapon: [{'name': 'None', 'type': WeaponType.Melee, 'range': 0, 'dmgModifier': 0, 'speedModifier': 1}]});
+			// newEntity.mesh.material = activeScene.bosses[[activeScene.bosses.length-1]].meshes[0].material.clone();
+			
+			var newEntity = new Entity(activeScene.enemies[Game.EnemyType.StoneBall].meshes[0].clone("enemyMesh-" + Game.enemyCount), {type: EntityType.Boss, health: 4, damage: 1, speed: .3, action: 1, weapon: [{'name': 'None', 'type': WeaponType.Melee, 'range': 0, 'dmgModifier': 0, 'speedModifier': 1}]});
+			newEntity.mesh.material = activeScene.enemies[Game.EnemyType.StoneBall].meshes[0].material.clone();
+			newEntity.mesh.scaling = new BABYLON.Vector3(6, 6, 6);
+			newEntity.mesh.ellipsoid = new BABYLON.Vector3(6, 3.2, 6);
+			
 			newEntity.mesh.type = Game.BossType.StoneBall;
 			newEntity.mesh.rotationOffset = new BABYLON.Vector3(0,0,0);
 			//attach animations
@@ -123,22 +165,27 @@ Game.processEnemies = function(self) {
 	if (!self.activeRoom.enemiesDead) {
 		for (self.enemyCounter = 0; self.enemyCounter < self.activeRoom.enemy.length; self.enemyCounter++) {
 			var activeEnemy = self.activeRoom.enemy[self.enemyCounter];
+			// Get Dead state of first enemy, then AND the result with the following enemies in the room
 			if (self.enemyCounter == 0 ) {
 				self.activeRoom.enemiesDead = activeEnemy.isDead;
 			}
 			else {
 				self.activeRoom.enemiesDead = (self.activeRoom.enemiesDead && activeEnemy.isDead);
 			}
+			// Check to see which pathing algorithm to use
 			switch (activeEnemy.pathing) {
-				case 1:
+				// Straight at ya, even if objects are in the way
+				case Game.PathingType.Follow:
 					activeEnemy.velocity = GetPathVector(activeEnemy.mesh.position,self.player.mesh.position,{speed: activeEnemy.speed, tolerance: 12});
 					activeEnemy.mesh.rotation.y = -activeEnemy.velocity.angle + activeEnemy.mesh.rotationOffset.y;
 					break;
-				default:
+				// Wander around, up, down, left, right...
+				case Game.PathingType.Patrol:
 					activeEnemy.velocity = $.extend(activeEnemy.velocity, getPointingVector(activeEnemy.mesh, self.player.mesh));
 					var diff = activeEnemy.mesh.position.subtract(activeEnemy.mesh.previousPosition);
 					var iZ = 0; var vZ = 0;
 					var iX = 0; var vX = 0;
+					
 					if (activeEnemy.counter > 4 || !(activeEnemy.velocity.direction.x || activeEnemy.velocity.direction.z) || (Game.getRandomInt(0,100) < 3)) {
 						activeEnemy.counter=0;
 						var whichDirection = Game.getRandomInt(0,3);
@@ -161,12 +208,63 @@ Game.processEnemies = function(self) {
 								break;
 							default:
 						}
+						// Apply speed and direction
 						activeEnemy.mesh.rotation.y = -Game.ltArray[iZ][iX] + activeEnemy.mesh.rotationOffset.y;
 						activeEnemy.velocity.direction = new BABYLON.Vector3(activeEnemy.speed*vX, self.gravity.y, activeEnemy.speed*vZ);
 					}
 					else if ((Math.abs(diff.x) <= .01)*Math.abs(activeEnemy.velocity.direction.x) || (Math.abs(diff.z) <= .01)*Math.abs(activeEnemy.velocity.direction.z)) {
 						activeEnemy.counter++;
 					}
+					
+					if (activeEnemy.mesh.type = Game.EnemyType.StoneBall) {
+						var planarDistance = GetPlanarDistance(activeEnemy.mesh, self.player.mesh);
+						if (Math.abs(planarDistance.xDiff) < 4) {
+							activeEnemy.pathing = Game.PathingType.StraightAttack;
+							activeEnemy.speedModifier = 2;
+							if (planarDistance.zDiff > 0) {
+								vZ=1;
+								iZ=1;
+							}
+							else {
+								vZ=-1;
+								iZ=2;
+							}
+							// Apply speed and direction
+							activeEnemy.mesh.rotation.y = -Game.ltArray[iZ][iX] + activeEnemy.mesh.rotationOffset.y;
+							activeEnemy.velocity.direction = new BABYLON.Vector3(activeEnemy.speed*vX, self.gravity.y, activeEnemy.speed*vZ);
+						}
+						else if (Math.abs(planarDistance.zDiff) < 4) {
+							activeEnemy.pathing = Game.PathingType.StraightAttack;
+							activeEnemy.speedModifier = 2;
+							if (planarDistance.xDiff > 0) {
+								vX=1;
+								iX=1;
+							}
+							else {
+								vX=-1;
+								iX=2;
+							}
+							// Apply speed and direction
+							activeEnemy.mesh.rotation.y = -Game.ltArray[iZ][iX] + activeEnemy.mesh.rotationOffset.y;
+							activeEnemy.velocity.direction = new BABYLON.Vector3(activeEnemy.speed*vX, self.gravity.y, activeEnemy.speed*vZ);
+						}
+					}
+					break;
+				case Game.PathingType.StraightAttack:
+					// stay on path until object is hit
+					var diff = activeEnemy.mesh.position.subtract(activeEnemy.mesh.previousPosition);
+					if (activeEnemy.counter > 40) {
+						activeEnemy.counter=0;
+						activeEnemy.pathing = Game.PathingType.Patrol;
+							activeEnemy.speedModifier = 1;
+					}
+					else if ((Math.abs(diff.x) <= .01)*Math.abs(activeEnemy.velocity.direction.x) || (Math.abs(diff.z) <= .01)*Math.abs(activeEnemy.velocity.direction.z)) {
+						activeEnemy.counter++;
+					}
+					break;
+				default:
+					// Do Nothin and keep previous setting
+					break;
 			}
 			if (activeEnemy.velocity.magnitude <= activeEnemy.weapon[activeEnemy.activeAttack].range) {
 				// TODO: Create a AttackManager for handling how often Enemies attack
@@ -413,7 +511,7 @@ Game.animationsStoneBall = function(entityMesh) {
 				entity.mesh.animations[0] = self.Move.animation;
 				//entity.mesh.animatable.stop();
 			}
-			self.animatable = activeScene.beginAnimation(entity.mesh, 0, 120, true, 1.0, function () {
+			self.animatable = activeScene.beginAnimation(entity.mesh, 0, 120, true, 1.0*entity.speedModifier, function () {
 				self.animating = 0;
 			});
 		}

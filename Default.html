@@ -51,14 +51,12 @@
 	<!--Script references. -->
     <script src="Scripts/jquery-1.10.2.min.js"></script>
 	<script type="text/javascript" src="Scripts/timedLoop.js"></script>
-	<script type="text/javascript" src="Scripts/cannon.js"></script>
-	<script type="text/javascript" src="Scripts/hand-1.3.8.js"></script>
-	<!-- <script src="http://www.babylonjs.com/oimo.js"></script> -->
-	<!-- <script type="text/javascript" src="Scripts/babylon.1.14.js"></script> -->
-	<script type="text/javascript" src="Scripts/babylon.2.0-beta.js"></script>
-	<script type="text/javascript" src="Scripts/babylon.gamefx.collection.js"></script>
-	<!-- <script type="text/javascript" src="Scripts/babylon.gamefx.keyboardmanager.js"></script> -->
-	<script type="text/javascript" src="Scripts/babylon.gamefx.virtualjoystick.js"></script>
+	<script type="text/javascript" src="Scripts/bjs/cannon.js"></script>
+	<script type="text/javascript" src="Scripts/bjs/hand-1.3.8.js"></script>
+	<!-- <script type="text/javascript" src="Scripts/bjs/babylon.2.0-beta.js"></script> -->
+	<script type="text/javascript" src="Scripts/bjs/babylon.2.2.js"></script>
+	<script type="text/javascript" src="Scripts/bjs/babylon.gamefx.collection.js"></script>
+	<script type="text/javascript" src="Scripts/bjs/babylon.gamefx.virtualjoystick.js"></script>
 	<script type="text/javascript" src="Scripts/setImmediate.js"></script>
 	
 	<script type="text/javascript" src="Scripts/input.js"></script>
@@ -71,18 +69,5 @@
     <script type="text/javascript" src="Scripts/MapGenerator.js"></script>
     <script type="text/javascript" src="Scripts/BabylonScene.js"></script>
     <script type="text/javascript" src="Scripts/BabylonMechanics.js"></script>
-	<script>
-		// Show About information
-		$('#about').click(function () 
-			{$('#modalDiv').fadeOut(200, function () {
-				$('#aboutModal').fadeIn(200);
-			});
-		});
-		$('#aboutModal').click(function () 
-			{$('#aboutModal').fadeOut(200, function () {
-				$('#modalDiv').fadeIn(200);
-			});
-		});
-	</script>
 	
 </html>

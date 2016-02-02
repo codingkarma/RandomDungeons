@@ -185,8 +185,9 @@ Game.CreateGameScene = function() {
 	// enemy tasks
 	scene.bossTask = [];
 	scene.enemyTask = [];
-	scene.bossTask.push(scene.assetsManager.addMeshTask("bossTask0", "", "./Models3D/", "Book_Golem2.b.js"));
-	scene.enemyTask.push(scene.assetsManager.addMeshTask("enemyTask0", "", "./Models3D/", "FlyingBook.b.js"));
+	scene.bossTask.push(scene.assetsManager.addMeshTask("bookGolem_BossTask", "", "./Models3D/", "Book_Golem2.b.js"));
+	scene.enemyTask.push(scene.assetsManager.addMeshTask("flyingBookTask", "", "./Models3D/", "FlyingBook.b.js"));
+	scene.enemyTask.push(scene.assetsManager.addMeshTask("stoneBallTask", "", "./Models3D/", "Stone_Ball.b.js"));
 	
 	//Set functions to assign loaded meshes
 	scene.playerTask.onSuccess = function (task) {
@@ -214,13 +215,15 @@ Game.CreateGameScene = function() {
 		scene.doorMesh.scaling = new BABYLON.Vector3(4.8, 4.8, 4.8);
 	}
 	
+	// Loop through Enemy Asset Tasks and set onSuccess()
 	scene.enemies = [];
 	for (var i_loop = 0; i_loop < scene.enemyTask.length; i_loop++) {
-		var Index = i_loop;
 		scene.enemyTask[i_loop].onSuccess = function (task) {
 			var j_loop=0;
 			// Load Meshes
-			scene.enemies.push({ meshes: [] });
+			var Index = scene.enemies.push({ meshes: [] }) - 1;
+			Game.associateEnemywTask(task.name, Index);
+			
 			for (j_loop = 0; j_loop < task.loadedMeshes.length; j_loop++) {
 				scene.enemies[Index].meshes[j_loop] = task.loadedMeshes[j_loop];
 				// set all other meshes as children to first mesh
@@ -240,11 +243,12 @@ Game.CreateGameScene = function() {
 	
 	scene.bosses = [];
 	for (var i_loop = 0; i_loop < scene.bossTask.length; i_loop++) {
-		var Index = i_loop;
 		scene.bossTask[i_loop].onSuccess = function (task) {
 			var j_loop=0;
 			// Load Meshes
-			scene.bosses.push({ meshes: [] });
+			var Index = scene.bosses.push({ meshes: [] }) - 1;
+			Game.associateBosswTask(task.name, Index);
+			
 			for (j_loop = 0; j_loop < task.loadedMeshes.length; j_loop++) {
 				scene.bosses[Index].meshes[j_loop] = task.loadedMeshes[j_loop];
 				// set all other meshes as children to first mesh
@@ -499,20 +503,21 @@ Game.CreateGameScene = function() {
 	scene.moveMeshes = function () {
 		var self = scene;
 		var i=0;
-		var tempVal;
+		var moveVelocity;
 		var animationRatio = self.getAnimationRatio();
 		
 		//Need to update self every loop, I guess
 		for (i=0; i < self.activeRoom.enemy.length;i++) {
 			if (self.activeRoom.enemy[i].action == 1 && self.activeRoom.enemy[i].isDead == false) {
 				self.activeRoom.enemy[i].mesh.previousPosition = new BABYLON.Vector3(self.activeRoom.enemy[i].mesh.position.x,self.activeRoom.enemy[i].mesh.position.y,self.activeRoom.enemy[i].mesh.position.z);
-				tempVal = self.activeRoom.enemy[i].velocity.direction.multiply(new BABYLON.Vector3(animationRatio,animationRatio,animationRatio));
-				self.activeRoom.enemy[i].mesh.moveWithCollisions(tempVal);
+				moveVelocity = self.activeRoom.enemy[i].velocity.direction.multiply(new BABYLON.Vector3(animationRatio*self.activeRoom.enemy[i].speedModifier,animationRatio*self.activeRoom.enemy[i].speedModifier,animationRatio*self.activeRoom.enemy[i].speedModifier));
+				moveVelocity = moveVelocity.multiply(new BABYLON.Vector3(animationRatio,animationRatio,animationRatio));
+				self.activeRoom.enemy[i].mesh.moveWithCollisions(moveVelocity);
 			}
 		}
-		//tempVal = new BABYLON.Vector3(self.player.velocity.direction.x*animationRatio,self.player.velocity.direction.y*animationRatio,self.player.velocity.direction.z*animationRatio);
-		tempVal = self.player.velocity.direction.multiply(new BABYLON.Vector3(animationRatio,animationRatio,animationRatio));
-		self.player.mesh.moveWithCollisions(tempVal);
+		//moveVelocity = new BABYLON.Vector3(self.player.velocity.direction.x*animationRatio,self.player.velocity.direction.y*animationRatio,self.player.velocity.direction.z*animationRatio);
+		moveVelocity = self.player.velocity.direction.multiply(new BABYLON.Vector3(animationRatio,animationRatio,animationRatio));
+		self.player.mesh.moveWithCollisions(moveVelocity);
 	}
 	
     scene.registerBeforeRender(function(){

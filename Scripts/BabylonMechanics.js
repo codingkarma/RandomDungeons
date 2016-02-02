@@ -4,6 +4,11 @@ Game.initStartScene = function() {
 	
 	// Create Start Scene
 	activeScene = Game.scene.push(Game.CreateStartScene(Game.engine)) - 1;
+	// Create and load the sound async
+	Game.audio = {};
+    Game.audio.titleScreen = new BABYLON.Sound("Title-Music", "./Audio/Title_Screen_Dungeon_Siege-like_RPG.mp3", Game.scene[0], function () {
+		Game.audio.titleScreen.play();
+    }, { loop: true, autoplay: true });
 	//Game.scene[activeScene].camera.attachControl(Game.canvas);
 	Game.scene[activeScene].renderLoop = function () {
 		//Render scene and any changes
@@ -36,6 +41,7 @@ Game.initGameScene = function() {
 			}
 			//when everything is ready this gets executed once
 			if (this.isErrthingReady) {
+				Game.audio.titleScreen.pause();
 				for (var i=0; i < this.activeRoom.enemy.length; i++) {
 					this.activeRoom.enemy[i].velocity = {'direction' : new BABYLON.Vector3(0,this.gravity.y,0), 'angle': 0};
 				}

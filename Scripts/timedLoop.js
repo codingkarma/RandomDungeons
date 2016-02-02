@@ -52,10 +52,11 @@
 		timedLoop.start = function () {
 			loopStart = performance.now();
 			timedLoop.loopId = setTimeout(function () {
-				actualWait = performance.now() - loopStart;
-				// Apply first order filter to reduce spikes in average
-				// Note: waitDifference is accumulative 
-				waitDifference = waitDifference*.6 + .4*(actualWait - loopWait);
+				var beforeFunctionCall = performance.now();
+				actualWait = beforeFunctionCall - loopStart;
+				// get difference between actual wait and expected wait,
+				// this is on a per loop basis
+				waitDifference = (actualWait - loopWait);
 				//don't let waitDifference grow larger than the loopWait
 				if (Math.abs(waitDifference) > loopWait*3) {
 					waitDifference = 0; // reset it
@@ -71,14 +72,18 @@
 				// Get total elapsed time in between calls and get average
 				previousTime = nowTime;
 				nowTime = performance.now();
+				var funcCallTime = nowTime - beforeFunctionCall;
 				var timeDiff = nowTime - previousTime;
-				// Apply first order filter to reduce spikes in average
+				// Apply first order filter to smooth out average
 				if (timeDiff < 200) {
-					loopAverage = loopAverage*.8 + .2*(timeDiff);
+					loopAverage = loopAverage*.9 + .1*(timeDiff);
 				}
 				
 				//determine what the next wait time should be
-				loopWait = loopTIME - waitDifference;
+				loopWait = loopTIME - funcCallTime - waitDifference;
+				if (loopWait < 2) {
+					loopWait = 2; // don't let loop time lower than 1 ms
+				}
 				//**********END******************//
 				timedLoop.start(); // lastly call logic loop recursively
 			},loopWait);

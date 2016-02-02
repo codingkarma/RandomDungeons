@@ -69,6 +69,17 @@ function dungeonComplete() {
 				}
 			});
 		});
+		// Show About information
+		$('#about').click(function () 
+			{$('#modalDiv').fadeOut(200, function () {
+				$('#aboutModal').fadeIn(200);
+			});
+		});
+		$('#MainMenu').click(function () 
+			{$('#aboutModal').fadeOut(200, function () {
+				$('#modalDiv').fadeIn(200);
+			});
+		});
 	});
 }
 

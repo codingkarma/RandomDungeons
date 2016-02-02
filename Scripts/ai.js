@@ -18,6 +18,13 @@ function GetPathVector0(startPosition, endPosition, options)
 	}
 }
 
+function GetPlanarDistance(sourceMesh, targetMesh) {
+	var xDiff = targetMesh.position.x-sourceMesh.position.x;
+	var zDiff = targetMesh.position.z-sourceMesh.position.z;
+	
+	return {'xDiff': xDiff, 'zDiff': zDiff};
+}
+
 function GetPathVector(startPosition, endPosition, options) {
 	var settings = $.extend({
 		speed: 1.0,
